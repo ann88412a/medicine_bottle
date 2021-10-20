@@ -12,6 +12,25 @@ This project is using Jetson Nano with camera to predicted the medicine bottle l
 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
 -->
 
+## How to install the WiFi USB dongle driver
+Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver
+```
+$ sudo apt-get install git dkms
+$ git clone https://github.com/jeremyb31/rtl8188eu.git
+$ sudo dkms add ./rtl8188eu
+$ sudo dkms install 8188eu/1.0
+```
+## How to use the USB webcam with Jetson Nano
+Using usb webcam on Jetson Nano had to install opencv with apt-get
+```
+$ sudo apt-get update
+$ sudo apt-get upgrade -y
+$ sudo apt-get install build-essential nano
+$ sudo apt-get install python3-opencv
+```
+
+
+
 
 ## To-Do List
 
