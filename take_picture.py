@@ -29,12 +29,12 @@ def gstreamer_pipeline(
     )
 
 sharpen_kernel = np.array([[0,-1,0],
-                                                        [-1,5,-1],
-                                                         [0,-1,0]])
+                         [-1,5,-1],
+                         [0,-1,0]])
 
 edge_kernel = np.array([[-1,-1,-1],
-                                                    [-1,9,-1],
-                                                    [-1,-1,-1]])
+                         [-1,9,-1],
+                        [-1,-1,-1]])
 
 def  take_picture():
     cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER) #RGB 
