@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+#SPI
+
 def gstreamer_pipeline(
     capture_width=1280,
     capture_height=720,
@@ -43,8 +45,8 @@ def  take_picture():
     # cv2.imshow('take_picture',frame)
     # sharpen_img = cv2.filter2D(src=frame,ddepth=-1,kernel=kernel)
     # edge_img = cv2.filter2D(src=frame,ddepth=-1,kernel=edge_kernel)
-    aw = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)
-    canny = cv2.Canny(aw,100,250)
+    # aw = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)
+    canny = cv2.Canny(frame,100,250)
     
     cv2.imwrite('./pictures/test.png',canny)
 

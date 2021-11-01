@@ -12,7 +12,7 @@ import cv2
 # Flip the image by setting the flip_method (most common values: 0 and 2)
 # display_width and display_height determine the size of the window on the screen
 
-
+# SPI
 def gstreamer_pipeline(
     capture_width=1280,
     capture_height=720,
