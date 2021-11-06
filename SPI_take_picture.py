@@ -45,7 +45,7 @@ def  take_picture():
     # cv2.imshow('take_picture',frame)
     # sharpen_img = cv2.filter2D(src=frame,ddepth=-1,kernel=kernel)
     # edge_img = cv2.filter2D(src=frame,ddepth=-1,kernel=edge_kernel)
-    # aw = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)
+    frame = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)
     canny = cv2.Canny(frame,100,250)
     
     cv2.imwrite('./pictures/test.png',canny)
