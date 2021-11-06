@@ -9,7 +9,7 @@ def circle(image):
   # circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,100,
   #                             param1=100,param2=30,minRadius=40, maxRadius=70)
   circles = cv2.HoughCircles(cimg, cv2.HOUGH_GRADIENT, 1, 100,
-                              param1=100, param2=20, minRadius=20, maxRadius=60)
+                              param1=350, param2=30, minRadius=20, maxRadius=60)
 
   # print('circles: ', circles)
   if circles is None:
