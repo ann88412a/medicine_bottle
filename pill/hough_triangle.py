@@ -46,12 +46,13 @@ print(np.array(contours).shape)
 for contour in contours:
     # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
     approx = cv2.approxPolyDP(contour,20,True)
-    cv2.drawContours(img, [approx], 0, (160,225, 206), 5)
+    # cv2.drawContours(img, [approx], 0, (255,0, 0), 5)
     # print(approx)
     x = approx.ravel()[0]
     y = approx.ravel()[1] - 5
     if len(approx) == 3:
-        cv2.putText(img, "Triangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (160,225,206))
+        cv2.putText(img, "Triangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255,0,0))
+        cv2.drawContours(img, [approx], 0, (255,0, 0), 5)
     # elif len(approx) == 4:
     #     x1 ,y1, w, h = cv2.boundingRect(approx)
     #     aspectRatio = float(w)/h
@@ -70,4 +71,5 @@ for contour in contours:
 
 cv2.imshow("shapes", img)
 cv2.waitKey(0)
+cv2.imwrite('./pictures/triangle_detect.png',img)
 cv2.destroyAllWindows()

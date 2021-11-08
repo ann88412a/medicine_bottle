@@ -46,6 +46,7 @@ if __name__ == '__main__':
       print('hi')
 
       if cv2.waitKey(1) & 0xFF == ord('q'):
+          cv2.imwrite('./pictures/circle_detect.png',frame)
           break
   cap.release()
   cv2.destroyAllWindows()
