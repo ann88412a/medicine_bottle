@@ -5,7 +5,7 @@ cap = cv2.VideoCapture(0)
 
 while(True):
     ret, frame = cap.read()
-    frame = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)   
+    # frame = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)   
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         
@@ -14,3 +14,4 @@ while(True):
 
 cap.release()
 cv2.destroyAllWindows()
+

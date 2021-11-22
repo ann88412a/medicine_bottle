@@ -51,8 +51,8 @@ for contour in contours:
     x = approx.ravel()[0]
     y = approx.ravel()[1] - 5
     if len(approx) == 3:
-        cv2.putText(img, "Triangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255,0,0))
-        cv2.drawContours(img, [approx], 0, (255,0, 0), 5)
+        cv2.putText(img, "Triangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,255))
+        cv2.drawContours(img, [approx], 0, (0,0, 255), 5)
     # elif len(approx) == 4:
     #     x1 ,y1, w, h = cv2.boundingRect(approx)
     #     aspectRatio = float(w)/h
@@ -73,3 +73,5 @@ cv2.imshow("shapes", img)
 cv2.waitKey(0)
 cv2.imwrite('./pictures/triangle_detect.png',img)
 cv2.destroyAllWindows()
+
+
