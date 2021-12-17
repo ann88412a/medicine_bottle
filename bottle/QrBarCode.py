@@ -31,7 +31,7 @@ while(True):
         #   # 向終端列印條形碼資料和條形碼型別
         #   print("[INFO] Found {} barcode: {}".format(barcode.type, barcodeData))
         # print(barcodeData)
-        cv2.imshow('frame', frame)
+    cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
