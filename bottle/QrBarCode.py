@@ -1,4 +1,7 @@
-from cv2 import cv2
+try:
+    from cv2 import cv2
+except:
+    import cv2
 import numpy as np
 from pyzbar import pyzbar
 
