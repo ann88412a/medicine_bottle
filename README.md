@@ -5,7 +5,7 @@ The plan of using real-time video and the other method to Identifying medicines.
 
 This project is using Jetson Nano with camera to predicted the medicine bottle label, pill shape and the dosage of drugs.
 
-`access token: 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`
+
 
 <!--
 30day token 10/5
