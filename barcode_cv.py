@@ -6,7 +6,7 @@ try:
     from cv2 import cv2
 except:
     import cv2
-import numpy as np
+# import numpy as np
 from pyzbar import pyzbar
 
 
