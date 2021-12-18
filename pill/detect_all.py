@@ -17,17 +17,20 @@ cv2.imwrite('./pictures/shape.png',cannied)
 
 #--------------------detect circle--------------------------
 circles = cv2.HoughCircles(cannied, cv2.HOUGH_GRADIENT, 1, 100,
-                              param1=350, param2=30, minRadius=20, maxRadius=60)
+                                param1=100, param2=20, minRadius=10, maxRadius=60)
+# circles = cv2.HoughCircles(cannied, cv2.HOUGH_GRADIENT, 1, 100,
+#                               param1=350, param2=30, minRadius=20, maxRadius=60)
 circle_coordinate = []
-for i in circles[0,:]:
-    # draw the outer circle
-    image1 = cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
-    print('圓心座標:', i[0], i[1])
-    circle_coordinate.append([i[0],i[1]])
-    print('圓心半徑:', i[2])
-    # draw the center of the circle
-    cv2.putText(img, "circle", (i[0],i[1]), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,255,0))
-    images = cv2.circle(image1, (i[0], i[1]), 2, (0, 255,0), 3)
+if len(circles) != 0:
+    for i in circles[0,:]:
+        # draw the outer circle
+        image1 = cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        print('圓心座標:', i[0], i[1])
+        circle_coordinate.append([i[0],i[1]])
+        print('圓心半徑:', i[2])
+        # draw the center of the circle
+        cv2.putText(img, "circle", (i[0],i[1]), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,255,0))
+        images = cv2.circle(image1, (i[0], i[1]), 2, (0, 255,0), 3)
 # cv2.imshow("circles", images)
 #--------------------detect circle--------------------------
 
