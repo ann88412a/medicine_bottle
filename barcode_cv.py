@@ -1,9 +1,15 @@
 try:
+    # fix opencv open webcam slowly bug in WIN10
+    import os
+    os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+    # call cv2 in WIN10
     from cv2 import cv2
 except:
     import cv2
 import numpy as np
 from pyzbar import pyzbar
+
+
 
 def barcode_decoder(frame, show_type=None):
     bar_info = [None]
@@ -40,27 +46,25 @@ def barcode_decoder(frame, show_type=None):
 
 
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_EXPOSURE, -6)
+
+from pylibdmtx.pylibdmtx import decode as dm_decode
+
 
 while(True):
     ret, frame = cap.read()
     frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-
-    # detect_obj = cv2.QRCodeDetector()
-    # # qr_info, points, qr_img = detect_obj.detectAndDecode(frame)
-    # # print('qr_info:', qr_info)
-    # is_ok, points = detect_obj.detect(frame)
-    # if(is_ok):
-    #     # print('is_ok:', is_ok)
-    #     # print('points:', points)
-    #     # print("\n")
-    #     qr_info, qr_img = detect_obj.decode(frame, points)
-    #     print('qr_info:', qr_info)
-    #     print('qr_img.shape:', qr_img.shape)
-    #     print('qr_img:', qr_img)
+    # fps = cap.get(cv2.CAP_PROP_FPS)
+    # width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
+    # height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+    # print(width, height, fps)
 
 
-    # frame, bar_info = barcoder_decode(frame, show_type='draw')
+    # print(dm_decode(frame, timeout=30, max_count=1))
+
+
+
+
+    frame, bar_info = barcode_decoder(frame, show_type='draw')
 
 
     cv2.imshow('frame', frame)
