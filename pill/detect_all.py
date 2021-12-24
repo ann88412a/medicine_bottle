@@ -4,7 +4,7 @@ from numpy.core.fromnumeric import shape
 from scipy.spatial import distance
 import statistics
 
-img = cv2.imread('/home/medical/medicine_bottle/pictures/test.png')
+img = cv2.imread('/home/medical/medicine_bottle/pictures/orignal_input.png')
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (5, 5),0)
@@ -13,7 +13,7 @@ blurred = cv2.GaussianBlur(gray, (5, 5),0)
 # cv2.imshow("a", blurred)
 cannied = cv2.Canny(np.asarray(blurred), 150, 200)
 cv2.imshow("b", cannied)
-cv2.imwrite('./pictures/shape.png',cannied)
+cv2.imwrite('./pictures/all_shape.png',cannied)
 
 #--------------------detect circle--------------------------
 circles = cv2.HoughCircles(cannied, cv2.HOUGH_GRADIENT, 1, 100,
@@ -105,5 +105,5 @@ cv2.imshow("shapes", img)
 
 
 cv2.waitKey(0)
-cv2.imwrite('./pictures/all_detect.png',img)
+cv2.imwrite('./pictures/detect_all.png',img)
 cv2.destroyAllWindows()

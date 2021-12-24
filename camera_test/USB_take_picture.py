@@ -14,7 +14,7 @@ while(True):
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         
-        cv2.imwrite('./pictures/test.png',frame)
+        cv2.imwrite('./pictures/orignal_input.png',frame)
         break
 
 cap.release()

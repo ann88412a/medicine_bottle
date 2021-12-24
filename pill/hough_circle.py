@@ -16,7 +16,7 @@ def circle(image):
     #                             param1=100,param2=30,minRadius=40, maxRadius=70)
     circles = cv2.HoughCircles(cannied, cv2.HOUGH_GRADIENT, 1, 100,
                                 param1=100, param2=20, minRadius=10, maxRadius=60)
-
+    #param2 = 20
   # print('circles: ', circles)
     if circles is None:
         return image

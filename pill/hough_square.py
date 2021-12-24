@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from numpy.core.fromnumeric import shape
 
-img = cv2.imread('/home/medical/medicine_bottle/pictures/test.png')
+img = cv2.imread('/home/medical/medicine_bottle/pictures/orignal_input.png')
 # cv2.imshow("1", img)
 print(np.array(img).shape)
 imgGrey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
