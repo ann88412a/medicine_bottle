@@ -1,2 +1,5 @@
 .idea
 .DS_Store
+/pill/ePillID_data/
+/pill/pillsPicture/
+/pill/pill_detect/__pycache__/
