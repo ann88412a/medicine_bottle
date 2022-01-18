@@ -529,3 +529,5 @@ pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00093_mask.png
 pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00094_mask.png
 pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00095_mask.png
 pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00096_mask.png
+model.pth
+pill_model.pth

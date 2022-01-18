@@ -75,10 +75,11 @@ class PennFudanDataset(object):
         target = {}
         target["boxes"] = boxes
         target["labels"] = labels
-        target["masks"] = masks
+        # target["masks"] = masks
         target["image_id"] = image_id
         target["area"] = area
         target["iscrowd"] = iscrowd
+        print(target)
 
         if self.transforms is not None:
             img, target = self.transforms(img, target)
@@ -91,20 +92,20 @@ class PennFudanDataset(object):
 
 def get_model_instance_segmentation(num_classes):
     # load an instance segmentation model pre-trained pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
 
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new one
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
-    # now get the number of input features for the mask classifier
-    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-    hidden_layer = 256
-    # and replace the mask predictor with a new one
-    model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
-                                                       hidden_layer,
-                                                       num_classes)
+    # # now get the number of input features for the mask classifier
+    # in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+    # hidden_layer = 256
+    # # and replace the mask predictor with a new one
+    # model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
+    #                                                    hidden_layer,
+    #                                                    num_classes)
 
     return model
 
@@ -167,7 +168,7 @@ def main():
     print("That's it!")
     print("#### Saving the model ####")
     # path = "C:/Users/lucas/OneDrive/Área de Trabalho/TorchVisionObjectDetection/model/trainedModel.pth"
-    # torch.save(model.state_dict(), "model.pth")
+    torch.save(model.state_dict(), "model.pth")
     print("#### Model saved! Now execute tv-evaluation-code.py to run it! ####")
 
 if __name__ == "__main__":
