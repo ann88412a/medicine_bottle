@@ -21,46 +21,46 @@ import xml.etree.ElementTree as ET
 
 
 #==============check one data======================
-# data_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/images/'
-# print(data_dir)
-# filenames = sorted([name for name in os.listdir(data_dir) if os.path.splitext(name)[-1] == '.jpg' or os.path.splitext(name)[-1] == '.jpeg' or os.path.splitext(name)[-1] == '.png'])
-# print(len(filenames))
+data_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/images/'
+print(data_dir)
+filenames = sorted([name for name in os.listdir(data_dir) if os.path.splitext(name)[-1] == '.jpg' or os.path.splitext(name)[-1] == '.jpeg' or os.path.splitext(name)[-1] == '.png'])
+print(len(filenames))
 
 
-# img =  cv2.imread(data_dir+filenames[0])
-# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+img =  cv2.imread(data_dir+filenames[0])
+img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
 
-# bbox_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/annotations/'
-# bboxes_list = sorted([name for name in os.listdir(bbox_dir) if os.path.splitext(name)[-1] == '.xml'])
-# # print(bboxs)
-# root = ET.parse(bbox_dir + bboxes_list[0]).getroot()
-# print(root)
+bbox_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/annotations/'
+bboxes_list = sorted([name for name in os.listdir(bbox_dir) if os.path.splitext(name)[-1] == '.xml'])
+# print(bboxs)
+root = ET.parse(bbox_dir + bboxes_list[0]).getroot()
+print(root)
 
-# bboxes = []
-# temp = [0,0,0,0]
-# for item in root.iter():
+bboxes = []
+temp = [0,0,0,0]
+for item in root.iter():
 
-#     # print(item.tag,item.text)
-#     if item.tag == 'xmin':
-#         temp[0] = int(item.text)
-#     elif item.tag == 'ymin':
-#         temp[1] = int(item.text)
-#     elif item.tag == 'xmax':
-#         temp[2] = int(item.text)
-#     elif item.tag == 'ymax':
-#         temp[3] = int(item.text)
-#         bboxes.append(temp.copy())
+    # print(item.tag,item.text)
+    if item.tag == 'xmin':
+        temp[0] = int(item.text)
+    elif item.tag == 'ymin':
+        temp[1] = int(item.text)
+    elif item.tag == 'xmax':
+        temp[2] = int(item.text)
+    elif item.tag == 'ymax':
+        temp[3] = int(item.text)
+        bboxes.append(temp.copy())
 
 #==============check one data======================
 
 #------------check bbox-----------
-# for bbox in bboxes:
-#     print(bbox)
-#     cv2.rectangle(img,(bbox[0],bbox[1]),(bbox[2],bbox[3]), (0, 255, 0), 2)
-
-# cv2.imshow('d',img)
-# cv2.waitKey(0)
+for bbox in bboxes:
+    print(bbox)
+    cv2.rectangle(img,(bbox[0],bbox[1]),(bbox[2],bbox[3]), (0, 255, 0), 2)
+print(img.shape,type(img))
+cv2.imshow('d',img)
+cv2.waitKey(0)
 imgs_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/images/'
 annotations_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/annotations/'
 #----------------pillDataset-----------------------
@@ -81,7 +81,7 @@ class PillDataset(torch.utils.data.Dataset):
         img_name = self.imgs[idx]
         image_path = os.path.join(self.imgs_dir, img_name)
         img = cv2.imread(image_path)
-    
+        
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
         img_res = cv2.resize(img_rgb, (self.width, self.height), cv2.INTER_AREA)
 
