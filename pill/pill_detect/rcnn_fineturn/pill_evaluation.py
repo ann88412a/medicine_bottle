@@ -2,7 +2,7 @@ from operator import mod
 import os
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageDraw
 
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -15,6 +15,7 @@ import transforms as T
 
 import cv2
 import xml.etree.ElementTree as ET
+import time
 
 data_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/images/'
 xml_dir = os.path.abspath(os.getcwd()) + '/pill/pillsPicture/annotations/'
@@ -145,52 +146,97 @@ def main():
     path = os.path.abspath(os.getcwd()) + '/pill_model.pth'
     class_num = 2
     model = get_model_instance_segmentation(class_num)
-    print(model)
+    # print(model)
     model.load_state_dict(torch.load(path))
     model.eval()
 
     print("###### Running the model ######")
     model.eval()
     model.cuda()
+    t0 = time.time()
     image = next(iter(data_loader_test))
+    # print('image',image)
+    
 
     #Here we create a list, because the model expects a list of Tensors
     lista = []
     #It is important to send the image to CUDA, otherwise it will try to execute in the CPU
     x = image[0][0].cuda()
     
+    # print('image',image[0][0])
+  
     img = np.array(image[0][0])
     img = np.moveaxis(img,0,-1)
+    img = img*255
     # cv2.imshow('t',img)
     # cv2.waitKey(0)
-    print('shape',img.shape)
+    # print('shape',img.shape)
+  
     
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    # cv2.imwrite('orignal.png',img)
     lista.append(x)
-    print('x',x)
+    # print('x',x)
     
     output = model(lista)
-    print('target',output )
-    print(output[0]['boxes'])
+    # print('target',output )
+    # print(output[0]['boxes'])
     bboxes = output[0]['boxes']
-    print(bboxes,bboxes[0],int(bboxes[0][0]))
+    # print(bboxes,bboxes[0],int(bboxes[0][0]))
+    
+    
     for bbox in bboxes:
-        print(bbox)
+        # print(bbox)
+        # img.rectangle((int(bbox[0]),int(bbox[1])),(int(bbox[2]),int(bbox[3])),outline='green')
         cv2.rectangle(img,(int(bbox[0]),int(bbox[1])),(int(bbox[2]),int(bbox[3])), (0, 255, 0), 2)
-    print(img.shape,type(img))
+    cv2.imwrite('eval.png',img)
+    print('first predict : ',time.time() - t0)
+    
+    # ==============================
+    t1 = time.time()
+    image = next(iter(data_loader_test))
+    
+    lista = []
+    x1 = image[0][0].cuda()
+    
+    img = np.array(image[0][0])
+    img = np.moveaxis(img,0,-1)
+    img = img*255
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    
+    lista.append(x1)
+    
+    output = model(lista)
 
+    bboxes = output[0]['boxes']
+    
+    for bbox in bboxes:
+        cv2.rectangle(img,(int(bbox[0]),int(bbox[1])),(int(bbox[2]),int(bbox[3])), (0, 255, 0), 2)
+    cv2.imwrite('eval1.png',img)
+    print('second predict : ',time.time() - t1)
+    # ==============================
+    # print(img.shape,type(img))
+    # img.save('eval.png')
     # output = convert_tensor_to_RGB(output[0])
 
     #Here, we pass the output to CPU in order to properly save the image
     # output_cpu = output.cpu()
 
     #Just a number to order your images
-    number = 2
+    # number = 2
 
     #Saving the images
-    # ToPILImage()(output_cpu).save('images/test_'+str(number)+'.png', mode='png')
+  
+
     print("#### All Done! :) ####")
-    cv2.imshow('t',img)
-    cv2.waitKey(0)
+
+    # remote can't display
+    # cv2.imshow('t',img)
+    # cv2.waitKey(0)
+
+    # cv2.imwrite('eval.png',img)
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    print('load model and predict a picture : ',time.time() - start)
