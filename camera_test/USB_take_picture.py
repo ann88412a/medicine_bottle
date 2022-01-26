@@ -20,13 +20,25 @@ cap = cv2.VideoCapture(0)
 #         break
 
 # ---------------remote version-----------
-for i in range(5):
+# for i in range(5):
 
+#     ret, frame = cap.read()
+#     time.sleep(1)
+# cv2.imwrite('./pictures/orignal_input.png',frame)
+# print('save done!!')
+
+# ---------------recoding data-------------
+i = 0
+while(True):
     ret, frame = cap.read()
-    time.sleep(1)
-cv2.imwrite('./pictures/orignal_input.png',frame)
-print('save done!!')
-
+    
+    # frame = cv2.addWeighted(frame, 4, cv2.blur(frame, (80, 80)), -4, 128)   
+    cv2.imshow('frame', frame)
+    if cv2.waitKey(1) & 0xFF == ord('r'):
+        i = i+1
+        cv2.imwrite('/home/fritingo/Documents/pill_data/1-2-3-4/'+str(i)+'.png',frame)
+    elif cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 cap.release()
 cv2.destroyAllWindows()
 
