@@ -531,3 +531,15 @@ pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00095_mask.png
 pill/pill_detect/rcnn_fineturn/PennFudanPed/PedMasks/PennPed00096_mask.png
 model.pth
 pill_model.pth
+pill/pill_detect/rcnn_fineturn/__pycache__/coco_eval.cpython-38.pyc
+pill/pill_detect/rcnn_fineturn/__pycache__/coco_utils.cpython-38.pyc
+pill/pill_detect/rcnn_fineturn/__pycache__/engine.cpython-38.pyc
+pill/pill_detect/rcnn_fineturn/__pycache__/transforms.cpython-38.pyc
+pill/pill_detect/rcnn_train_one_ep/__pycache__/utils.cpython-38.pyc
+pill/pill_detect/rcnn_train_one_ep/__pycache__/transforms.cpython-38.pyc
+.gitignore
+.gitignore
+pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_eval.cpython-38.pyc
+pill/pill_detect/rcnn_train_one_ep/__pycache__/engine.cpython-38.pyc
+pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_utils.cpython-38.pyc
+pill/pill_detect/rcnn_fineturn/__pycache__/utils.cpython-38.pyc
