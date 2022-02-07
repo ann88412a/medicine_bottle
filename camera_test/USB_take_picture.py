@@ -36,7 +36,7 @@ while(True):
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('r'):
         i = i+1
-        cv2.imwrite('/home/fritingo/Documents/pill_data/1-2-3-4/'+str(i)+'.png',frame)
+        cv2.imwrite('/home/fritingo/Documents/pill_data/light_source/light'+str(i)+'.png',frame)
     elif cv2.waitKey(1) & 0xFF == ord('q'):
         break
 cap.release()

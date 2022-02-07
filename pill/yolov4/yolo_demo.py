@@ -12,7 +12,8 @@ pills = np.array([])
 for line in info:  #handle output line by line
     line = line.strip('\r\n')
     i = i+1
-    if i > 12:
-        # print(i,line)
-        pills = np.append(pills,line)
+    # if i > 10:
+    print(i,line)
+        # pills = np.append(pills,line)
+os.popen('q')
 print(pills)

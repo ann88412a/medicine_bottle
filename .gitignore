@@ -543,3 +543,4 @@ pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_eval.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/engine.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_utils.cpython-38.pyc
 pill/pill_detect/rcnn_fineturn/__pycache__/utils.cpython-38.pyc
+bad.list
