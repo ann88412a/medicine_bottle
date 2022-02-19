@@ -1,0 +1,5 @@
+classes = 4
+train  = /home/fritingo/Documents/yolo/darknet/pill/yolov4_tiny_pill_train.txt
+valid  = /home/fritingo/Documents/yolo/darknet/pill/yolov4_tiny_pill_test.txt
+names = /home/fritingo/Documents/yolo/darknet/pill/obj.name
+backup = backup/
