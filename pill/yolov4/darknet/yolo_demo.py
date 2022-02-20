@@ -15,18 +15,9 @@ i = 0
 pills = np.array([])
 for line in info:  #handle output line by line
     line = line.strip('\r\n')
-<<<<<<< HEAD
     i = i+1
     # if i > 10:
     print(i,line)
         # pills = np.append(pills,line)
 os.popen('q')
 print(pills)
-=======
-    # print(line)
-    if 'Sennoside' in line or 'Repaglinide' in line or  'Cataflam' in line:
-        pills = np.append(pills,line) 
-    
-print(pills)
-print(time.time()-start)
->>>>>>> b04b666a94560f46a8ab96e7fbdf14b0825162b5
