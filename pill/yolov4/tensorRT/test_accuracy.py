@@ -10,7 +10,8 @@ import time
 import argparse
 
 import cv2
-import pycuda.autoinit  # This is needed for initializing CUDA driver
+import pycuda.autoinit
+from scipy import test  # This is needed for initializing CUDA driver
 
 from utils.yolo_classes import get_cls_dict
 from utils.camera import add_camera_args, Camera
@@ -33,7 +34,7 @@ def parse_args():
         '-c', '--category_num', type=int, default=4,
         help='number of object categories [80]')
     parser.add_argument(
-        '-t', '--conf_thresh', type=float, default=0.9,
+        '-t', '--conf_thresh', type=float, default=0.95,
         help='set the detection confidence threshold')
     parser.add_argument(
         '-m', '--model', type=str, required=True,
@@ -61,7 +62,13 @@ def loop_and_detect(cam, trt_yolo, conf_th, vis):
     fps = 0.0
     tic = time.time()
     class_name = ['Sennoside','Apresoline','Repaglinide','Cataflam']
+    test_pill = ['Apresoline']
+    end = [0,0]
+
+    right_and_error = [0,0]
     while True:
+        args = parse_args()
+        print(args,args.letter_box)
         if cv2.getWindowProperty(WINDOW_NAME, 0) < 0:
             break
         img = cam.read()
@@ -70,8 +77,24 @@ def loop_and_detect(cam, trt_yolo, conf_th, vis):
         boxes, confs, clss = trt_yolo.detect(img, conf_th)
         img = vis.draw_bboxes(img, boxes, confs,clss)
         print(confs)
+        
         for i in clss:
             print(class_name[int(i)])
+        
+        if [class_name[int(i)] for i in clss] == test_pill:
+            right_and_error[0] = right_and_error[0] + 1
+        else:
+            right_and_error[1] = right_and_error[1] + 1
+
+        print('total:',right_and_error[0]+right_and_error[1],'right:',right_and_error[0],'error',right_and_error[1])
+
+        if right_and_error[0]+right_and_error[1] == 250:
+            end = right_and_error.copy()
+        print('confusion_matrix  =>','total:',end[0]+end[1],'right:',end[0],'error',end[1])
+        
+        # Sennosid right:163,error:87  total:250
+        #
+                
         img = show_fps(img, fps)
         cv2.imshow(WINDOW_NAME, img)
         toc = time.time()

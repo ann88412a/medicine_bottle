@@ -1,9 +1,3 @@
-"""trt_yolo.py
-
-This script demonstrates how to do real-time object detection with
-TensorRT optimized YOLO engine.
-"""
-
 
 import os
 import time
@@ -22,30 +16,30 @@ from utils.yolo_with_plugins import TrtYOLO
 WINDOW_NAME = 'TrtYOLODemo'
 
 
-def parse_args():
-    """Parse input arguments."""
-    desc = ('Capture and display live camera video, while doing '
-            'real-time object detection with TensorRT optimized '
-            'YOLO model on Jetson')
-    parser = argparse.ArgumentParser(description=desc)
-    parser = add_camera_args(parser)
-    parser.add_argument(
-        '-c', '--category_num', type=int, default=4,
-        help='number of object categories [80]')
-    parser.add_argument(
-        '-t', '--conf_thresh', type=float, default=0.9,
-        help='set the detection confidence threshold')
-    parser.add_argument(
-        '-m', '--model', type=str, required=True,
-        help=('[yolov3-tiny|yolov3|yolov3-spp|yolov4-tiny|yolov4|'
-              'yolov4-csp|yolov4x-mish]-[{dimension}], where '
-              '{dimension} could be either a single number (e.g. '
-              '288, 416, 608) or 2 numbers, WxH (e.g. 416x256)'))
-    parser.add_argument(
-        '-l', '--letter_box', action='store_true',
-        help='inference with letterboxed image [False]')
-    args = parser.parse_args()
-    return args
+# def parse_args():
+#     """Parse input arguments."""
+#     desc = ('Capture and display live camera video, while doing '
+#             'real-time object detection with TensorRT optimized '
+#             'YOLO model on Jetson')
+#     parser = argparse.ArgumentParser(description=desc)
+#     parser = add_camera_args(parser)
+#     parser.add_argument(
+#         '-c', '--category_num', type=int, default=4,
+#         help='number of object categories [80]')
+#     parser.add_argument(
+#         '-t', '--conf_thresh', type=float, default=0.9,
+#         help='set the detection confidence threshold')
+#     parser.add_argument(
+#         '-m', '--model', type=str, required=True,
+#         help=('[yolov3-tiny|yolov3|yolov3-spp|yolov4-tiny|yolov4|'
+#               'yolov4-csp|yolov4x-mish]-[{dimension}], where '
+#               '{dimension} could be either a single number (e.g. '
+#               '288, 416, 608) or 2 numbers, WxH (e.g. 416x256)'))
+#     parser.add_argument(
+#         '-l', '--letter_box', action='store_true',
+#         help='inference with letterboxed image [False]')
+#     args = parser.parse_args()
+#     return args
 
 
 def loop_and_detect(cam, trt_yolo, conf_th, vis):
@@ -88,26 +82,28 @@ def loop_and_detect(cam, trt_yolo, conf_th, vis):
 
 
 def main():
-    args = parse_args()
-    print(args,args.letter_box)
-    if args.category_num <= 0:
-        raise SystemExit('ERROR: bad category_num (%d)!' % args.category_num)
-    if not os.path.isfile('yolo/%s.trt' % args.model):
-        raise SystemExit('ERROR: file (yolo/%s.trt) not found!' % args.model)
+    category_num = 4
+    model = 'yolov4_tiny_pill'
+    class_name = ['Sennoside','Apresoline','Repaglinide','Cataflam']
+    # args = parse_args()
+    if category_num <= 0:
+        raise SystemExit('ERROR: bad category_num (%d)!' % category_num)
+    if not os.path.isfile('yolo/%s.trt' % model):
+        raise SystemExit('ERROR: file (yolo/%s.trt) not found!' % model)
 
-    cam = Camera(args)
+    cam = Camera(0)
     if not cam.isOpened():
         raise SystemExit('ERROR: failed to open camera!')
 
-    cls_dict = get_cls_dict(args.category_num)
+    cls_dict = get_cls_dict(category_num)
     print(cls_dict)
     vis = BBoxVisualization(cls_dict)
-    trt_yolo = TrtYOLO(args.model, args.category_num, args.letter_box)
+    trt_yolo = TrtYOLO(model, category_num, class_name)
 
     open_window(
         WINDOW_NAME, 'Camera TensorRT YOLO Demo',
         cam.img_width, cam.img_height)
-    loop_and_detect(cam, trt_yolo, args.conf_thresh, vis=vis)
+    loop_and_detect(cam, trt_yolo,0.95, vis=vis)
 
     cam.release()
     cv2.destroyAllWindows()
