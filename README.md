@@ -7,28 +7,6 @@ This project is using Jetson Nano with camera to predicted the medicine bottle l
 
 
 
-<!--
-30day token 10/5
-
-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
--->
-
-## How to install the WiFi USB dongle driver
-Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver
-```
-$ sudo apt-get install git dkms
-$ git clone https://github.com/jeremyb31/rtl8188eu.git
-$ sudo dkms add ./rtl8188eu
-$ sudo dkms install 8188eu/1.0
-```
-## How to use the USB webcam with Jetson Nano
-Using usb webcam on Jetson Nano had to install opencv with apt-get
-```
-$ sudo apt-get update
-$ sudo apt-get upgrade -y
-$ sudo apt-get install build-essential nano
-$ sudo apt-get install python3-opencv
-```
 
 
 
@@ -50,3 +28,69 @@ $ sudo apt-get install python3-opencv
 - [ ] 7. Identifying pill shape (Using cv hough transform to find circle square)
 
 - [ ] 8. Undecided ...
+
+
+
+
+
+----------------------------------------
+<!--
+30day token 10/5
+
+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
+-->
+
+
+
+## How to install the WiFi USB dongle driver
+Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver.
+```
+$ sudo apt-get install git dkms
+$ git clone https://github.com/jeremyb31/rtl8188eu.git
+$ sudo dkms add ./rtl8188eu
+$ sudo dkms install 8188eu/1.0
+```
+
+## How to upgrade the opencv to 4.5.4
+uninstall the old opencv version. 
+```
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo sudo apt-get purge *libopencv*
+```
+Enlarge memory swap.
+```
+$ sudo apt-get update
+$ sudo apt-get upgrade
+## install nano
+$ sudo apt-get install nano
+## install dphys-swapfile
+$ sudo apt-get install dphys-swapfile
+## enlarge the boundary (set CONF_MAXSWAP=4096)
+$ sudo nano /sbin/dphys-swapfile
+## give the required memory size (set CONF_SWAPSIZE=4096)
+$ sudo nano /etc/dphys-swapfile
+## reboot afterwards
+$ sudo reboot.
+```
+Installation script with the 4.5.4 version.
+```
+$ wget https://github.com/Qengineering/Install-OpenCV-Jetson-Nano/raw/main/OpenCV-4-5-4.sh
+$ sudo chmod 755 ./OpenCV-4-5-4.sh
+$ ./OpenCV-4-5-4.sh
+## once the installation is done...
+$ rm OpenCV-4-5-4.sh
+## remove the dphys-swapfile now
+$ sudo /etc/init.d/dphys-swapfile stop
+$ sudo apt-get remove --purge dphys-swapfile
+## just a tip to save an additional 275 MB
+$ sudo rm -rf ~/opencv
+$ sudo rm -rf ~/opencv_contrib
+```
+After a successful compilation, install all newly generated packages in the database of your system with the following commands.
+```
+$ sudo make install
+$ sudo ldconfig
+$ make clean
+$ sudo apt-get update
+```
