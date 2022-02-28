@@ -43,8 +43,8 @@ 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
 
 
 ## How to install the WiFi USB dongle driver
-#### Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver.
-```
+*Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver.*
+```shell
 $ sudo apt-get install git dkms
 $ git clone https://github.com/jeremyb31/rtl8188eu.git
 $ sudo dkms add ./rtl8188eu
@@ -58,14 +58,14 @@ https://forums.developer.nvidia.com/t/how-can-i-remove-the-opencv-3-3-that-comes
 #install opencv 4.5.4
 https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html
 -->
-#### uninstall the old opencv version. 
-```
+*uninstall the old opencv version.*
+```shell
 $ sudo apt-get update
 $ sudo apt-get upgrade
 $ sudo sudo apt-get purge *libopencv*
 ```
-#### Enlarge memory swap.
-```
+*Enlarge memory swap.*
+```shell
 $ sudo apt-get update
 $ sudo apt-get upgrade
 ## install nano
@@ -79,8 +79,8 @@ $ sudo nano /etc/dphys-swapfile
 ## reboot afterwards
 $ sudo reboot.
 ```
-#### Installation script with the 4.5.4 version.
-```
+*Installation script with the 4.5.4 version.*
+```shell
 $ wget https://github.com/Qengineering/Install-OpenCV-Jetson-Nano/raw/main/OpenCV-4-5-4.sh
 $ sudo chmod 755 ./OpenCV-4-5-4.sh
 $ ./OpenCV-4-5-4.sh
@@ -93,8 +93,8 @@ $ sudo apt-get remove --purge dphys-swapfile
 $ sudo rm -rf ~/opencv
 $ sudo rm -rf ~/opencv_contrib
 ```
-#### After a successful compilation, install all newly generated packages in the database of your system with the following commands.
-```
+*After a successful compilation, install all newly generated packages in the database of your system with the following commands.*
+```shell
 $ sudo make install
 $ sudo ldconfig
 $ make clean
@@ -102,8 +102,8 @@ $ sudo apt-get update
 ```
 
 ## How to install the pylibdmtx library
-#### Install the pylibdmtx(data matrix detector library)
-```
+*Install the pylibdmtx(data matrix detector library)*
+```shell
 $ sudo apt-get install libdmtx0a
 $ pip3 install pylibdmtx
 ```
