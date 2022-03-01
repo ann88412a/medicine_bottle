@@ -278,6 +278,10 @@ class Page2(tk.Frame):
             global inference_detection
             global vote
             
+            print('--------------------------')
+            print('--------------------------')
+            print('--------------------------')
+            print(vote_list)
 
             if len(vote_list) >9:
                 label.config(text = "辨識完成")
@@ -334,9 +338,21 @@ class Page3(tk.Frame):
             print('--------------------------')
             print(result)
 
+        def init():
+            global start_detect
+            global inference_detection
+            global vote_list
+            global vote
+            global result
+
+            start_detect = False
+            inference_detection =[]
+            vote_list = []
+            vote = False
+            result = []
         
         button1 = tk.Button(self, text ="確認",
-                            command = lambda : [controller.show_frame(Page1),show_ans()],font=LARGEFONT)
+                            command = lambda : [controller.show_frame(Page1),show_ans(),init()],font=LARGEFONT)
      
         # putting the button in its place by
         # using grid

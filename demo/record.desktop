@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name = 收集資料
+Comment = take picture and auto upload 
+Exec = /home/medical/record.sh && /home/medical/ybat.sh
+Icon = /home/medical/t.jpeg
+Terminal = false
+Type = Application
