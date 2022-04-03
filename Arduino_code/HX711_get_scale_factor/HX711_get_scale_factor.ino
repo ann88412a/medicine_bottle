@@ -26,6 +26,7 @@ void setup() {
   Serial.println("Nothing on it.");
   Serial.println(scale.get_units(10));
   Serial.println("Please put sapmple object on it..."); //提示放上基準物品
+  delay(3000);
   
 }
 

@@ -1,76 +1,86 @@
 /**
- *
- * HX711 library for Arduino - example file
- * https://github.com/bogde/HX711
- *
- * MIT License
- * (c) 2018 Bogdan Necula
- *
+
+   HX711 library for Arduino - example file
+   https://github.com/bogde/HX711
+
+   MIT License
+   (c) 2018 Bogdan Necula
+
 **/
 #include "HX711.h"
-
-
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
-
-
 HX711 scale;
 
+int sort_desc(const void *cmp1, const void *cmp2)
+{
+  // Need to cast the void * to int *
+  int a = *((int *)cmp1);
+  int b = *((int *)cmp2);
+  // The comparison
+  return a > b ? -1 : (a < b ? 1 : 0);
+}
+
+double get_weight(int n = 50, float err = 0.001) {
+  double hist[n];
+  double val, val_sum = 0;
+
+  for (int i = 0; i < n; i++) {
+    val = scale.get_units();
+    hist[i] = val;
+  }
+
+  int hist_length = sizeof(hist) / sizeof(hist[0]);
+  qsort(hist, hist_length, sizeof(hist[0]), sort_desc);
+
+
+  double val_mid = hist[hist_length/2];
+  double out_sum = 0;
+  int cnt = 0;
+  for (int i = 0; i < n; i++) {
+    if (abs(hist[i] - val_mid) < err) {
+      out_sum += hist[i];
+      cnt++;
+    }
+  }
+  double out = out_sum / cnt;
+  return out;
+}
+
+double get_val, max_val = 0;
+double min_val = 10000;
 void setup() {
   Serial.begin(38400);
-//  Serial.println("HX711 Demo");
-//
-//  Serial.println("Initializing the scale");
-
-  // Initialize library with data output pin, clock input pin and gain factor.
-  // Channel selection is made by passing the appropriate gain:
-  // - With a gain factor of 64 or 128, channel A is selected
-  // - With a gain factor of 32, channel B is selected
-  // By omitting the gain factor parameter, the library
-  // default "128" (Channel A) is used here.
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-
-//  Serial.println("Before setting up the scale:");
-//  Serial.print("read: \t\t");
-//  Serial.println(scale.read());      // print a raw reading from the ADC
-//
-//  Serial.print("read average: \t\t");
-//  Serial.println(scale.read_average(20));   // print the average of 20 readings from the ADC
-//
-//  Serial.print("get value: \t\t");
-//  Serial.println(scale.get_value(5));   // print the average of 5 readings from the ADC minus the tare weight (not set yet)
-//
-//  Serial.print("get units: \t\t");
-//  Serial.println(scale.get_units(5), 1);  // print the average of 5 readings from the ADC minus tare weight (not set) divided
-//            // by the SCALE parameter (not set yet)
-
-  scale.set_scale(1083.f);                      // this value is obtained by calibrating the scale with known weights; see the README for details
+  scale.set_scale(1142.f);                      // this value is obtained by calibrating the scale with known weights; see the README for details
   scale.tare();               // reset the scale to 0
-
-//  Serial.println("After setting up the scale:");
-//
-//  Serial.print("read: \t\t");
-//  Serial.println(scale.read());                 // print a raw reading from the ADC
-//
-//  Serial.print("read average: \t\t");
-//  Serial.println(scale.read_average(20));       // print the average of 20 readings from the ADC
-//
-//  Serial.print("get value: \t\t");
-//  Serial.println(scale.get_value(5));   // print the average of 5 readings from the ADC minus the tare weight, set with tare()
-//
-//  Serial.print("get units: \t\t");
-//  Serial.println(scale.get_units(5), 1);        // print the average of 5 readings from the ADC minus tare weight, divided
-//            // by the SCALE parameter set with set_scale
-//
-//  Serial.println("Readings:");
+  Serial.println("put on");
+  delay(3000);
+  scale.get_units();
 }
 
 void loop() {
-  Serial.print("one reading:\t");
-  Serial.print(scale.get_units(), 3);
-  Serial.print("\t| average:\t");
-  Serial.println(scale.get_units(30), 3);
+  //  Serial.println(get_weight(),4);
+  //  Serial.print("one reading:\t");
+  //  Serial.print(scale.get_units(), 3);
+  //  Serial.print("\t| average:\t");
+
+  get_val = get_weight();
+  if (get_val > max_val) {
+    max_val = get_val;
+  }
+  if (get_val < min_val) {
+    min_val = get_val;
+  }
+  Serial.print("val: ");
+  Serial.print(get_val, 4);
+  Serial.print("\t max: ");
+  Serial.print(max_val, 4);
+  Serial.print("\t min: ");
+  Serial.print(min_val, 4);
+  Serial.print("\t err: ");
+  Serial.println(max_val - min_val, 4);
 
   scale.power_down();             // put the ADC in sleep mode
   delay(300);
