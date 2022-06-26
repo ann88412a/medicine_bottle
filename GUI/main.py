@@ -9,6 +9,8 @@ except:
     # call cv2 in jetson nano
     import cv2
 from PIL import Image, ImageTk
+import sys
+sys.path.append('../')
 from bottle.syringe_scale import syringe_scale
 
 class medical_GUI:
@@ -130,6 +132,7 @@ class medical_GUI:
     def show_webcam_stream(self):
         # self.clean()
         _, self.frame = self.cap.read()
+        # print(self.frame.shape)
         self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         # print(self.frame.shape)  # (960, 720, 3)
         self.frame = self.syringe_scale.get_scall_raw(self.frame)
@@ -147,7 +150,7 @@ class medical_GUI:
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(0)
     GUI = medical_GUI(cap)
 
 
