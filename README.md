@@ -60,6 +60,8 @@ $ sudo dkms install 8188eu/1.0
 
 Use USB Image Tool: https://www.alexpage.de/usb-image-tool/download/
 
+Mode: Device Mode
+
 Restore: write the system image in USB device or SD card
 
 BackUp: clone the system image
