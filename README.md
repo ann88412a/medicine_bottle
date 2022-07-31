@@ -56,13 +56,9 @@ $ sudo dkms install 8188eu/1.0
 ```
 
 ## How to write/BackUp the system image in windows
-*Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver.*
-
-Use USB Image Tool: https://www.alexpage.de/usb-image-tool/download/
-
+*Use USB Image Tool: https://www.alexpage.de/usb-image-tool/download/*
+```
 Mode: Device Mode
-
 Restore: write the system image in USB device or SD card
-
 BackUp: clone the system image
-
+```
