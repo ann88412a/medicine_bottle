@@ -56,9 +56,22 @@ $ sudo dkms install 8188eu/1.0
 ```
 
 ## How to write/BackUp the system image in windows
-*Use USB Image Tool: https://www.alexpage.de/usb-image-tool/download/*
+*Use "USB Image Tool" BackUp: https://www.alexpage.de/usb-image-tool/download/*
 ```
 Mode: Device Mode
-Restore: write the system image in USB device or SD card
 BackUp: clone the system image
+```
+*Use balenaEtcher write: https://www.balena.io/etcher/*
+```
+Select image: Choose the system image which you want to use.
+Select drive: Choose the SD card or USB device which you want to write.(It will be format) 
+```
+*If you want to boot from USB device*
+```shell
+# Use the same mrthod(SD card) to write the USB device.
+$ sudo mount /dev/sda1 /mnt
+# open /mnt/boot/extlinux/extlinux.conf
+# change root=/dev/mmcblk0p1 to root=/dev/sda1 and save it.
+# Shutdown and remove the SD card.(Keep the USB device)
+# Boot will load from USB device.
 ```
