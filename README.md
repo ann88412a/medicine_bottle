@@ -75,3 +75,14 @@ $ sudo mount /dev/sda1 /mnt
 # Shutdown and remove the SD card.(Keep the USB device)
 # Boot will load from USB device.
 ```
+
+*Nano cant not Boot (Black screen)*
+```shell
+# Download NVIDIA SDK Manager (.deb)
+# https://developer.nvidia.com/nvidia-sdk-manager
+# ref: https://juejin.cn/post/7099653549713260575
+$ sudo apt install ./{sdkmanger_file}
+$ sdkmanger
+```
+
+

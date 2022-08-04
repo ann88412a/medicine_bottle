@@ -60,7 +60,7 @@ if(__name__ == "__main__"):
     sc = syringe_scale()
     while(True):
         ret, frame = cap.read()
-        frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         # height, width, channels = frame.shape
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape) # (640, 480, 3)

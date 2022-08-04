@@ -17,8 +17,8 @@ class medical_GUI:
     def __init__(self, cap):
         # setup the webcam
         self.cap = cap
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.cap.set(cv2.CAP_PROP_FPS, 30)
 
         # create the window
@@ -131,8 +131,9 @@ class medical_GUI:
 
     def show_webcam_stream(self):
         _, self.frame = self.cap.read()
+        print(self.frame.shape)
         # print(self.frame.shape)
-        self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_CLOCKWISE)
         # print(self.frame.shape)  # (960, 720, 3)
         self.frame = self.syringe_scale.get_scall_raw(self.frame)
         img_ratio = self.__screen_height/self.frame.shape[0]*0.9*0.995
@@ -149,6 +150,8 @@ class medical_GUI:
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     GUI = medical_GUI(cap)
 
 
