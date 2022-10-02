@@ -59,7 +59,6 @@ const dai = function (profile, ida) {
                 break;
             }
         } else {
-            console.log('pull ', odf_func, odf_name, data)
             odf_func[odf_name](data);
         }
     }
@@ -70,9 +69,9 @@ const dai = function (profile, ida) {
         ida.ida_init();
     }
 
-    // function deregisterCallback (result) {
-    //     console.log('deregister:', result);
-    // }
+    function deregisterCallback (result) {
+        console.log('deregister:', result);
+    }
 
     // function deregister () {
     //     dan.deregister(deregisterCallback);

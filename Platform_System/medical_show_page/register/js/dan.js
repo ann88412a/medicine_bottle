@@ -4,9 +4,9 @@ var dan = (function () {
     var POLLING_INTERVAL = 500;
     var _pull;
     var _push;
-    var _mac_addr = 'a3b571f17654';
+    var _mac_addr = '';
     var _profile = {};
-    var _registered = true;
+    var _registered = false;
     var _idf_list;
     var _odf_list;
     var _df_list;
@@ -19,7 +19,7 @@ var dan = (function () {
     function init (push, pull, endpoint, mac_addr, profile, callback) {
         _pull = pull;
 	_push = push;
-        // _mac_addr = mac_addr;
+        _mac_addr = mac_addr;
 
         function init_callback (result) {
             if (result) {
@@ -28,40 +28,53 @@ var dan = (function () {
                 callback('register failed');
             }
         }
-        console.log('connect exist DM')
-        connect(endpoint, profile, init_callback);
-
-        
-
+        register(endpoint, profile, init_callback);
     }
 
-    function connect (endpoint, profile, callback) {
+    function register (endpoint, profile, callback) {
         //profile['d_name'] = (Math.floor(Math.random() * 99)).toString() + '.' + profile['dm_name'];
                  
         _profile = profile;
         csmapi.set_endpoint(endpoint);
 
         var retry_count = 0;
-        
-        _idf_list = profile['idf_list'].slice();
-        _odf_list = profile['odf_list'].slice();
-        _df_list = profile['df_list'].slice();
-                    
+        function register_callback (result, d_name, password = '') {
+            if (result) {
+                if (!_registered) {
+                    _registered = true;
+                    _password = password;
+                    profile.d_name = d_name;
+		    _idf_list = profile['idf_list'].slice();
+		    _odf_list = profile['odf_list'].slice();
+		    _df_list = profile['df_list'].slice();
+                    			
 
-        for (var i = 0; i < _df_list.length; i++) {
-            _df_selected[_df_list[i]] = false;
+                    for (var i = 0; i < _df_list.length; i++) {
+                        _df_selected[_df_list[i]] = false;
+					}
+                    for (var i = 0; i < _odf_list.length; i++) {
+                        _odf_timestamp[_odf_list[i]] = '';
+                    }
+                    _ctl_timestamp = '';
+                    _suspended = false;					
+                    setTimeout(pull_ctl, 0);
+                }
+                callback(true);
+            } else {
+                if (retry_count < 2) {
+                    retry_count += 1;
+                    setTimeout(function () {
+                        csmapi.register(_mac_addr, profile, register_callback);
+                    }, RETRY_INTERVAL);
+                } else {
+                    callback(false);
+                }
+            }
         }
-        for (var i = 0; i < _odf_list.length; i++) {
-            _odf_timestamp[_odf_list[i]] = '';
-        }
-        _ctl_timestamp = '';
-        _suspended = false;					
-        setTimeout(pull_ctl, 0);
-            
+        csmapi.register(_mac_addr, profile, register_callback);
     }
 
     function pull_ctl () {
-        // console.log('pull here')
         if (!_registered) {
             return;
         }
@@ -86,25 +99,23 @@ var dan = (function () {
 		if (!_registered) {
             return;
         }
-        
-        // if (_suspended || index >= _odf_list.length) {
-        //     setTimeout(push_idf, POLLING_INTERVAL, 0);
-        //     return;
-        // }
 
-        var _odf_name = _odf_list[index % _odf_list.length];
-        // console.log(_odf_name)
-        
-        // if (!_df_selected[_odf_name]) {
-        //     pull_odf(index + 1);
-        //     return;
-        // }
+        if (_suspended || index >= _odf_list.length) {
+            setTimeout(push_idf, POLLING_INTERVAL, 0);
+            return;
+        }
+
+        var _odf_name = _odf_list[index];
+
+        if (!_df_selected[_odf_name]) {
+            pull_odf(index + 1);
+            return;
+        }
 
         function pull_odf_callback (dataset, error) {
-            if (has_new_data(dataset, _odf_timestamp[_odf_list[index % _odf_list.length]])) {
-                _odf_timestamp[_odf_list[index % _odf_list.length]] = dataset[0][0];
-                
-                _pull(_odf_list[index % _odf_list.length], dataset[0][1]);
+            if (has_new_data(dataset, _odf_timestamp[_odf_list[index]])) {
+                _odf_timestamp[_odf_list[index]] = dataset[0][0];
+                _pull(_odf_list[index], dataset[0][1]);
             }
 
             setTimeout(pull_odf, POLLING_INTERVAL, index + 1);
@@ -167,27 +178,26 @@ var dan = (function () {
     }
 
     function push(idf_name, data, callback) {
-        // console.log('push',idf_name,data,callback)
 		if(!Array.isArray(data))
 			data = [data];
         if (idf_name == 'Control') {
             idf_name = '__Ctl_I__';
         }
         //_df_is_odf[idf_name] = false;
-        // if (idf_name == '__Ctl_I__' || _df_selected[idf_name]) {
-        csmapi.push(_mac_addr, _password, idf_name, data, callback);
-        // }
+        if (idf_name == '__Ctl_I__' || _df_selected[idf_name]) {
+            csmapi.push(_mac_addr, _password, idf_name, data, callback);
+        }
     }
 
-    // function deregister (callback) {
-    //     _registered = false;
-    //     csmapi.deregister(_mac_addr, callback);
-    // }
+    function deregister (callback) {
+        _registered = false;
+        csmapi.deregister(_mac_addr, callback);
+    }
 
     return {
         'init': init,
-        // 'register': register,
+        'register': register,
         'push': push,
-        // 'deregister': deregister,
+        'deregister': deregister,
     };
 })();

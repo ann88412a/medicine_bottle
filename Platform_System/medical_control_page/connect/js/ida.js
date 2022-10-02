@@ -9,34 +9,34 @@
         };
 
 		
-        function Dummy_Sensor(){
-            return Math.random();
-        }
-
-        function Dummy_Control(data){
-           $('.ODF_value')[0].innerText=data[0];
-        }
-        function barcode(data){
-            $('.ODF_value')[0].innerText=data[0];
+        function barcode(){
+            
          }
 
-        function confirm(data){
-            $('.ODF_value')[0].innerText=data[0];
+        function confirm(){
+            
          }
 
-        function pill_yolo(data){
-            $('.ODF_value')[0].innerText=data[0];
+        function pill_yolo(){
+            
          }
 
         function barcode_result(data){
-            console.log(data)
-            return Math.random();
+            // console.log
+            $('.ODF_value')[0].innerText=data[0];
         }
 
         function pill_yolo_done(data){
-            console.log(data)
-            return Math.random();
+            if (data[0] == true)
+            {
+                $('.ODF_yolo')[0].innerText = '藥丸確認完成';
+            }else{
+                $('.ODF_yolo')[0].innerText = 'waiting...';
+            }
+            
         }
+
+        
       
 /*******************************************************************/                
         function ida_init(){

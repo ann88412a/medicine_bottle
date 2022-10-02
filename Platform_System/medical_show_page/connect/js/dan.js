@@ -4,7 +4,7 @@ var dan = (function () {
     var POLLING_INTERVAL = 500;
     var _pull;
     var _push;
-    var _mac_addr = 'a3b571f17654';
+    var _mac_addr = '9d12a9a36e77';
     var _profile = {};
     var _registered = true;
     var _idf_list;
