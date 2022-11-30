@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>醫療檢定</title>
+<html>
+  <head>
+    <script src="js/jquery.js" type="text/javascript"></script>
+    <script src="js/csmapi.js"></script>
+    <script src="js/dan.js"></script>
+    <script src="js/dai.js"></script>
+    <script src="js/ida.js"></script>
+	
+  </head>
+
+  <body>
+	<legend >請依序執行</legend>
+  <p>請輸入您的學號或是ID</p>
+  <input id = 'IDF_ID' value="">
+  <p>點擊按鈕開始掃碼</p>
+  <button onclick="dan.push('barcode',[true])" >掃 barcode</button> <br>
+  <p>掃碼結果</p>
+  <legend class='ODF_value'>_____________</legend>
+  <p>點擊按鈕開始辨識藥丸</p>
+  <button onclick="dan.push('pill_yolo',[true])" >喂藥</button> <br>
+  <legend class='ODF_yolo'></legend>
+  <p>喂藥完成後</p>
+  <button onclick="confirm()" >提交結果</button> 
+  
+  
+  <script>
+    function confirm()
+    {
+      dan.push('confirm',[true,document.getElementById('IDF_ID').value]);
+      var fidld = document.getElementById('IDF_ID')
+      fidld.value = '';
+      setTimeout(() => { location.href='https://fritingo.ddns.net/medical_show_page/connect/index.html'; }, 500);
+    }
+  </script>
+    
+    <br>
+
+  
+  </body>
+</html>

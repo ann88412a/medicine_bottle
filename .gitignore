@@ -537,11 +537,10 @@ pill/pill_detect/rcnn_fineturn/__pycache__/engine.cpython-38.pyc
 pill/pill_detect/rcnn_fineturn/__pycache__/transforms.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/utils.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/transforms.cpython-38.pyc
-.gitignore
-.gitignore
 pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_eval.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/engine.cpython-38.pyc
 pill/pill_detect/rcnn_train_one_ep/__pycache__/coco_utils.cpython-38.pyc
 pill/pill_detect/rcnn_fineturn/__pycache__/utils.cpython-38.pyc
 bad.list
 demo/__pycache__/darknet.cpython-36.pyc
+camera_test/data

@@ -36,8 +36,9 @@ while(True):
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('r'):
         i = i+1
-        # cv2.imwrite('/home/medical/data/'+str(i)+'.png',frame)
-        cv2.imwrite('/home/medical/medicine_bottle/pill/yolov4/darknet/test.png',frame)
+        cv2.imwrite('/Users/zhuangdongsheng/Documents/medicine_bottle/camera_test/data/Sennoside_2/Sennoside_'+str(i)+'.png',frame)
+        print('save '+str(i))
+        # cv2.imwrite('/home/medical/medicine_bottle/pill/yolov4/darknet/test.png',frame)
     elif cv2.waitKey(1) & 0xFF == ord('q'):
         break
 cap.release()

@@ -8,6 +8,7 @@ LARGEFONT =("Verdana", 50)
   
 class tkinterApp(tk.Tk):
      
+     
     # __init__ function for class tkinterApp
     def __init__(self, *args, **kwargs):
          
