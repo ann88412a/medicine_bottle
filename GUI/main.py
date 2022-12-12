@@ -131,7 +131,7 @@ class medical_GUI:
 
     def show_webcam_stream(self):
         _, self.frame = self.cap.read()
-        print(self.frame.shape)
+        # print(self.frame.shape)
         # print(self.frame.shape)
         self.frame = cv2.rotate(self.frame, cv2.ROTATE_90_CLOCKWISE)
         # print(self.frame.shape)  # (960, 720, 3)

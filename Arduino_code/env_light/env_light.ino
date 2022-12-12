@@ -1,6 +1,6 @@
 #define light_pin 5 //define the light hardware pin is D5(PWM)
 #define serial_bound_rate 115200 //defint the bound rate is 115200
-uint8_t var_light = 10; //init val is 10
+uint8_t var_light = 255; //init val is 10
 String serial_read = ""; //init
 bool DEBUG_MODE = false; //serial print info (if true)
 
