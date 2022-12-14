@@ -1,0 +1,5 @@
+classes = 9
+train  = /home/chengyu/Documents/Dio/medicine_bottle/pill/cyho/train.txt
+valid  = /home/chengyu/Documents/Dio/medicine_bottle/pill/cyho/test.txt
+names = /home/chengyu/Documents/Dio/medicine_bottle/pill/cyho/obj.name
+backup = /home/chengyu/Documents/Dio/medicine_bottle/pill/cyho/backup

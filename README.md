@@ -38,11 +38,31 @@ This project is using Jetson Nano with camera to predicted the medicine bottle l
 
 
 ----------------------------------------
-<!--
-30day token 10/5
 
-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
--->
+## file structure
+    .
+    ├── .git
+    ├── Arduino_code (arduino relate file)
+    ├── bottle (bottle function file)
+    ├── camera_test (camera test and setting file )
+    ├── deploy_nano (for yang ming nano exec file)
+        ├── lesson_plan_4 (each lesson plan)
+    ├── document (plan relate file)
+    ├── GUI
+    ├── pictures 
+    ├── pill (pill detection relate file)
+        ├── folder (each darknet training file)
+        ├── others (traditional image processing)
+    ├── Platform_System (IoTtalk web page and device)
+        ├── medical_control_page (user control web page)
+        ├── medical_show_page (feedback web page)
+        ├── medical_device (yang ming nano IoTtalk device)
+    ├── recording_system (yang ming recording data device)
+    ├── .vscode
+    ├── .gitignore
+    ├── LICENSE
+    └── README.md
+
 
 
 
@@ -85,4 +105,6 @@ $ sudo apt install ./{sdkmanger_file}
 $ sdkmanger
 ```
 
+*Yang ming deployment operation video*
+https://drive.google.com/file/d/1Kk4vD4NKLuZSDS1dN5Uc6jvUK7NtrUn_/view?usp=sharing
 
