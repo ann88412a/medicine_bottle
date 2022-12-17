@@ -544,3 +544,4 @@ pill/pill_detect/rcnn_fineturn/__pycache__/utils.cpython-38.pyc
 bad.list
 demo/__pycache__/darknet.cpython-36.pyc
 camera_test/data
+pill/cyho/backup/yolov7_final.weights
