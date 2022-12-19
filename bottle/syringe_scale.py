@@ -14,34 +14,40 @@ class syringe_scale:
     def __init__(self):
         pass
 
-    def image_preprocessing(self, img, syringe_type):  # (1080, 1920, 3) -> (1000, 250, 3)
-        # w, h = 250, 1000
-        # x, y = (1080 - w) // 2, 1920 - h - 70
-        # return cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)[y:y+h, x:x+w]
-
-        w, h = 1920, 310
-        pts1 = np.float32([[60, 389], [1920, 355], [54, 685], [1915, 718]])
+    def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
+        # w, h = 1020, 260
+        w, h = 1200, 260
+        pts1 = np.float32([[684, 387], [1897, 370], [680, 675], [1902, 695]])
         pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
         H, _ = cv2.findHomography(pts1, pts2, method=cv2.RANSAC, ransacReprojThreshold=3.0)
         img = cv2.warpPerspective(img, H, (w, h), flags=cv2.INTER_LINEAR)
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        # print(img.shape)
+        return img[150:w - 50, 5:-5]
+
+    def image_preprocessing(self, last_frame, cur_frame, syringe_type):
+        frame1 = self.image_homography(last_frame)
+        frame2 = self.image_homography(cur_frame)
+        img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
 
         if syringe_type == "1 ml":
-            img = img[1070:1860, 95:-95]
+            img = img[230:-40, 70:-70]
         elif syringe_type == "3 ml":
-            img = img[1210:1860, 80:-80]
+            img = img[360:-30, 60:-60]
         elif syringe_type == "5 ml":
-            img = img[1160:1860, 55:-55]
+            img = img[290:, 45:-45]
         elif syringe_type == "10 ml":
-            img = img[860:1860, 30:-30]
+            img = img[70:-10, 30:-30]
         elif syringe_type == "100 units":
-            img = img[1060:1860, 80:-80]
+            img = img[230:-20, 80:-80]
         elif syringe_type == "others":
-            img = img[1310:1760, 90:-90]
+            img = img[440:-110, 70:-70]
         else:
-            img = img[1310:1760, 90:-90]
-
-        img = cv2.resize(img, (250, 1000))
+            print("Syringe type input error!! your input:", syringe_type)
+        # img = cv2.resize(img, (250, 1000))
+        img_ratio = 1.5
+        img = cv2.resize(img, None, fx=img_ratio, fy=img_ratio)
+        # print(img.shape)
         return img
 
     def hsv_thresholding(self, img, threshold=40):
@@ -76,33 +82,34 @@ class syringe_scale:
 
         contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
         if len(contours) > 0:
-            contour = max(contours, key=cv2.contourArea)  # max Area contour
             # (x, y), radius = cv2.minEnclosingCircle(contour)
             # center = (int(x), int(y))
             # radius = int(radius)
             # # cv2.circle(img, center, radius, (0, 255, 0), 2)
             # # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
 
-            for c in contours:
-                if cv2.contourArea(c) > 1000:
-                    # print(cv2.contourArea(c))
-                    cv2.fillPoly(img, [c], (0, 0, 255))
-            cv2.fillPoly(img, [contour], (255, 0, 0))
+            for c in range(len(contours)):
+                if cv2.contourArea(contours[c]) > 1000:
+                    # print(cv2.contourArea(contours[c]))
+                    cv2.fillPoly(contours[c], [contours[c]], (0, 0, 255))
+
+            contour = max(contours, key=cv2.contourArea)  # max Area contour
+            # cv2.fillPoly(img, [contour], (255, 0, 0))
             # # print("arcLength", cv2.arcLength(contour, True))
-            img_ratio = 0.8
-            cv2.imshow("frame_scall", cv2.resize(img, None, fx=img_ratio, fy=img_ratio))
+            # img_ratio = 0.8
+            # cv2.imshow("frame_scall", cv2.resize(img, None, fx=img_ratio, fy=img_ratio))
             return contour
         return None
 
     def get_plunger_tip_dist(self, img, syringe_type, threshold=40):
         contour = self.find_plunger_tip(img, syringe_type, threshold)
         if contour is not None:
-            (x, y), radius = cv2.minEnclosingCircle(contour)
-            center = (int(x), int(y))
-            radius = int(radius)
+            # (x, y), radius = cv2.minEnclosingCircle(contour)
+            # center = (int(x), int(y))
+            # radius = int(radius)
             # cv2.circle(img, center, radius, (0, 255, 0), 2)
             # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
-            # cv2.fillPoly(img, [contour], (255, 0, 0))
+            cv2.fillPoly(img, [contour], (255, 0, 0))
             # print("arcLength", cv2.arcLength(contour, True))
             ## find the centroid of this contour
             M = cv2.moments(contour)
@@ -122,8 +129,8 @@ class syringe_scale:
             "others": (pixel_y/82, pixel_y)
         }[syringe_type]
 
-    def get_scale(self, img, syringe_type="others", threshold=40):  # draw
-        img = self.image_preprocessing(img.copy(), syringe_type)
+    def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=40):  # draw
+        img = self.image_preprocessing(last_frame.copy(), cur_frame.copy(), syringe_type)
         plunger_tip = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
         # plunger_tip = self.get_plunger_tip_dist(img.copy(), threshold=threshold)  # get tip xy
 
@@ -146,24 +153,21 @@ if(__name__ == "__main__"):
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     sc = syringe_scale()
-    # w, h = 250, 1000
-    # x, y = (1080-w)//2, 1920-h-70
     last_ret, last_frame = cap.read()
-
     while(True):
         ret, cur_frame = cap.read()
-        frame = np.mean([last_frame, cur_frame], axis=0).astype(np.uint8)
-        last_frame = cur_frame
+        # ret, frame = cap.read()
         # height, width, channels = frame.shape
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
+        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
 
-        # frame_scall = sc.hsv_thresholding(sc.image_preprocessing(frame), 40)
-        frame_scall, scale_value = sc.get_scale(frame, syringe_type="10 ml")
+        img_ratio = 1000/frame_scall.shape[0]
+        cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 
-        # img_ratio = 0.8
-        # cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 
+
+        last_frame = cur_frame
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cap.release()
