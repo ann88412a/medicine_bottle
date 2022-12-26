@@ -1,0 +1,56 @@
+<style>
+    .inputWithin {
+        position: relative; 
+        display: inline-block;
+    }		
+    .inputWithin .img { /*左邊圖示*/
+        position: absolute; 			
+        left: 10px;
+        top: calc(50% - 0.5em);
+    }
+</style>
+
+<meta charset="utf-8">
+<h2 align="center">請確認病人資訊</h2>
+<br>
+<p align="center">掃病人條碼</p>
+<p align="center">點擊按鈕開始掃碼</p>
+<center>
+    <button onclick="dan.push('barcode',[true])" >掃 barcode</button> 
+</center>
+<br>
+<p align="center">確認掃碼結果</p>
+<center>
+    <legend class='ODF_value'>_____________</legend>
+</center>
+<br>
+<center>
+    <div class="inputWithin">
+        <img id = 'bar' src="" width="30" background-color: transparent/>
+        <!-- <input id = 'IDF_ID' value=""> -->
+        <input type="radio" name = 'barcode' value="1">病人資料正確
+        <input type="radio" name = 'barcode' value="2">病人資料錯誤
+    </div>
+</center>
+
+<script>
+    async function getvalue()
+    {
+        var radios = document.getElementsByName('barcode');
+        // const bar_value = document.getElementById('bar_v');
+        // console.log(radios[0]);
+        if (radios[0].checked || radios[1].checked)
+        {
+
+            var img = document.getElementById('bar');
+            img.src="../pic/ok1.jpeg";
+        }else
+        {
+            var img = document.getElementById('bar');
+            img.src="";
+        }
+        
+    }
+    setInterval(getvalue, 1000);
+</script>
+
