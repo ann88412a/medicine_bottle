@@ -8,6 +8,7 @@ except:
     # call cv2 in jetson nano
     import cv2
 import numpy as np
+from syringe_scale import syringe_scale
 
 # 讀取中文路徑圖檔(圖片讀取為BGR)
 def cv_imread(filePath):
@@ -17,11 +18,12 @@ def cv_imread(filePath):
 # 點擊欲判定HSV值的圖片位置(以滑鼠左鍵單擊)
 def mouse_click(event, x, y, flags, para):
     if event == cv2.EVENT_LBUTTONDOWN:
-        print("x,y: {}, {}".format(x,y))
-        # print("BGR:", frame[y, x])
-        # print("GRAY:", gray[y, x])
-        print("HSV:", hsv[y, x])
-        print('='*30)
+        # print("x,y: {}, {}".format(x,y))
+        # # print("BGR:", frame[y, x])
+        # # print("GRAY:", gray[y, x])
+        # print("HSV:", hsv[y, x])
+        # print('='*30)
+        print("save")
 
 def image_homography(img):  # (1080, 1920, 3) -> (1000, 250, 3)
     # w, h = 1020, 260
@@ -35,37 +37,58 @@ def image_homography(img):  # (1080, 1920, 3) -> (1000, 250, 3)
     # print(img.shape)
     return img[150:w-50, 5:-5]
 
-def image_preprocessing(last_frame, cur_frame):
+def image_preprocessing(last_frame, cur_frame, syringe_type):
     frame1 = image_homography(last_frame)
     frame2 = image_homography(cur_frame)
     img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
+
+    if syringe_type == "1 ml":
+        img = img[230:-40, 70:-70]
+    elif syringe_type == "3 ml":
+        img = img[360:-30, 60:-60]
+    elif syringe_type == "5 ml":
+        img = img[290:, 45:-45]
+    elif syringe_type == "10 ml":
+        img = img[70:-10, 30:-30]
+    elif syringe_type == "100 units":
+        img = img[230:-20, 80:-80]
+    elif syringe_type == "others":
+        img = img[440:-110, 70:-70]
+    else:
+        print("Syringe type input error!! your input:", syringe_type)
     return img
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    sc = syringe_scale()
     _, last_frame = cap.read()
 
     while (True):
         # ret, frame = cap.read()
         ret, cur_frame = cap.read()
-        frame = image_preprocessing(last_frame, cur_frame)
+
+        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="others")
+        # print(frame.shape)
+
+        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # cv2.namedWindow("frame")
+        # cv2.setMouseCallback("frame", mouse_click)
+
+        # print(frame.shape)
+
+
+
+        img_ratio = 1000 / frame_scall.shape[0]
+        cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
+
+
+
+
+
         last_frame = cur_frame
-
-
-        # print(frame.shape)
-
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        cv2.namedWindow("frame")
-        cv2.setMouseCallback("frame", mouse_click)
-
-        # print(frame.shape)
-
-        img_ratio = 0.8
-        cv2.imshow("frame", cv2.resize(frame, None, fx=img_ratio, fy=img_ratio))
-
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cap.release()

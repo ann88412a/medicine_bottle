@@ -45,8 +45,8 @@ class syringe_scale:
         else:
             print("Syringe type input error!! your input:", syringe_type)
         # img = cv2.resize(img, (250, 1000))
-        img_ratio = 1.5
-        img = cv2.resize(img, None, fx=img_ratio, fy=img_ratio)
+        # img_ratio = 1.5
+        # img = cv2.resize(img, None, fx=img_ratio, fy=img_ratio)
         # print(img.shape)
         return img
 
@@ -109,7 +109,7 @@ class syringe_scale:
             # radius = int(radius)
             # cv2.circle(img, center, radius, (0, 255, 0), 2)
             # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
-            cv2.fillPoly(img, [contour], (255, 0, 0))
+            # cv2.fillPoly(img, [contour], (255, 0, 0))
             # print("arcLength", cv2.arcLength(contour, True))
             ## find the centroid of this contour
             M = cv2.moments(contour)
@@ -121,8 +121,8 @@ class syringe_scale:
 
     def syringe_pixel2unit(self, pixel_y, syringe_type):
         return {
-            "1 ml": (pixel_y/82, pixel_y),
-            "3 ml": (pixel_y/82, pixel_y),
+            "1 ml": (round(pixel_y/665, 2), pixel_y),
+            "3 ml": (round(pixel_y/525*3, 1), pixel_y),
             "5 ml": (pixel_y/82, pixel_y),
             "10 ml": (pixel_y/82, pixel_y),
             "100 units": (pixel_y/82, pixel_y),
@@ -135,16 +135,21 @@ class syringe_scale:
         # plunger_tip = self.get_plunger_tip_dist(img.copy(), threshold=threshold)  # get tip xy
 
         scale = None
-        cv2.putText(img, "type: "+syringe_type, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+        # cv2.putText(img, "type: "+syringe_type, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+        # print("type: " + syringe_type)
 
         if plunger_tip is not None:
             scale, tip_y = self.syringe_pixel2unit(plunger_tip[1], syringe_type)
             # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
             # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
-            cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
-            cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+            # cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
+            # cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+            # print("scale: " + str(scale), str(plunger_tip[1]))
         else:
-            cv2.putText(img, "scale: Null", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+            # cv2.putText(img, "scale: Null", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+            # print("scale: Null")
+            pass
+        # print("\n\n\n\n\n")
         return img, scale
 
 
@@ -160,7 +165,7 @@ if(__name__ == "__main__"):
         # height, width, channels = frame.shape
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
-        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
+        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="3 ml")
 
         img_ratio = 1000/frame_scall.shape[0]
         cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
@@ -172,3 +177,6 @@ if(__name__ == "__main__"):
             break
     cap.release()
     cv2.destroyAllWindows()
+
+
+# 模板匹配
