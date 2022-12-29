@@ -1,0 +1,39 @@
+<!doctype html>
+
+
+<head>
+    <title>Syringe scale</title>
+    <meta charset=utf-8>
+</head>
+
+<body>
+    <h1>Syringe scale</h1>
+
+    <button> <a href="{{ url_for('barcode') }}">add medicine</a></button>
+
+    <br><br>
+
+    <table border=3>  <!-- show medicine list -->
+        <tr>
+            <th width=30px>No.</th>
+            <th width=200px>Medicine name</th>
+            <th width=200px>Barcode</th>
+            <th width=200px>Dosage</th>
+            <th width=200px>Injection site</th>
+        </tr>
+        {% if medicine_list |length > 0 %}
+            {% for i in medicine_list %}
+                <tr>
+                    <td>{{ loop.index0 + 1 }}</td>
+                    {% for j in i %}
+                        <td>{{ j }}</td>
+                    {%endfor%}
+                </tr>
+            {%endfor%}
+        {% endif %}
+    </table>
+
+    <br><br>
+
+    <button> <a href="{{ url_for('syringe_index') }}">Submit</a></button>
+</body>
