@@ -10,8 +10,8 @@ import json
 
 
 # ================ iottalk ===============
-ServerURL = 'https://6.iottalk.tw'      #with non-secure connection
-Reg_addr = 'BAC0B21FDC33' #if None, Reg_addr = MAC address
+ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
+Reg_addr = 'BAC0B21FDC32' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL
 
@@ -53,16 +53,18 @@ rep_pill_check = False
 while True:
     try:
         # ============= barcode ===============
-        barcode_check = DAN.pull('barcode_check')
+        barcode_check = DAN.pull('patient_barcode_sign')
         
         if barcode_check:
             
             barcode_ans, timedOut = timedInput("Please, do enter something: ", timeout= 10)
             # print(barcode_ans, timedOut)
-            DAN.push ('barcode_ans', barcode_ans) 
+            if barcode_ans == "":
+                barcode_ans = 'barcode not read'
+            DAN.push ('patient_barcode_r', barcode_ans) 
 
         # ============= pill yolo ===============
-        pill_detect_check = DAN.pull('pill_detect_check')
+        pill_detect_check = DAN.pull('pill_sign')
         
         if pill_detect_check:
             rep_pill_check = False
@@ -72,7 +74,7 @@ while True:
             
             for item in pills.keys():
                 pills[item] = 0
-            DAN.push ('pill_detect_done', False)
+            # DAN.push ('pill_r', False)
         
         if rep_pill_check == False and predictions.qsize() >= 50:
             rep_pill_check = True
@@ -90,22 +92,22 @@ while True:
                 pills[pill] += 1
 
             
-            DAN.push ('pill_detect_done', True)
+            # DAN.push ('pill_detect_done', True)
             
             print(candidate)
             print(vote)
             # print('return',predictions.qsize())
         # =========== confirm ==========
-        confirm_check = DAN.pull('id_check') 
+        # confirm_check = DAN.pull('id_check') 
         
-        if confirm_check:
-            pills_json = json.dumps(pills)
-            print(pills)
-            DAN.push ('backup', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), confirm_check[1], barcode_ans, pills_json) 
+        # if confirm_check:
+        #     pills_json = json.dumps(pills)
+        #     print(pills)
+        #     DAN.push ('backup', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), confirm_check[1], barcode_ans, pills_json) 
 
-            time.sleep(0.5)
-            DAN.push ('barcode_ans', '____________') 
-            DAN.push ('pill_detect_done', False)
+        #     time.sleep(0.5)
+        #     DAN.push ('barcode_ans', '____________') 
+        #     DAN.push ('pill_detect_done', False)
             
 
 
