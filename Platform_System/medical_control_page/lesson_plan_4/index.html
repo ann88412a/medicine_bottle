@@ -89,7 +89,8 @@
             <p align="center">掃病人條碼</p>
             <p align="center">點擊按鈕開始掃碼</p>
             <center>
-                <button onclick="dan.push('patient_barcode',[true])" >掃 barcode</button> 
+                <button onclick="check_bt('barcode')" >掃 barcode</button> 
+                <!-- dan.push('patient_barcode',[true]) -->
             </center>
             <br>
 
@@ -1173,18 +1174,155 @@
             <p align="center">將口服藥放入設備中</p>
             <p align="center">點擊按鈕開始辨識藥丸</p>
             <center>
-                <button onclick="dan.push('pill_detect',[true])" >辨識藥丸</button> 
+                <button onclick="check_bt('pill')" >辨識藥丸</button> 
                 <br>
-                <p align="center">確認辨識藥丸結果</p>
-                <legend class='ODF_value'>_____________</legend>
-                <br>
-                <div class="inputWithin">
-                    <img id = 'bar' src="" width="30" background-color: transparent/>
-                    <!-- <input id = 'IDF_ID' value=""> -->
-                    <input type="radio" name = 'barcode' value="1">病人資料正確
-                    <input type="radio" name = 'barcode' value="2">病人資料錯誤
+                
+                <div class="card_mar">
+                    <h2 align="center">確認辨識藥丸結果</h2>
+                    <div id="resp-table">
+                        <div id="resp-table-body">
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    口服藥品項 
+                                </div>
+                                <div class="table-body-cell">
+                                    設備偵測出數量
+                                </div>
+                                <div class="table-body-cell">
+                                    給予與不給予理由 
+                                </div>
+                                
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Dilatrend 25mg/tab 
+                                </div>
+                                <div class="table-body-cell" id = 'Dilatrend 25mg/tab'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Dilatrend 25mg/tab r' value="">
+                                </div>
+
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Requip F.C 0.25mg/tab 
+                                </div>
+                                <div class="table-body-cell" id = 'Requip F.C 0.25mg/tab'>
+                                    X
+                                </div>
+                                <div class="table-body-cell" >
+                                    <input id = 'Requip F.C 0.25mg/tab r' value=""> 
+                                </div>
+
+                            </div>
+        
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Repaglinide 1mg/tab
+                                </div>
+                                <div class="table-body-cell" id = 'Repaglinide 1mg/tab'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Repaglinide 1mg/tab r' value="">  
+                                </div>
+
+
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Transamin 250mg/tab
+                                </div>
+                                <div class="table-body-cell" id = 'Transamin 250mg/tab'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Transamin 250mg/tab r' value="">   
+                                </div>
+
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Bokey 100mg/tab 
+                                </div>
+                                <div class="table-body-cell" id = 'Bokey 100mg/tab'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Bokey 100mg/tab r' value="">
+                                </div>
+
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Zocor 20 mg/tab
+                                </div>
+                                <div class="table-body-cell" id = 'Zocor 20 mg/tab'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Zocor 20 mg/tab r' value=""> 
+                                </div>
+
+
+                            </div>
+    
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    FLU-D (Fluconazole) 50mg/tab 
+                                </div>
+                                <div class="table-body-cell" id = 'FLU-D (Fluconazole) 50mg/tab'>
+                                    X
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'FLU-D (Fluconazole) 50mg/tab r' value=""> 
+                                </div>
+
+                            </div>
+
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Dilantin
+                                </div>
+                                <div class="table-body-cell" id = 'Dilantin'>
+                                    X 
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Dilantin r' value="">  
+                                </div>
+
+                            </div>
+
+                            <div class="resp-table-row"> 
+                                <div class="table-body-cell">
+                                    Requip F.C 1 mg
+                                </div>
+                                <div class="table-body-cell" id = 'Requip F.C 1 mg'>
+                                    X
+                                </div>
+                                <div class="table-body-cell">
+                                    <input id = 'Requip F.C 1 mg r' value="">   
+                                </div>
+
+                            </div>
+    
+
+    
+                            
+    
+    
+                        </div>
+                    </div>
                 </div>
             </center>
+            
 
             <br>
             <br>

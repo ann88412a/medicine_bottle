@@ -72,3 +72,15 @@ function check_page(n){
         plusSlides(1);
     }
 }
+
+function check_bt(f){
+    if (f === 'barcode'){
+        dan.push('patient_barcode',[true]);
+        // sleep(3000);
+        output_patient_barcode_bt = output_patient_barcode_bt + 1;
+    }
+    else if(f === 'pill'){
+        dan.push('pill_detect',[true]);
+        output_pill_bt = output_pill_bt + 1;
+    }
+}

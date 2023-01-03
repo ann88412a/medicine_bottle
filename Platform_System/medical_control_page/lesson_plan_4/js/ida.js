@@ -1,3 +1,6 @@
+var output_patient_barcode_bt = 0;
+var output_pill_bt = 0;
+
  $(function(){
         csmapi.set_endpoint ('https://1.iottalk.tw');
         var profile = {
@@ -9,26 +12,38 @@
 
 		
         function confirm(data){
-            $('.ODF_value')[0].innerText=data[0];
+            // $('.ODF_value')[0].innerText=data[0];
          }
 
         function patient_barcode(data){
-            $('.ODF_value')[0].innerText=data[0];
+            // $('.ODF_value')[0].innerText=data[0];
          }
 
         function pill_detect(data){
-            $('.ODF_value')[0].innerText=data[0];
+            // $('.ODF_value')[0].innerText=data[0];
         }
 
         
         function output_patient_barcode(data){
-            console.log(data)
-            return Math.random();
+            if (output_patient_barcode_bt > 0){
+                $('.ODF_value')[0].innerText=data[0];
+            }
+            
         }
 
         function output_pill(data){
-            console.log(data)
-            return Math.random();
+            
+            if (output_pill_bt > 0){
+                document.getElementById('Dilatrend 25mg/tab').textContent = data[0];
+                document.getElementById('Requip F.C 0.25mg/tab').textContent = data[1];
+                document.getElementById('Repaglinide 1mg/tab').textContent = data[2];
+                document.getElementById('Transamin 250mg/tab').textContent = data[3];
+                document.getElementById('Bokey 100mg/tab').textContent = data[4];
+                document.getElementById('Zocor 20 mg/tab').textContent = data[5];
+                document.getElementById('FLU-D (Fluconazole) 50mg/tab').textContent = data[6];
+                document.getElementById('Dilantin').textContent = data[7];
+                document.getElementById('Requip F.C 1 mg').textContent = data[8];
+            }
         }
 
         
