@@ -91,12 +91,20 @@ while True:
             for pill in candidate[vote.index(max(vote))]:
                 pills[pill] += 1
 
-            
-            # DAN.push ('pill_detect_done', True)
-            
             print(candidate)
             print(vote)
-            # print('return',predictions.qsize())
+            for item in pills:
+                print(item, pills[item])
+            DAN.push ('pill_r',  pills['Dilatrend 25mg/tab'],
+                                                    pills[ 'Requip F.C 0.25mg/tab'],
+                                                    pills['Repaglinide 1mg/tab'],
+                                                    pills['Transamin 250mg/tab'],
+                                                    pills[ 'Bokey 100mg/tab'],
+                                                    pills['Zocor 20 mg/tab'], 
+                                                    pills['FLU-D (Fluconazole) 50mg/tab'],
+                                                    pills['Dilantin'],
+                                                    pills['Requip F.C 1 mg'])
+        # print('return',predictions.qsize())
         # =========== confirm ==========
         # confirm_check = DAN.pull('id_check') 
         
