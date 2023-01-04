@@ -89,6 +89,8 @@
             <p align="center">掃病人條碼</p>
             <p align="center">點擊按鈕開始掃碼</p>
             <center>
+                <img id = 'bar_odf' src="" width="30" background-color: transparent/>
+                
                 <button onclick="check_bt('barcode')" >掃 barcode</button> 
                 <!-- dan.push('patient_barcode',[true]) -->
             </center>
@@ -96,7 +98,9 @@
 
             <p align="center">確認掃碼結果</p>
             <center>
-                <legend class='ODF_value'>_____________</legend>
+                <legend class='ODF_value' display:inline;>_____________</legend>
+                
+               
                 <br>
                 <div class="inputWithin">
                     <img id = 'bar' src="" width="30" background-color: transparent/>
@@ -1172,13 +1176,21 @@
             <br>
 
             <p align="center">將口服藥放入設備中</p>
+            
+            
             <p align="center">點擊按鈕開始辨識藥丸</p>
+            
+            
             <center>
+                <img id = 'pill_odf' src="" width="30" background-color: transparent; display:inline;/>
                 <button onclick="check_bt('pill')" >辨識藥丸</button> 
                 <br>
                 
                 <div class="card_mar">
-                    <h2 align="center">確認辨識藥丸結果</h2>
+                    
+                    
+                    <h2 align="center" display:inline;>確認辨識藥丸結果</h2>
+                    
                     <div id="resp-table">
                         <div id="resp-table-body">
                             <div class="resp-table-row"> 
@@ -1328,7 +1340,7 @@
             <br>
 
             <center>
-                <button onclick="check_page(4)">確認及下一頁</button>
+                <button onclick="check_page(4)">確認送出</button>
             </center>
             <br>
             <br>

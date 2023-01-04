@@ -26,6 +26,8 @@ var output_pill_bt = 0;
         
         function output_patient_barcode(data){
             if (output_patient_barcode_bt > 0){
+                var img = document.getElementById('bar_odf');
+                img.src="pic/ok1.jpeg";
                 $('.ODF_value')[0].innerText=data[0];
             }
             
@@ -34,6 +36,8 @@ var output_pill_bt = 0;
         function output_pill(data){
             
             if (output_pill_bt > 0){
+                var img = document.getElementById('pill_odf');
+                img.src="pic/ok1.jpeg";
                 document.getElementById('Dilatrend 25mg/tab').textContent = data[0];
                 document.getElementById('Requip F.C 0.25mg/tab').textContent = data[1];
                 document.getElementById('Repaglinide 1mg/tab').textContent = data[2];
