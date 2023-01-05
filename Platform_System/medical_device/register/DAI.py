@@ -3,7 +3,7 @@ import DAN , os
 import threading
 
 #================iottalk===============
-ServerURL = 'https://6.iottalk.tw'      #with non-secure connection
+ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
 
@@ -16,7 +16,7 @@ while True:
         #DAN.push ('Dummy_Sensor', IDF_data) #Push data to an input device feature "Dummy_Sensor"
 
         #==================================
-        pill_detect_check = DAN.pull('pill_detect_check')#Pull data from an output device feature "Dummy_Control"
+        pill_detect_check = DAN.pull('patient_barcode_sign')#Pull data from an output device feature "Dummy_Control"
         print(pill_detect_check)
         
         

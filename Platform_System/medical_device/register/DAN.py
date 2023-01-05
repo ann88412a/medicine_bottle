@@ -6,7 +6,7 @@ profile = {
     'dm_name': 'medical_device',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['backup', 'barcode_ans', 'pill_detect_done', 'barcode_check', 'id_check', 'pill_detect_check'],
+    'df_list': ['patient_barcode_r', 'pill_r', 'patient_barcode_sign', 'pill_sign'],
 }
 mac_addr = None #'C860008BD249'
 

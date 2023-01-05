@@ -6,9 +6,9 @@ profile = {
     'dm_name': 'medical_device',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['backup', 'barcode_ans', 'pill_detect_done', 'barcode_check', 'id_check', 'pill_detect_check'],
+    'df_list': ['patient_barcode_r', 'pill_r', 'patient_barcode_sign', 'pill_sign'],
 }
-mac_addr = 'BAC0B21FDC33' #'C860008BD249'
+mac_addr = 'BAC0B21FDC32' #'C860008BD249'
 MAC = mac_addr
 # state = 'SUSPEND'     #for control channel
 state = 'RESUME'

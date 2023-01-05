@@ -1,37 +1,38 @@
  $(function(){
-        csmapi.set_endpoint ('https://6.iottalk.tw');
+        csmapi.set_endpoint ('https://1.iottalk.tw');
         var profile = {
 		    'dm_name': 'medical_control',          
-			'idf_list':[barcode, confirm, pill_yolo],
-			'odf_list':[barcode_result, pill_yolo_done],
+			'idf_list':[confirm, patient_barcode, pill_detect],
+			'odf_list':[output_patient_barcode, output_pill],
 		        'd_name': 'medical_control_page_1',
         };
 		
-        function Dummy_Sensor(){
-            return Math.random();
-        }
+        // function Dummy_Sensor(){
+        //     return Math.random();
+        // }
 
-        function Dummy_Control(data){
-           $('.ODF_value')[0].innerText=data[0];
-        }
-        function barcode(data){
-            $('.ODF_value')[0].innerText=data[0];
-         }
-
+        // function Dummy_Control(data){
+        //    $('.ODF_value')[0].innerText=data[0];
+        // }
         function confirm(data){
             $('.ODF_value')[0].innerText=data[0];
          }
 
-        function pill_yolo(data){
+        function patient_barcode(data){
             $('.ODF_value')[0].innerText=data[0];
          }
 
-        function barcode_result(data){
+        function pill_detect(data){
+            $('.ODF_value')[0].innerText=data[0];
+        }
+
+        
+        function output_patient_barcode(data){
             console.log(data)
             return Math.random();
         }
 
-        function pill_yolo_done(data){
+        function output_pill(data){
             console.log(data)
             return Math.random();
         }
