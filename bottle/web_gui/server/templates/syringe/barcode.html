@@ -7,11 +7,11 @@
 </head>
 
 <body>
-    <h1>Please scan the barcode id</h1>
     {% if barcode_id == "" %}
-        <form method="post">
-            <input type="text" name="barcode" autofocus>
-        </form>
+        <h1>Please scan the barcode id</h1>
+<!--        <form method="post">-->
+<!--            <input type="text" name="barcode" autofocus>-->
+<!--        </form>-->
     {% else %}
 	    <p>Barcode: {{barcode_id}}</p>
         <button> <a href="{{ url_for('syringe_index') }}">redo</a></button>

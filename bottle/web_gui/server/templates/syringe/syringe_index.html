@@ -1,27 +1,27 @@
 <!doctype html>
-
-
 <head>
     <title>Syringe scale</title>
     <meta charset=utf-8>
 </head>
 
 <body>
+    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
     <h1>Syringe scale</h1>
 
-    <button> <a href="{{ url_for('barcode') }}">add medicine</a></button>
+    <button> <a href="{{ url_for('add_new') }}">add medicine</a></button>
 
     <br><br>
 
     <table border=3>  <!-- show medicine list -->
         <tr>
-            <th width=30px>No.</th>
-            <th width=200px>Medicine name</th>
-            <th width=200px>Barcode</th>
-            <th width=200px>Dosage</th>
-            <th width=200px>Injection site</th>
+            <th width=20px>No.</th>
+            <th width=120px>Barcode</th>
+            <th width=400px>Medicine name</th>
+            <th width=100px>Dosage</th>
+            <th width=100px>Diluted doses</th>
+            <th width=100px>Injection site</th>
         </tr>
-        {% if medicine_list |length > 0 %}
+        {% if (medicine_list |length > 0) %}
             {% for i in medicine_list %}
                 <tr>
                     <td>{{ loop.index0 + 1 }}</td>
@@ -33,7 +33,8 @@
         {% endif %}
     </table>
 
-    <br><br>
 
-    <button> <a href="{{ url_for('syringe_index') }}">Submit</a></button>
+    <button style="float:left"> <a href="{{ url_for('submit_result') }}">Submit</a></button>
+
+
 </body>

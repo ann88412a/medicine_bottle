@@ -16,7 +16,7 @@ DAN.device_registration_with_retry(ServerURL, Reg_addr)
 while True:
     try:
         IDF_data = random.uniform(1, 10)
-        DAN.push('Dummy_Sensor', IDF_data) #Push data to an input device feature "Dummy_Sensor"
+        # DAN.push('Dummy_Sensor', IDF_data) #Push data to an input device feature "Dummy_Sensor"
 
         # ==================================
 

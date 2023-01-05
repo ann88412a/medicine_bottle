@@ -1,0 +1,50 @@
+<!doctype html>
+<head>
+    <title>Add new medicine</title>
+    <meta charset=utf-8>
+</head>
+
+<body>
+    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
+    <h1> Add new medicine </h1>
+
+    {% if barcode_id == None %}
+        <p> Please scan the barcode. </p>
+        <button> <a href="{{ url_for('barcode') }}">Start scan</a></button>
+    {% else %}
+        <p>
+            {{ barcode_id }} : {{ medicine_name }}
+            <button> <a href="{{ url_for('barcode') }}">rescan</a></button>
+        </p>
+<!--        <p> {{ Injection_site }} </p>-->
+
+
+
+        <table border=3>  <!-- show medicine list -->
+            <tr>
+                <th width=20px>No.</th>
+                <th width=100px>Syringe type</th>
+                <th width=100px>Dosage</th>
+                <th width=100px>Diluted doses</th>
+            </tr>
+<!--            {% if (medicine_list |length > 0) %}-->
+<!--                {% for i in medicine_list %}-->
+<!--                    <tr>-->
+<!--                        <td>{{ loop.index0 + 1 }}</td>-->
+<!--                        {% for j in i %}-->
+<!--                            <td>{{ j }}</td>-->
+<!--                        {%endfor%}-->
+<!--                    </tr>-->
+<!--                {%endfor%}-->
+<!--            {% endif %}-->
+        </table>
+    {% endif %}
+
+
+
+
+
+<!--    <button style="float:left"> <a href="{{ url_for('submit_result') }}">Confirm to add</a></button>-->
+
+
+</body>
