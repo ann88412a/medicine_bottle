@@ -1,5 +1,5 @@
 import time, random, threading, requests
-import csmapi
+from iottalk_lib import csmapi
 
 # example
 profile = {
@@ -11,8 +11,8 @@ profile = {
 }
 mac_addr = None
 
-state = 'SUSPEND'     #for control channel
-#state = 'RESUME'
+# state = 'SUSPEND'     #for control channel
+state = 'RESUME'
 
 SelectedDF = []
 def ControlChannel():
