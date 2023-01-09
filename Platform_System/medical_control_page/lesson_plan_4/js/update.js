@@ -69,13 +69,31 @@ function check_page(n){
         }
     }
     else if(n === 4){
+        const radios = document.getElementsByName('barcode');
+        var radios_ans;
+        if (radios[0].checked)
+        {
+            radios_ans = 'yes';
+        }else if (radios[1].checked)
+        {
+            radios_ans = 'no';
+        }else
+        {
+            radios_ans = 'null';
+        }
+
         const all_info = JSON.stringify({ id: document.getElementById('IDF_ID').value,
                                             name: document.getElementById('IDF_name').value,
                                             barcode: $('.ODF_value')[0].innerText,
+                                            barcode_r: radios_ans,
                                             Dilatrend25: document.getElementById('Dilatrend 25mg/tab').value,
                                             Dilatrend25_r: document.getElementById('Dilatrend 25mg/tab r').value,
+                                            Dilantin: document.getElementById('Dilantin').value,
+                                            Dilantin_r: document.getElementById('Dilantin r').value,
                                             Requip: document.getElementById('Requip F.C 0.25mg/tab').value,
                                             Requip_r: document.getElementById('Requip F.C 0.25mg/tab r').value,
+                                            Requip1: document.getElementById('Requip F.C 1 mg').value,
+                                            Requip1_r: document.getElementById('Requip F.C 1 mg r').value,
                                             Repaglinide: document.getElementById('Repaglinide 1mg/tab').value,
                                             Repaglinide_r: document.getElementById('Repaglinide 1mg/tab r').value,
                                             Transamin: document.getElementById('Transamin 250mg/tab').value,
@@ -86,13 +104,9 @@ function check_page(n){
                                             Zocor_r: document.getElementById('Zocor 20 mg/tab r').value,
                                             FLU: document.getElementById('FLU-D (Fluconazole) 50mg/tab').value,
                                             FLU_r: document.getElementById('FLU-D (Fluconazole) 50mg/tab r').value,
-                                            Dilantin: document.getElementById('Dilantin').value,
-                                            Dilantin_r: document.getElementById('Dilantin r').value,
-                                            Requip: document.getElementById('Requip F.C 1 mg').value,
-                                            Requip_r: document.getElementById('Requip F.C 1 mg r').value,
                                             
                                              });
-        dan.push('confim', all_info);
+        dan.push('confirm', all_info);
     }
     else{
         plusSlides(1);
