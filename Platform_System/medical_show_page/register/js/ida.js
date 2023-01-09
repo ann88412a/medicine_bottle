@@ -1,17 +1,20 @@
  $(function(){
-        csmapi.set_endpoint ('https://6.iottalk.tw');
+        csmapi.set_endpoint ('https://1.iottalk.tw');
         var profile = {
-                'dm_name': 'medical_show_page',          
-                'idf_list':[],
+                'dm_name': 'medical_feedback',          
+                'idf_list':[save],
                 'odf_list':[show],
                 'd_name': 'medical_show_page_1',
         };
 		
-        
+        function save(){
+                console.log(data);
+                // $('.ODF_value')[0].innerText=data[0];
+        }
 
         function show(data){
-                console.log(data)
-                $('.ODF_value')[0].innerText=data[0];
+                console.log(data);
+                // $('.ODF_value')[0].innerText=data[0];
         }
         
       
