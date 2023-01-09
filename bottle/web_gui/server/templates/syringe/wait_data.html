@@ -1,0 +1,13 @@
+<!doctype html>
+<head>
+    <title>Wait Data</title>
+    <meta charset=utf-8>
+    <meta http-equiv="refresh" content="1">
+</head>
+
+<body>
+    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
+    <h1> Add new medicine </h1>
+    <p> Please scan the barcode... </p>
+    <button> <a href="{{ url_for('syringe_index') }}">cancel</a></button>
+</body>

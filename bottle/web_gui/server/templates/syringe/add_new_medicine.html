@@ -8,36 +8,49 @@
     <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
     <h1> Add new medicine </h1>
 
-    {% if barcode_id == None %}
-        <p> Please scan the barcode. </p>
-        <button> <a href="{{ url_for('barcode') }}">Start scan</a></button>
-    {% else %}
-        <p>
-            {{ barcode_id }} : {{ medicine_name }}
-            <button> <a href="{{ url_for('barcode') }}">rescan</a></button>
-        </p>
-<!--        <p> {{ Injection_site }} </p>-->
+    {% if request.cookies.get('barcode_id') == 'None' %}
+        <form method="post">
+            <p> *Please click the button to start. </p>
+            <input type="hidden" name="syringe_scan_state" value="0">
+            <button type="submit" name="barcode_scan_state" value="1">Start</button>
+        </form>
 
+    {% elif request.cookies.get('syringe_scale_value') == 'None' %}
+        <p> {{ medicine_dict[request.cookies.get('barcode_id')] }} ({{ request.cookies.get('barcode_id') }}) </p> <br>
+{#<!--        <p> {{ Injection_site }} </p>-->#}
+        <form method="post" onsubmit="return confirm('Please make sure all of your settings are correct.');">
+            <p> *Please make sure all of your settings are correct, and click the button to start. </p>
+            <p> Diluted doses: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml</p>
+            <p>
+                Syringe type:
+                <input type="checkbox" name="syringe_type" value="1 ml" checked>1 ml &nbsp&nbsp&nbsp&nbsp
+                <input type="checkbox" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
+                <input type="checkbox" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
+                <input type="checkbox" name="syringe_type" value="10 ml">10 ml
+            </p>
+            <input type="hidden" name="barcode_scan_state" value="0">
+            <button type="submit" name="syringe_scan_state" value="1">Start</button>
+        </form>
 
-
-        <table border=3>  <!-- show medicine list -->
-            <tr>
-                <th width=20px>No.</th>
-                <th width=100px>Syringe type</th>
-                <th width=100px>Dosage</th>
-                <th width=100px>Diluted doses</th>
-            </tr>
-<!--            {% if (medicine_list |length > 0) %}-->
-<!--                {% for i in medicine_list %}-->
-<!--                    <tr>-->
-<!--                        <td>{{ loop.index0 + 1 }}</td>-->
-<!--                        {% for j in i %}-->
-<!--                            <td>{{ j }}</td>-->
-<!--                        {%endfor%}-->
-<!--                    </tr>-->
-<!--                {%endfor%}-->
-<!--            {% endif %}-->
-        </table>
+        {% else %}
+            <table border=3>  <!-- show medicine list -->
+                <tr>
+                    <th width=20px>No.</th>
+                    <th width=100px>Syringe type</th>
+                    <th width=100px>Dosage</th>
+                    <th width=100px>Diluted doses</th>
+                </tr>
+    <!--            {% if (medicine_list |length > 0) %}-->
+    <!--                {% for i in medicine_list %}-->
+    <!--                    <tr>-->
+    <!--                        <td>{{ loop.index0 + 1 }}</td>-->
+    <!--                        {% for j in i %}-->
+    <!--                            <td>{{ j }}</td>-->
+    <!--                        {%endfor%}-->
+    <!--                    </tr>-->
+    <!--                {%endfor%}-->
+    <!--            {% endif %}-->
+            </table>
     {% endif %}
 
 

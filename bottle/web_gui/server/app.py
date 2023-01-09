@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, url_for, redirect, Response, make_response
 from datetime import timedelta
-import time
+from threading import Thread
 import numpy as np
+import time
+from iottalk_lib import DAN
 
-
-# medicine_list = []
 hist_dict = {}  # {username:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
+pull_data = {"barcode": {}, "syringe": {}}
 medicine_dict = {"4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Group 1
                  "4710031297121": "Heparin Sodium Injection 5000 IU/ml 'Tai Yu'",
                  "4710596700920": "CEFAZOLIN INJECTION 1GM 'C.C.P.'",
@@ -39,45 +40,54 @@ def init(username):
 @app.route('/syringe/syringe_index/')
 def syringe_index():
     global hist_dict
-    # print(hist_dict)
-    # print(request.cookies.get('username'))
-    return render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')])
+    resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')]))
+    resp.set_cookie('random_id', str(time.time()))  # save random_id in cookies. use for unit.
+    resp.set_cookie('barcode_id', "None")  # save random_id in cookies. use for unit.
+    resp.set_cookie('syringe_diluent_value', "None")
+    resp.set_cookie('syringe_type', "None")
+    resp.set_cookie('syringe_scale_value', "None")
+    # DAN.push('syringe_scale_control_server', request.cookies.get('username'), request.cookies.get('random_id'), 5.5, "1 ml", 10.3)
+    return resp
 
-@app.route('/syringe/add_new/')
+@app.route('/syringe/add_new/', methods=['POST','GET'])
 def add_new():
-    return render_template(r'syringe/add_new_medicine.html', barcode_id=None, medicine_name=None)
-
-
-@app.route('/syringe/barcode/')
-def barcode():
-    # dai.push('df_name_barcode_sw', [request.cookies.get('username'), True])
-    # barcode_id = dai.pull()
-    # t = time.time()
-    # while(True):
-    #     if (time.time()-t) > 5:
-    #         break
-    barcode_id = "4715550032017"
-    global hist_dict
-    usr = request.cookies.get('username')
-    ## hist_dict[usr][len(hist_dict[usr])-1]  # 最後一筆
-    hist_dict[usr].append([barcode_id])
-    hist_dict[usr][len(hist_dict[usr])-1].append(medicine_dict[barcode_id])
-    # print("barcode_id:", barcode_id)
-    return render_template(r'syringe/barcode.html', barcode_id="")
-
-@app.route('/syringe/diluent/')
-def diluent():
-    return render_template(r'syringe/diluent.html')
-
-@app.route('/syringe/scale/', methods=['POST','GET'])
-def scale():
     if request.method == 'POST':
-        # if request.values['send'] == 'next':
-        syringe_type = request.values['syringe_type']
-        print("syringe_type:", syringe_type)
-        return render_template(r'syringe/scale.html', syringe_type=syringe_type)
-    return render_template(r'syringe/scale.html', syringe_type="")
+        if request.values['barcode_scan_state'] == '1':
+            DAN.push('barcode_control_server', request.cookies.get('username'),
+                     request.cookies.get('random_id'), True)
+            return redirect(url_for(r'wait_data'))
+        elif request.values['syringe_scan_state'] == '1':
+            DAN.push('syringe_scale_control_server', request.cookies.get('username'),
+                     request.cookies.get('random_id'), request.values['syringe_diluent_value'],
+                     request.values['syringe_type'], True)
+            return redirect(url_for(r'wait_data'))
 
+    return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
+
+
+@app.route('/syringe/wait_data/')
+def wait_data():
+    global pull_data
+    if request.cookies.get('random_id') in pull_data["barcode"].keys():
+        resp = make_response(redirect(url_for(r'add_new')))
+        resp.set_cookie('barcode_id', str(pull_data["barcode"][request.cookies.get('random_id')]))
+        del pull_data["barcode"][request.cookies.get('random_id')]
+        return resp
+    if request.cookies.get('random_id') in pull_data["syringe"].keys():
+        resp = make_response(redirect(url_for(r'add_new')))
+        resp.set_cookie('syringe_diluent_value', str(pull_data["syringe"][request.cookies.get('random_id')][-3]))
+        resp.set_cookie('syringe_type', pull_data["syringe"][request.cookies.get('random_id')][-2])
+        resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]))
+        del pull_data["syringe"][request.cookies.get('random_id')]
+        return resp
+    return render_template(r'syringe/wait_data.html', barcode_id=None, medicine_name=None)
+    # barcode_id = "4715550032017"
+    # global hist_dict
+    # usr = request.cookies.get('username')
+    # ## hist_dict[usr][len(hist_dict[usr])-1]  # 最後一筆
+    # hist_dict[usr].append([barcode_id])
+    # hist_dict[usr][len(hist_dict[usr])-1].append(medicine_dict[barcode_id])
+    # # print("barcode_id:", barcode_id)
 
 @app.route('/syringe/submit_result/')
 def submit_result():
@@ -89,9 +99,51 @@ def submit_result():
     return redirect("https://www.google.com", code=302)  # Enter the URL you wish to use after push data.
 
 
+## =============================================================
+def dummy_device_loop():
+    global pull_data
+    ServerURL = 'http://1.iottalk.tw:9999'  # with non-secure connection
+    # ServerURL = 'https://DomainName' #with SSL connection
+    Reg_addr = None  # if None, Reg_addr = MAC address
+    DAN.profile['dm_name'] = 'medical_bottle_server'
+    DAN.profile['df_list'] = ['barcode_control_server', 'syringe_scale_control_server', 'barcode_result_server',
+                              'syringe_scale_result_server', ]
+    DAN.profile['d_name'] = 'medical_bottle_server'
+    DAN.device_registration_with_retry(ServerURL, Reg_addr)
+    # DAN.deregister()  #if you want to deregister this device, uncomment this line
+    # exit()            #if you want to deregister this device, uncomment this line
+    while True:
+        try:
+            # IDF_data = random.uniform(1, 10)
+            # DAN.push('Dummy_Sensor', IDF_data)  # Push data to an input device feature "Dummy_Sensor"
 
+            # ==================================
+            barcode_result = DAN.pull('barcode_result_server')  # Pull data from an output device feature "Dummy_Control"
+            if barcode_result != None:  ## barcode_result -> [UserName, RandId, BarcodeResult]
+                # if barcode_result[-1] == True:
+                #     DAN.push('barcode_control_server', request.cookies.get('username'),
+                #              request.cookies.get('random_id'), False)
+                print('barcode_result', barcode_result)
+                pull_data["barcode"][barcode_result[1]] = barcode_result[-1]
+            syringe_scale_result = DAN.pull('syringe_scale_result_server')  # Pull data from an output device feature "Dummy_Control"
+            if syringe_scale_result != None:  ## syringe_scale_result -> [UserName, RandId, DilutedDoses, SyringeType, Dosage]
+                print('syringe_scale_result', syringe_scale_result)
+                pull_data["syringe"][syringe_scale_result[1]] = syringe_scale_result[-3:]
 
+        except Exception as e:
+            print(e)
+            if str(e).find('mac_addr not found:') != -1:
+                print('Reg_addr is not found. Try to re-register...')
+                DAN.device_registration_with_retry(ServerURL, Reg_addr)
+            else:
+                print('Connection failed due to unknow reasons.')
+                time.sleep(1)
+        time.sleep(0.2)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port="8787", debug=True)
+    Thread(target=dummy_device_loop).start()
+
+
+    app.run(host='0.0.0.0', port="54784", debug=True)
+    # app.run(host='0.0.0.0', port="54784", debug=False)
