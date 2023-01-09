@@ -107,6 +107,9 @@ function check_page(n){
                                             
                                              });
         dan.push('confirm', all_info);
+        setTimeout(() => { window.location.href = 'http://140.113.110.21:1526/show/index.html'; }, 1000);
+        // 
+      
     }
     else{
         plusSlides(1);
