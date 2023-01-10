@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request, url_for, redirect, Response, make_response
-from datetime import timedelta
+from flask import Flask, render_template, request, url_for, redirect, make_response
 from threading import Thread
-import numpy as np
-import time, json
 from iottalk_lib import DAN
+import time, json, random, string
 
 hist_dict = {}  # {username:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
 pull_data = {"barcode": {}, "syringe": {}}
@@ -26,10 +24,11 @@ app = Flask(__name__)
 
 
 
-@app.route('/syringe/<username>')
-def init(username):
+@app.route('/syringe/')
+def init():
+    N = 16  ## len(username)
+    username = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
     print("welcome", username)
-    print("="*20 + "init" + "="*20)
     global hist_dict
     hist_dict[username] = []
     # hist_dict["kigison"] = [[1,2,3,4,5]]  # use for test
@@ -96,7 +95,6 @@ def wait_data():
         del pull_data["syringe"][request.cookies.get('random_id')]
         return resp
     if request.cookies.get('injection_site') != "None":
-        print("TESTETSTSTSTSTS", request.cookies.get('injection_site'))
         return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
     return render_template(r'syringe/wait_data.html', barcode_id=None, medicine_name=None)
 
@@ -104,14 +102,14 @@ def wait_data():
 def submit_result():
     global hist_dict
     try:
-        push_data = json.dumps({request.cookies.get('username'): hist_dict[request.cookies.get('username')]})
+        push_data = json.dumps({"bottle": hist_dict[request.cookies.get('username')]})
         DAN.push('syringe_submit_result_server', push_data)
         print("DAN.push('syringe_submit_result_server')", push_data)
         del hist_dict[request.cookies.get('username')]
 
     except KeyError:
         pass
-    return redirect("https://www.google.com", code=302)  # Enter the URL you wish to use after push data.
+    return redirect("http://140.113.110.21:1526/show/index.html", code=302)  # Enter the URL you wish to use after push data.
 
 
 ## =============================================================
