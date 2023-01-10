@@ -6,36 +6,23 @@ The plan of using real-time video and the other method to Identifying medicines.
 This project is using Jetson Nano with camera to predicted the medicine bottle label, pill shape and the dosage of drugs.
 
 
+##給藥方式說明:
+IVA需要一個agent，通常是精密輸液套
+每次給藥就對一些輸液
+用滴數控制給藥時間
 
+IVD是直接加在點滴袋(瓶)中
+比如說KCl，不可能15、30分鐘內給完，會GG
+而是加在bag中慢慢滴
 
+IV是緩推
+抽完藥後直接逗在IV cath上推注
+通常仿單中會告訴你要推幾分鐘
+大部分可IV的藥物也都可IVA
+注意勿將IV與IVP混淆
 
-
-
-## To-Do List
-
-- [x]  1. Setup the Jetson Nano
-
-- [x]  2. Meeting with the customer
-
-- [x]  3. Setup the camera environment
-
-- [x]  4. Design the hardware without sensors Ver. 1
-
-- [x]  5. Identifying the medicine bottls label by using 1D/2D Barcode scanner
-
-- [ ]  6. Identifying the dosage of drugs(syringe scale) by using Image recognition
-
-- [ ]  7. Identifying pill shape and dosage(using yolo)
-
-- [ ]  8. Design the hardware without sensors Ver. 2
-
-- [ ]  9. Design the Main GUI
-
-- [ ] 10. Undecided ...
-
-
-
-
+IVP是快速推注
+除非急救，否則由醫師執行
 
 ----------------------------------------
 

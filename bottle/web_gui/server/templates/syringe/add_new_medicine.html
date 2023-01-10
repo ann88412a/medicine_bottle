@@ -2,6 +2,11 @@
 <head>
     <title>Add new medicine</title>
     <meta charset=utf-8>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js">
+        function autoRefresh() {
+            window.location.reload();
+        }
+    </script>
 </head>
 
 <body>
@@ -12,52 +17,121 @@
         <form method="post">
             <p> *Please click the button to start. </p>
             <input type="hidden" name="syringe_scan_state" value="0">
+            <input type="hidden" name="injection_site_state" value="0">
+            <input type="hidden" name="add_new_state" value="0">
             <button type="submit" name="barcode_scan_state" value="1">Start</button>
         </form>
 
     {% elif request.cookies.get('syringe_scale_value') == 'None' %}
-        <p> {{ medicine_dict[request.cookies.get('barcode_id')] }} ({{ request.cookies.get('barcode_id') }}) </p> <br>
-{#<!--        <p> {{ Injection_site }} </p>-->#}
-        <form method="post" onsubmit="return confirm('Please make sure all of your settings are correct.');">
-            <p> *Please make sure all of your settings are correct, and click the button to start. </p>
-            <p> Diluted doses: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml</p>
-            <p>
-                Syringe type:
-                <input type="checkbox" name="syringe_type" value="1 ml" checked>1 ml &nbsp&nbsp&nbsp&nbsp
-                <input type="checkbox" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
-                <input type="checkbox" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
-                <input type="checkbox" name="syringe_type" value="10 ml">10 ml
-            </p>
-            <input type="hidden" name="barcode_scan_state" value="0">
-            <button type="submit" name="syringe_scan_state" value="1">Start</button>
-        </form>
-
-        {% else %}
-            <table border=3>  <!-- show medicine list -->
+        <div>
+            <table border=3>
                 <tr>
-                    <th width=20px>No.</th>
-                    <th width=100px>Syringe type</th>
-                    <th width=100px>Dosage</th>
-                    <th width=100px>Diluted doses</th>
+                    <th width=110px align="left">Barcode</th>
+                    <td> {{ request.cookies.get('barcode_id') }} </td>
                 </tr>
-    <!--            {% if (medicine_list |length > 0) %}-->
-    <!--                {% for i in medicine_list %}-->
-    <!--                    <tr>-->
-    <!--                        <td>{{ loop.index0 + 1 }}</td>-->
-    <!--                        {% for j in i %}-->
-    <!--                            <td>{{ j }}</td>-->
-    <!--                        {%endfor%}-->
-    <!--                    </tr>-->
-    <!--                {%endfor%}-->
-    <!--            {% endif %}-->
+                <tr>
+                    <th align="left">Medicine name</th>
+                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                </tr>
             </table>
+        </div><br>
+        <div>
+            <form method="post" onsubmit="if(typeof($('input[name=syringe_type]:checked').val())=='undefined'){alert('Please select the syringe type.');return false;}">
+                <p> *Please make sure all of your settings are correct, and click the button to start. </p>
+                <p> Diluted doses: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml</p>
+                <p>
+                    Syringe type:
+                    <input type="radio" name="syringe_type" value="1 ml">1 ml &nbsp&nbsp&nbsp&nbsp
+                    <input type="radio" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
+                    <input type="radio" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
+                    <input type="radio" name="syringe_type" value="10 ml">10 ml
+                </p>
+                <input type="hidden" name="barcode_scan_state" value="0">
+                <input type="hidden" name="injection_site_state" value="0">
+                <input type="hidden" name="add_new_state" value="0">
+                <button type="submit" name="syringe_scan_state" value="1">Start</button>
+            </form>
+        </div>
+
+    {% elif request.cookies.get('injection_site') == 'None' %}
+        <div>
+            <table border=3>
+                <tr>
+                    <th width=110px align="left">Barcode</th>
+                    <td> {{ request.cookies.get('barcode_id') }} </td>
+                </tr>
+                <tr>
+                    <th align="left">Medicine name</th>
+                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                </tr>
+                <tr>
+                    <th align="left">Dosage</th>
+                    <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
+                </tr>
+                <tr>
+                    <th align="left">Diluted doses</th>
+                    <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
+                </tr>
+                <tr>
+                    <th align="left">Syringe type</th>
+                    <td> {{ request.cookies.get('syringe_type') }} </td>
+                </tr>
+            </table>
+        </div><br>
+        <div>
+            <p> *Please select the injection site, and click the button next. </p>
+            <form method="post"  onsubmit="if(typeof($('input[name=injection_site]:checked').val())=='undefined'){alert('Please select the injection site.');return false;}">
+                <div style="position:relative; width:500px;">
+                    <img style="width:100%;" src="/static/images/IV.jpg">
+                    <input type="radio" style="position: absolute; width:20px; height:20px; top:200px; left:260px;" name="injection_site" value="IVD" checked>
+                    <input type="radio" style="position: absolute; width:20px; height:20px; top:500px; left:260px;" name="injection_site" value="IVA">
+                    <input type="radio" style="position: absolute; width:20px; height:20px; top:750px; left:265px;" name="injection_site" value="undefine">
+                </div>
+                <input type="hidden" name="barcode_scan_state" value="0">
+                <input type="hidden" name="syringe_scan_state" value="0">
+                <input type="hidden" name="add_new_state" value="0">
+                <button type="submit" name="injection_site_state" value="1">Next</button>
+            </form>
+        </div>
+
+    {% else %}
+        <div>
+            <table border=3>
+                <tr>
+                    <th width=110px align="left">Barcode</th>
+                    <td> {{ request.cookies.get('barcode_id') }} </td>
+                </tr>
+                <tr>
+                    <th align="left">Medicine name</th>
+                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                </tr>
+                <tr>
+                    <th align="left">Dosage</th>
+                    <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
+                </tr>
+                <tr>
+                    <th align="left">Diluted doses</th>
+                    <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
+                </tr>
+                <tr>
+                    <th align="left">Syringe type</th>
+                    <td> {{ request.cookies.get('syringe_type') }} </td>
+                </tr>
+                <tr>
+                    <th align="left">Injection site</th>
+                    <td> {{ request.cookies.get('injection_site') }} </td>
+                </tr>
+            </table>
+        </div><br>
+
+        <form method="post">
+            <input type="hidden" name="barcode_scan_state" value="0">
+            <input type="hidden" name="injection_site_state" value="0">
+            <input type="hidden" name="syringe_scan_state" value="0">
+            <button type="submit" name="add_new_state" value="1">Confirm to add</button>
+        </form>
     {% endif %}
 
-
-
-
-
-<!--    <button style="float:left"> <a href="{{ url_for('submit_result') }}">Confirm to add</a></button>-->
 
 
 </body>

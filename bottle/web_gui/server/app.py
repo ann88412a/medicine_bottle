@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, Response, 
 from datetime import timedelta
 from threading import Thread
 import numpy as np
-import time
+import time, json
 from iottalk_lib import DAN
 
 hist_dict = {}  # {username:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
@@ -46,11 +46,12 @@ def syringe_index():
     resp.set_cookie('syringe_diluent_value', "None")
     resp.set_cookie('syringe_type', "None")
     resp.set_cookie('syringe_scale_value', "None")
-    # DAN.push('syringe_scale_control_server', request.cookies.get('username'), request.cookies.get('random_id'), 5.5, "1 ml", 10.3)
+    resp.set_cookie('injection_site', "None")
     return resp
 
 @app.route('/syringe/add_new/', methods=['POST','GET'])
 def add_new():
+    global hist_dict
     if request.method == 'POST':
         if request.values['barcode_scan_state'] == '1':
             DAN.push('barcode_control_server', request.cookies.get('username'),
@@ -61,6 +62,20 @@ def add_new():
                      request.cookies.get('random_id'), request.values['syringe_diluent_value'],
                      request.values['syringe_type'], True)
             return redirect(url_for(r'wait_data'))
+        elif request.values['injection_site_state'] == '1':
+            resp = make_response(redirect(url_for(r'add_new')))
+            resp.set_cookie('injection_site', request.values['injection_site'])  # save random_id in cookies. use for unit.
+            return resp
+        elif request.values['add_new_state'] == '1':
+            usr = request.cookies.get('username')
+            Barcode = request.cookies.get('barcode_id')
+            Medicine_name = medicine_dict[Barcode]
+            Dosage = request.cookies.get('syringe_scale_value')
+            Diluted_doses = request.cookies.get('syringe_diluent_value')
+            Injection_site = request.cookies.get('injection_site')
+            print([Barcode, Medicine_name, Dosage, Diluted_doses, Injection_site])
+            hist_dict[usr].append([Barcode, Medicine_name, Dosage, Diluted_doses, Injection_site])
+            return redirect(url_for(r'syringe_index'))
 
     return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
 
@@ -80,20 +95,20 @@ def wait_data():
         resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]))
         del pull_data["syringe"][request.cookies.get('random_id')]
         return resp
+    if request.cookies.get('injection_site') != "None":
+        print("TESTETSTSTSTSTS", request.cookies.get('injection_site'))
+        return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
     return render_template(r'syringe/wait_data.html', barcode_id=None, medicine_name=None)
-    # barcode_id = "4715550032017"
-    # global hist_dict
-    # usr = request.cookies.get('username')
-    # ## hist_dict[usr][len(hist_dict[usr])-1]  # 最後一筆
-    # hist_dict[usr].append([barcode_id])
-    # hist_dict[usr][len(hist_dict[usr])-1].append(medicine_dict[barcode_id])
-    # # print("barcode_id:", barcode_id)
 
 @app.route('/syringe/submit_result/')
 def submit_result():
+    global hist_dict
     try:
-        # del hist_dict[request.cookies.get('username')]
-        print("del hist_dict[request.cookies.get('username')]")
+        push_data = json.dumps({request.cookies.get('username'): hist_dict[request.cookies.get('username')]})
+        DAN.push('syringe_submit_result_server', push_data)
+        print("DAN.push('syringe_submit_result_server')", push_data)
+        del hist_dict[request.cookies.get('username')]
+
     except KeyError:
         pass
     return redirect("https://www.google.com", code=302)  # Enter the URL you wish to use after push data.
@@ -106,7 +121,7 @@ def dummy_device_loop():
     # ServerURL = 'https://DomainName' #with SSL connection
     Reg_addr = None  # if None, Reg_addr = MAC address
     DAN.profile['dm_name'] = 'medical_bottle_server'
-    DAN.profile['df_list'] = ['barcode_control_server', 'syringe_scale_control_server', 'barcode_result_server',
+    DAN.profile['df_list'] = ['barcode_control_server', 'syringe_scale_control_server', 'syringe_submit_result_server', 'barcode_result_server',
                               'syringe_scale_result_server', ]
     DAN.profile['d_name'] = 'medical_bottle_server'
     DAN.device_registration_with_retry(ServerURL, Reg_addr)
@@ -114,10 +129,6 @@ def dummy_device_loop():
     # exit()            #if you want to deregister this device, uncomment this line
     while True:
         try:
-            # IDF_data = random.uniform(1, 10)
-            # DAN.push('Dummy_Sensor', IDF_data)  # Push data to an input device feature "Dummy_Sensor"
-
-            # ==================================
             barcode_result = DAN.pull('barcode_result_server')  # Pull data from an output device feature "Dummy_Control"
             if barcode_result != None:  ## barcode_result -> [UserName, RandId, BarcodeResult]
                 # if barcode_result[-1] == True:
@@ -145,5 +156,5 @@ if __name__ == '__main__':
     Thread(target=dummy_device_loop).start()
 
 
-    app.run(host='0.0.0.0', port="54784", debug=True)
-    # app.run(host='0.0.0.0', port="54784", debug=False)
+    # app.run(host='0.0.0.0', port="54784", debug=True)
+    app.run(host='0.0.0.0', port="54784", debug=False)

@@ -15,12 +15,13 @@
 <body>
     <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
     <h1>Syringe scale</h1>
-
-    <button> <a href="{{ url_for('add_new') }}">add medicine</a></button>
-
-    <br><br>
+    <br>
 
     <table border=3>  <!-- show medicine list -->
+        <caption style="font-weight:bold; font-size:22px;">
+            Medicine List:
+            <div style="float: right"> <button> <a href="{{ url_for('add_new') }}">add medicine</a></button> </div>
+        </caption>
         <tr>
             <th width=20px>No.</th>
             <th width=120px>Barcode</th>
@@ -38,8 +39,12 @@
                     {%endfor%}
                 </tr>
             {%endfor%}
+{#            <tr><td><button> <a href="{{ url_for('add_new') }}">add medicine</a></button></td></tr>#}
+        {% else %}
+            <tr><td colspan=6 align="center"> No data. </td></tr>
+{#            <tr><td colspan=6 align="right"> <button> <a href="{{ url_for('add_new') }}">add medicine</a></button> </td></tr>#}
         {% endif %}
-    </table>
+    </table><br>
 
 
     <button style="float:left"> <a href="{{ url_for('submit_result') }}">Submit</a></button>
