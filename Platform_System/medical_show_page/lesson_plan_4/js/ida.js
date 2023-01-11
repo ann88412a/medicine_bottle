@@ -45,7 +45,8 @@
 
             r2 = '您給 Dilatrend 25mg/tab 的理由：' + datas['Dilatrend25_r'];
             document.getElementById('2 r').innerHTML = r2;
-            r2r = '您給 Dilantin 的理由：' + datas['Dilantin_r'];
+            
+            r2r = '您不給 Dilatrend 25mg/tab 的理由：' + datas['Dilatrend25_r_no'];
             document.getElementById('2 r 2').innerHTML = r2r;
 
             // 3
@@ -60,7 +61,7 @@
 
             r3 = '您給 Requip F.C 0.25mg/tab 的理由：' + datas['Requip_r'];
             document.getElementById('3 r').innerHTML = r3;
-            r3r = '您給 Requip F.C 1mg 的理由：' + datas['Requip1_r'];
+            r3r = '您不給 Requip F.C 0.25mg/tab 的理由：' + datas['Requip_r_no'];
             document.getElementById('3 r 3').innerHTML = r3r;
 
             // 4
@@ -79,6 +80,8 @@
 
             r5 = '您給 Repaglinide 1mg/tab 的理由：' + datas['Repaglinide_r'];
             document.getElementById('5 r').innerHTML = r5;
+            r5r = '您不給 Repaglinide 1mg/tab 的理由：' + datas['Repaglinide_r_no'];
+            document.getElementById('5 r 5').innerHTML = r5r;
 
             // 6
             var img6 = document.getElementById('6 img');
@@ -92,6 +95,8 @@
 
             r6 = '您給 Transamin 250mg/tab 的理由：' + datas['Transamin_r'];
             document.getElementById('6 r').innerHTML = r6;
+            r6r = '您不給 Transamin 250mg/tab 的理由：' + datas['Transamin_r_no'];
+            document.getElementById('6 r 6').innerHTML = r6r;
            
             // 7 
             var img7 = document.getElementById('7 img');
@@ -109,6 +114,8 @@
 
             r8 = '您給 Bokey 100mg/tab 的理由：' + datas['Bokey_r'];
             document.getElementById('8 r').innerHTML = r8;
+            r8r = '您不給 Bokey 100mg/tab 的理由：' + datas['Bokey_r_no'];
+            document.getElementById('8 r 8').innerHTML = r8r;
 
             // 9
             var img9 = document.getElementById('9 img');
@@ -122,6 +129,8 @@
 
             r9 = '您給 Simvahexal 20 mg/tab 的理由：' + datas['Simvahexal_r'];
             document.getElementById('9 r').innerHTML = r9;
+            r9r = '您不給 Simvahexal 20 mg/tab 的理由：' + datas['Simvahexal_r_no'];
+            document.getElementById('9 r 9').innerHTML = r9r;
 
             // 10
             var img10 = document.getElementById('10 img');
@@ -135,6 +144,8 @@
 
             r10 = '您給 FLU-D (Fluconazole) 50mg/tab 的理由：' + datas['FLU_r'];
             document.getElementById('10 r').innerHTML = r10;
+            r10r = '您不給 FLU-D (Fluconazole) 50mg/tab 的理由：' + datas['FLU_r_no'];
+            document.getElementById('10 r 10').innerHTML = r10r;
          
 
             // score
