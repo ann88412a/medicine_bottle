@@ -15,6 +15,7 @@
         function show(data){
             var score = 0;
             var datas = JSON.parse(data[0]);
+            console.log('pull: ', datas);
             
             var id_name = 'ID：' + datas['id'] + ' 姓名：' + datas['name'];
             $('.ODF_ID')[0].innerText= id_name;
@@ -34,7 +35,7 @@
 
             // 2
             var img2 = document.getElementById('2 img');
-            if (datas['Dilatrend25'] == 1 && datas['Dilantin'] == 0) 
+            if (datas['Dilatrend25'] == 0 && datas['Dilantin'] == 0) 
             {
                 score = score + 1;
                 img2.src="pic/ok.jpg";
@@ -111,7 +112,7 @@
 
             // 9
             var img9 = document.getElementById('9 img');
-            if (datas['Zocor'] == 1) 
+            if (datas['Simvahexal'] == 1) 
             {
                 score = score + 1;
                 img9.src="pic/ok.jpg";
@@ -119,7 +120,7 @@
                 img9.src="pic/wrong.jpeg";
             } 
 
-            r9 = '您給 Zocor 20 mg/tab 的理由：' + datas['Zocor_r'];
+            r9 = '您給 Simvahexal 20 mg/tab 的理由：' + datas['Simvahexal_r'];
             document.getElementById('9 r').innerHTML = r9;
 
             // 10
