@@ -53,6 +53,20 @@ IVP是快速推注
 
 
 
+## How to install Arduino IDE(AARCH64) in Jetson Nano
+*Install the Arduino IDE (AARCH64 Ver.1.8.10).*
+```shell
+# Download-> https://downloads.arduino.cc/arduino-1.8.10-linuxaarch64.tar.xz
+# Move to ~/下載/arduino-1.8.10-linuxaarch64/arduino-1.8.10/
+$ sudo ./install.sh
+$ cd ~/Desktop/
+# Change owner
+$ chown medical arduino-arduinoide.desktop 
+# Click the new shortcut on Desktop, and select trust.
+$ sudo chmod 777 /dev/ttyUSB*
+```
+
+
 ## How to install the WiFi USB dongle driver
 *Install the WiFi USB dongle Dlink DWA-121(based on the rtl8188eu) driver.*
 ```shell
