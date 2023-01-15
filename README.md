@@ -63,7 +63,9 @@ $ cd ~/Desktop/
 # Change owner
 $ chown medical arduino-arduinoide.desktop 
 # Click the new shortcut on Desktop, and select trust.
-$ sudo chmod 777 /dev/ttyUSB*
+# This will reset after reboot -> sudo chmod 777 /dev/ttyUSB*
+# So, had to use the next command
+$ sudo adduser medical dialout
 ```
 
 
