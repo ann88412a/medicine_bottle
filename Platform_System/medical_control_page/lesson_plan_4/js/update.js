@@ -10,7 +10,7 @@ async function getvalue()
         }else
         {
             var img = document.getElementById('id');
-            img.src="";
+            img.src="./pic/no.png";
         }
         if (idf_name.value != "")
         {
@@ -19,7 +19,7 @@ async function getvalue()
         }else
         {
             var img = document.getElementById('name');
-            img.src="";
+            img.src="./pic/no.png";
         }
         if (radios[0].checked || radios[1].checked)
         {
@@ -29,7 +29,14 @@ async function getvalue()
         }else
         {
             var img = document.getElementById('bar');
-            img.src="";
+            img.src="./pic/no.png";
+        }
+        if (radios[1].checked)
+        {
+            $('.bar_no')[0].innerText = '已更換病人資訊為:陳志明(男) 出生年月日: 37/06/17 病歷號: 02386145 身分證字號：A120857201';
+        }else
+        {
+            $('.bar_no')[0].innerText = '';
         }
     }
 
@@ -86,24 +93,33 @@ function check_page(n){
                                             name: document.getElementById('IDF_name').value,
                                             barcode: $('.ODF_value')[0].innerText,
                                             barcode_r: radios_ans,
-                                            Dilatrend25: document.getElementById('Dilatrend 25mg/tab').value,
+                                            Dilatrend25: document.getElementById('Dilatrend 25mg/tab').item,
                                             Dilatrend25_r: document.getElementById('Dilatrend 25mg/tab r').value,
-                                            Dilantin: document.getElementById('Dilantin').value,
+                                            Dilatrend25_r_no: document.getElementById('Dilatrend 25mg/tab r no').value,
+                                            Dilantin: document.getElementById('Dilantin').item,
                                             Dilantin_r: document.getElementById('Dilantin r').value,
-                                            Requip: document.getElementById('Requip F.C 0.25mg/tab').value,
+                                            // Dilantin_r_no: document.getElementById('Dilantin r no').value,
+                                            Requip: document.getElementById('Requip F.C 0.25mg/tab').item,
                                             Requip_r: document.getElementById('Requip F.C 0.25mg/tab r').value,
-                                            Requip1: document.getElementById('Requip F.C 1 mg').value,
+                                            Requip_r_no: document.getElementById('Requip F.C 0.25mg/tab r no').value,
+                                            Requip1: document.getElementById('Requip F.C 1 mg').item,
                                             Requip1_r: document.getElementById('Requip F.C 1 mg r').value,
-                                            Repaglinide: document.getElementById('Repaglinide 1mg/tab').value,
+
+                                            Repaglinide: document.getElementById('Repaglinide 1mg/tab').item,
                                             Repaglinide_r: document.getElementById('Repaglinide 1mg/tab r').value,
-                                            Transamin: document.getElementById('Transamin 250mg/tab').value,
+                                            Repaglinide_r_no: document.getElementById('Repaglinide 1mg/tab r no').value,
+                                            Transamin: document.getElementById('Transamin 250mg/tab').item,
                                             Transamin_r: document.getElementById('Transamin 250mg/tab r').value,
-                                            Bokey: document.getElementById('Bokey 100mg/tab').value,
+                                            Transamin_r_no: document.getElementById('Transamin 250mg/tab r no').value,
+                                            Bokey: document.getElementById('Bokey 100mg/tab').item,
                                             Bokey_r: document.getElementById('Bokey 100mg/tab r').value,
-                                            Zocor: document.getElementById('Zocor 20 mg/tab').value,
-                                            Zocor_r: document.getElementById('Zocor 20 mg/tab r').value,
-                                            FLU: document.getElementById('FLU-D (Fluconazole) 50mg/tab').value,
+                                            Bokey_r_no: document.getElementById('Bokey 100mg/tab r no').value,
+                                            Simvahexal: document.getElementById('Simvahexal 20 mg/tab').item,
+                                            Simvahexal_r: document.getElementById('Simvahexal 20 mg/tab r').value,
+                                            Simvahexal_r_no: document.getElementById('Simvahexal 20 mg/tab r no').value,
+                                            FLU: document.getElementById('FLU-D (Fluconazole) 50mg/tab').item,
                                             FLU_r: document.getElementById('FLU-D (Fluconazole) 50mg/tab r').value,
+                                            FLU_r_no: document.getElementById('FLU-D (Fluconazole) 50mg/tab r no').value,
                                             
                                              });
         dan.push('confirm', all_info);
@@ -125,5 +141,6 @@ function check_bt(f){
     else if(f === 'pill'){
         dan.push('pill_detect',[true]);
         output_pill_bt = output_pill_bt + 1;
+        $('.pill_hint')[0].innerText = 'waiting...';
     }
 }
