@@ -26,7 +26,7 @@ app = Flask(__name__)
 
 @app.route('/syringe/')
 def init():
-    N = 16  ## len(username)
+    N = 5  ## len(username)
     username = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
     print("welcome", username)
     global hist_dict

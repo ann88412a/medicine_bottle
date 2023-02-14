@@ -2,7 +2,7 @@
 <head>
     <title>Add new medicine</title>
     <meta charset=utf-8>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js">
+    <script type="text/javascript" src="/static/js/jquery.min.js">
         function autoRefresh() {
             window.location.reload();
         }
@@ -10,48 +10,65 @@
 </head>
 
 <body>
-    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
-    <h1> Add new medicine </h1>
-
-    {% if request.cookies.get('barcode_id') == 'None' %}
+    <div style="float: right">隨機亂數識別碼: {{ request.cookies.get('username') }} </div>
+    <h1> 新增針劑藥物 </h1>
+    <hr>
+    <div>
+        <font style="font-weight:bold;">操作流程說明:</font>
+        <div style="margin-left: 1em;">
+            1. 操作設備掃描藥瓶條碼   <br>
+            2. 輸入欲稀釋劑量與   <br>
+            3. 還沒想到   <br>
+{#            4. 點擊<font style="background-color: #4CAF50">"下一步"</font>按鈕以繼續   <br>#}
+        </div>
+    </div>
+    <hr>
+    {% if request.cookies.get('barcode_id') == 'None' %} {# barcode掃描按鈕 #}
+    <div>
+        <p>流程：1</p>
+        <p>點擊<font style="background-color: #4CAF50">"下一步"</font>按鈕後，等待機器出現指示，並依指示操作。</p>
         <form method="post">
-            <p> *Please click the button to start. </p>
             <input type="hidden" name="syringe_scan_state" value="0">
             <input type="hidden" name="injection_site_state" value="0">
             <input type="hidden" name="add_new_state" value="0">
-            <button type="submit" name="barcode_scan_state" value="1">Start</button>
+            <button type="submit" name="barcode_scan_state" style="padding: 12px; background-color: #4CAF50; border: none; border-radius: 4px;" value="1">下一步</button>
         </form>
+    </div>
 
     {% elif request.cookies.get('syringe_scale_value') == 'None' %}
         <div>
-            <table border=3>
-                <tr>
-                    <th width=110px align="left">Barcode</th>
-                    <td> {{ request.cookies.get('barcode_id') }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Medicine name</th>
-                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
-                </tr>
-            </table>
-        </div><br>
-        <div>
-            <form method="post" onsubmit="if(typeof($('input[name=syringe_type]:checked').val())=='undefined'){alert('Please select the syringe type.');return false;}">
-                <p> *Please make sure all of your settings are correct, and click the button to start. </p>
-                <p> Diluted doses: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml</p>
-                <p>
-                    Syringe type:
-                    <input type="radio" name="syringe_type" value="1 ml">1 ml &nbsp&nbsp&nbsp&nbsp
-                    <input type="radio" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
-                    <input type="radio" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
-                    <input type="radio" name="syringe_type" value="10 ml">10 ml
-                </p>
-                <input type="hidden" name="barcode_scan_state" value="0">
-                <input type="hidden" name="injection_site_state" value="0">
-                <input type="hidden" name="add_new_state" value="0">
-                <button type="submit" name="syringe_scan_state" value="1">Start</button>
-            </form>
+            <p>流程：2</p>
+            <div>
+                <table border=3>
+                    <tr>
+                        <th width=110px align="left" style="background-color: #D6EEEE;">條碼編號</th>
+                        <td> {{ request.cookies.get('barcode_id') }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left" style="background-color: #D6EEEE;">藥劑名稱</th>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <div>
+                <form method="post" onsubmit="if(typeof($('input[name=syringe_type]:checked').val())=='undefined'){alert('Please select the syringe type.');return false;}">
+                    <p> Diluted doses: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml</p>
+                    <p>
+                        空針樣式:
+                        <input type="radio" name="syringe_type" value="1 ml">1 ml &nbsp&nbsp&nbsp&nbsp
+                        <input type="radio" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
+                        <input type="radio" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
+                        <input type="radio" name="syringe_type" value="10 ml">10 ml
+                    </p>
+                    <input type="hidden" name="barcode_scan_state" value="0">
+                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="add_new_state" value="0">
+                    <button type="submit" name="syringe_scan_state" value="1">下一步</button>
+                </form>
+            </div>
         </div>
+
 
     {% elif request.cookies.get('injection_site') == 'None' %}
         <div>
