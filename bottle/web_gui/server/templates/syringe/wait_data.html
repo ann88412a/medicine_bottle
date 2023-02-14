@@ -6,8 +6,9 @@
 </head>
 
 <body>
-    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
-    <h1> Add new medicine </h1>
+    <div style="float: right">隨機亂數識別碼: {{ request.cookies.get('username') }} </div>
+    <h1> 新增針劑藥物 </h1>
+    <hr>
     <p> Please use the mechine... </p>
-    <button> <a href="{{ url_for('syringe_index') }}">cancel</a></button>
+    <button> <a href="{{ url_for('syringe_index') }}">取消</a></button>
 </body>

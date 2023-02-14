@@ -13,22 +13,40 @@
 </head>
 
 <body>
-    <div style="float: right">Hi, usr: {{ request.cookies.get('username') }} </div>
-    <h1>Syringe scale</h1>
-    <br>
+    <div style="float: right">隨機亂數識別碼: {{ request.cookies.get('username') }} </div>
+    <h1>針劑藥物辨識系統</h1>
+    <hr>
 
+    <div>
+        <font style="font-weight:bold;">操作說明:</font>
+        <div style="margin-left: 1em;">
+            1. 如欲新增新的針劑藥物，請按下方<font style="font-weight:bold;">"已新增之針劑藥物清單"</font>表格右上角的<font style="background-color: #4CAF50">"新增"</font>按鈕!   <br>
+            2. 若確認下方<font style="font-weight:bold;">"已新增之針劑藥物清單"</font>表格已完成，則直接按下頁面左下方的<font style="color: white; background-color: #f44336">"上傳結果"</font>按鈕!   <br>
+            3. 還沒想到   <br>
+            4. 名詞解釋:
+                <div style="margin-left: 1em;">
+                    a. 條碼: 藥瓶上方的條碼編號  <br>
+                    b. 藥劑名稱: 該條碼所對應之藥劑名稱  <br>
+                    c. 施打總量: 從針筒注射進施打部位的所有液體量  <br>
+                    d. 稀釋總量: 用於稀釋的所有稀釋劑液體量  <br>
+                    e. 給藥途徑: 針劑施打部位  <br>
+                </div>
+        </div>
+    </div>
+
+    <hr>
     <table border=3>  <!-- show medicine list -->
         <caption style="font-weight:bold; font-size:22px;">
-            Medicine List:
-            <div style="float: right"> <button> <a href="{{ url_for('add_new') }}">add medicine</a></button> </div>
+            已新增之針劑藥物清單:
+            <div style="float: right"> <button style="padding: 12px; background-color: #4CAF50; border: none; border-radius: 4px;" onclick="window.location.href='{{ url_for('add_new') }}'">新增</button> </div>
         </caption>
-        <tr>
+        <tr style="background-color: #D6EEEE;">
             <th width=20px>No.</th>
-            <th width=120px>Barcode</th>
-            <th width=400px>Medicine name</th>
-            <th width=100px>Dosage</th>
-            <th width=100px>Diluted doses</th>
-            <th width=100px>Injection site</th>
+            <th width=120px>條碼編號</th>
+            <th width=400px>藥劑名稱</th>
+            <th width=100px>施打總量</th>
+            <th width=100px>稀釋總量</th>
+            <th width=100px>給藥途徑</th>
         </tr>
         {% if (medicine_list |length > 0) %}
             {% for i in medicine_list %}
@@ -41,13 +59,13 @@
             {%endfor%}
 {#            <tr><td><button> <a href="{{ url_for('add_new') }}">add medicine</a></button></td></tr>#}
         {% else %}
-            <tr><td colspan=6 align="center"> No data. </td></tr>
+            <tr><td colspan=6 align="center"> 這裡面什麼都沒有... </td></tr>
 {#            <tr><td colspan=6 align="right"> <button> <a href="{{ url_for('add_new') }}">add medicine</a></button> </td></tr>#}
         {% endif %}
     </table><br>
 
 
-    <button style="float:left"> <a href="{{ url_for('submit_result') }}">Submit</a></button>
-
+    <button style="float:left; padding: 12px; color: white; background-color: #f44336; border: none; border-radius: 4px;" onclick="if(confirm('確認送出？')){window.location.href='{{ url_for('submit_result') }}'}">上傳結果</button>
+{#onsubmit="if(){alert('');return false;}"#}
 
 </body>
