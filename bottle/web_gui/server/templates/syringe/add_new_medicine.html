@@ -2,6 +2,21 @@
 <head>
     <title>Add new medicine</title>
     <meta charset=utf-8>
+    <style>
+        body{
+            font-family: verdana;
+            font-size: 36px;
+        }
+        button {
+            border: none;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 32px;
+            border-radius: 8px;
+        }
+    </style>
     <script type="text/javascript" src="/static/js/jquery.min.js">
         function autoRefresh() {
             window.location.reload();
@@ -10,7 +25,7 @@
 </head>
 
 <body>
-    <div style="float: right">隨機亂數識別碼: {{ request.cookies.get('username') }} </div>
+    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>
     <h1> 新增針劑藥物 </h1>
     <hr>
 {#    <div>#}
@@ -33,7 +48,7 @@
             <input type="hidden" name="injection_site_state" value="0">
             <input type="hidden" name="add_new_state" value="0">
             <hr>
-            <button type="submit" name="barcode_scan_state" style="float: right; padding: 12px; background-color: #4CAF50; border: none; border-radius: 4px;" value="1">下一步</button>
+            <button type="submit" name="barcode_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
         </form>
     </div>
 
@@ -86,8 +101,8 @@
                     <input type="hidden" name="injection_site_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <hr>
-                    <button style="float:left; padding: 12px; color: white; background-color: #f44336; border: none; border-radius: 4px;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取消</button>
-                    <button type="submit" name="syringe_scan_state" style="float: right; padding: 12px; background-color: #4CAF50; border: none; border-radius: 4px;" value="1">下一步</button>
+                    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取消</button>
+                    <button type="submit" name="syringe_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
                 </form>
             </div>
         </div>
@@ -130,7 +145,7 @@
                 <input type="hidden" name="barcode_scan_state" value="0">
                 <input type="hidden" name="syringe_scan_state" value="0">
                 <input type="hidden" name="add_new_state" value="0">
-                <button type="submit" name="injection_site_state" value="1">Next</button>
+                <button type="submit" name="injection_site_state" style="background-color: #4CAF50;" value="1">下一步</button>
             </form>
         </div>
 
@@ -168,7 +183,7 @@
             <input type="hidden" name="barcode_scan_state" value="0">
             <input type="hidden" name="injection_site_state" value="0">
             <input type="hidden" name="syringe_scan_state" value="0">
-            <button type="submit" name="add_new_state" value="1">Confirm to add</button>
+            <button type="submit" name="add_new_state" style="background-color: #4CAF50;" value="1">確認新增</button>
         </form>
     {% endif %}
 

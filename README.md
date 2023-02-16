@@ -50,8 +50,8 @@ IVP是快速推注
     ├── LICENSE
     └── README.md
 
-
-
+## The Self-Signed Certificate (local-SSL)：
+https://blog.miniasp.com/post/2019/02/25/Creating-Self-signed-Certificate-using-OpenSSL
 
 ## How to install Arduino IDE(AARCH64) in Jetson Nano
 *Install the Arduino IDE (AARCH64 Ver.1.8.10).*
