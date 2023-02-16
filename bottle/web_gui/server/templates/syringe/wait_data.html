@@ -9,6 +9,11 @@
     <div style="float: right">隨機亂數識別碼: {{ request.cookies.get('username') }} </div>
     <h1> 新增針劑藥物 </h1>
     <hr>
-    <p> Please use the mechine... </p>
-    <button> <a href="{{ url_for('syringe_index') }}">取消</a></button>
+    <div>
+        <font style="font-weight:bold;">針劑辨識機器外觀:</font><br>
+        <img style="width:50%;" src="/static/images/barcode_scan.jpg"><br>
+    </div>
+    <hr>
+    <p> 請依照機器指示操作... </p>
+    <button style="float:left; padding: 12px; color: white; background-color: #f44336; border: none; border-radius: 4px;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取消</button>
 </body>

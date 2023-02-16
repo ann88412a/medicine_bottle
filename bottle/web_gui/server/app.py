@@ -33,19 +33,20 @@ def init():
     hist_dict[username] = []
     # hist_dict["kigison"] = [[1,2,3,4,5]]  # use for test
     resp = make_response(redirect(url_for(r'syringe_index')))
-    resp.set_cookie('username', username)  # save username in cookies
+    resp.set_cookie('username', username, samesite='None', secure=True)  # save username in cookies
     return resp
 
 @app.route('/syringe/syringe_index/')
 def syringe_index():
     global hist_dict
+    # print(request.cookies)
     resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')]))
-    resp.set_cookie('random_id', str(time.time()))  # save random_id in cookies. use for unit.
-    resp.set_cookie('barcode_id', "None")  # save random_id in cookies. use for unit.
-    resp.set_cookie('syringe_diluent_value', "None")
-    resp.set_cookie('syringe_type', "None")
-    resp.set_cookie('syringe_scale_value', "None")
-    resp.set_cookie('injection_site', "None")
+    resp.set_cookie('random_id', str(time.time()), samesite='None', secure=True)  # save random_id in cookies. use for unit.
+    resp.set_cookie('barcode_id', "None", samesite='None', secure=True)  # save random_id in cookies. use for unit.
+    resp.set_cookie('syringe_diluent_value', "None", samesite='None', secure=True)
+    resp.set_cookie('syringe_type', "None", samesite='None', secure=True)
+    resp.set_cookie('syringe_scale_value', "None", samesite='None', secure=True)
+    resp.set_cookie('injection_site', "None", samesite='None', secure=True)
     return resp
 
 @app.route('/syringe/add_new/', methods=['POST','GET'])
@@ -63,7 +64,7 @@ def add_new():
             return redirect(url_for(r'wait_data'))
         elif request.values['injection_site_state'] == '1':
             resp = make_response(redirect(url_for(r'add_new')))
-            resp.set_cookie('injection_site', request.values['injection_site'])  # save random_id in cookies. use for unit.
+            resp.set_cookie('injection_site', request.values['injection_site'], samesite='None', secure=True)  # save random_id in cookies. use for unit.
             return resp
         elif request.values['add_new_state'] == '1':
             usr = request.cookies.get('username')
@@ -84,14 +85,14 @@ def wait_data():
     global pull_data
     if request.cookies.get('random_id') in pull_data["barcode"].keys():
         resp = make_response(redirect(url_for(r'add_new')))
-        resp.set_cookie('barcode_id', str(pull_data["barcode"][request.cookies.get('random_id')]))
+        resp.set_cookie('barcode_id', str(pull_data["barcode"][request.cookies.get('random_id')]), samesite='None', secure=True)
         del pull_data["barcode"][request.cookies.get('random_id')]
         return resp
     if request.cookies.get('random_id') in pull_data["syringe"].keys():
         resp = make_response(redirect(url_for(r'add_new')))
-        resp.set_cookie('syringe_diluent_value', str(pull_data["syringe"][request.cookies.get('random_id')][-3]))
-        resp.set_cookie('syringe_type', pull_data["syringe"][request.cookies.get('random_id')][-2])
-        resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]))
+        resp.set_cookie('syringe_diluent_value', str(pull_data["syringe"][request.cookies.get('random_id')][-3]), samesite='None', secure=True)
+        resp.set_cookie('syringe_type', pull_data["syringe"][request.cookies.get('random_id')][-2], samesite='None', secure=True)
+        resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]), samesite='None', secure=True)
         del pull_data["syringe"][request.cookies.get('random_id')]
         return resp
     if request.cookies.get('injection_site') != "None":
@@ -152,7 +153,6 @@ def dummy_device_loop():
 
 if __name__ == '__main__':
     Thread(target=dummy_device_loop).start()
-
-
+    # font - family: verdana;
     # app.run(host='0.0.0.0', port="54784", debug=True)
-    app.run(host='0.0.0.0', port="54784", debug=False)
+    app.run(host='0.0.0.0', port="8100", ssl_context=('D:/medical_ssl/server.crt', 'D:/medical_ssl/server.key'), debug=False)
