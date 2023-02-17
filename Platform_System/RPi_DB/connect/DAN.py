@@ -2,11 +2,11 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'Medication_Device',
-    'dm_name': 'Medication_Device',
+    'd_name': 'medical_device_0',
+    'dm_name': 'medical_device',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['Pill_Detect_Result-I', 'Pill_Detect-O'],
+    'df_list': ['patient_barcode_r', 'pill_r', 'patient_barcode_sign', 'pill_sign'],
 }
 mac_addr = 'BAC0B21FDC32' #'C860008BD249'
 MAC = mac_addr

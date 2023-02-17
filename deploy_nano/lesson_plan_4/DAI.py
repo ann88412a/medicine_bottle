@@ -52,21 +52,21 @@ barcode_ans = '--------------'
 rep_pill_check = False
 while True:
     try:
-        # ============= barcode ===============
-        barcode_check = DAN.pull('patient_barcode_sign')
+        # # ============= barcode ===============
+        # barcode_check = DAN.pull('patient_barcode_sign')
         
-        if barcode_check:
+        # if barcode_check:
             
-            barcode_ans, timedOut = timedInput("Please, do enter something: ", timeout= 10)
-            # print(barcode_ans, timedOut)
-            if barcode_ans == "":
-                barcode_ans = 'barcode not read'
-            DAN.push ('patient_barcode_r', barcode_ans) 
+        #     barcode_ans, timedOut = timedInput("Please, do enter something: ", timeout= 10)
+        #     # print(barcode_ans, timedOut)
+        #     if barcode_ans == "":
+        #         barcode_ans = 'barcode not read'
+        #     DAN.push ('patient_barcode_r', barcode_ans) 
 
         # ============= pill yolo ===============
-        pill_detect_check = DAN.pull('pill_sign')
+        pill_detect_check = DAN.pull('Pill_Detect-O')
         
-        if pill_detect_check:
+        if pill_detect_check[1]:
             rep_pill_check = False
             # clear queue
             for i in range(predictions.qsize()):
@@ -95,7 +95,8 @@ while True:
             print(vote)
             for item in pills:
                 print(item, pills[item])
-            DAN.push ('pill_r',  pills['Dilatrend 25mg/tab'],
+            DAN.push ('Pill_Detect_Result-I',  pill_detect_check[0],
+                                                    pills['Dilatrend 25mg/tab'],
                                                     pills[ 'Requip F.C 0.25mg/tab'],
                                                     pills['Repaglinide 1mg/tab'],
                                                     pills['Transamin 250mg/tab'],
@@ -104,19 +105,6 @@ while True:
                                                     pills['FLU-D (Fluconazole) 50mg/tab'],
                                                     pills['Dilantin'],
                                                     pills['Requip F.C 1 mg'])
-        # print('return',predictions.qsize())
-        # =========== confirm ==========
-        # confirm_check = DAN.pull('id_check') 
-        
-        # if confirm_check:
-        #     pills_json = json.dumps(pills)
-        #     print(pills)
-        #     DAN.push ('backup', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), confirm_check[1], barcode_ans, pills_json) 
-
-        #     time.sleep(0.5)
-        #     DAN.push ('barcode_ans', '____________') 
-        #     DAN.push ('pill_detect_done', False)
-            
 
 
 

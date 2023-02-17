@@ -2,18 +2,16 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'Medication_Device',
-    'dm_name': 'Medication_Device',
+    'd_name': 'Medication_DB_0',
+    'dm_name': 'Medication_DB',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['Pill_Detect_Result-I', 'Pill_Detect-O'],
+    'df_list': ['Patient-I', 'Search-Result-I', 'Barcode-O', 'Search-O', 'Sheet-O'],
 }
-mac_addr = 'BAC0B21FDC32' #'C860008BD249'
-MAC = mac_addr
-# state = 'SUSPEND'     #for control channel
+mac_addr = None #'C860008BD249'
+
+#state = 'SUSPEND'     #for control channel
 state = 'RESUME'
-
-
 
 SelectedDF = []
 control_channel_timestamp = None
@@ -72,9 +70,7 @@ def detect_local_ec():
             #print('IoTtalk server = {}'.format(csmapi.ENDPOINT))
 
 timestamp={}
-# ====== connect ======
-for i in profile['df_list']: timestamp[i] = ''
-# MAC=get_mac_addr()
+MAC=get_mac_addr()
 thx=None
 def register_device(addr):
     global MAC, profile, timestamp, thx
@@ -118,9 +114,10 @@ def device_registration_with_retry(URL=None, addr=None):
 
 def pull(FEATURE_NAME):
     global timestamp
-    
+
     if state == 'RESUME': data = csmapi.pull(MAC,FEATURE_NAME)
     else: data = []
+        
     if data != []:
         if timestamp[FEATURE_NAME] == data[0][0]:
             return None
