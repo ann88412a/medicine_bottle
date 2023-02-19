@@ -2,21 +2,7 @@
 <head>
     <title>Add new medicine</title>
     <meta charset=utf-8>
-    <style>
-        body{
-            font-family: verdana;
-            font-size: 36px;
-        }
-        button {
-            border: none;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 32px;
-            border-radius: 8px;
-        }
-    </style>
+    <link rel=stylesheet type="text/css" href="/static/css/medical_bottle.css">
     <script type="text/javascript" src="/static/js/jquery.min.js">
         function autoRefresh() {
             window.location.reload();
@@ -25,52 +11,66 @@
 </head>
 
 <body>
-    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>
-    <h1> 新增針劑藥物 </h1>
-    <hr>
-{#    <div>#}
-{#        <font style="font-weight:bold;">針劑辨識機器外觀:</font><br>#}
-{#        <img style="width:50%;" src="/static/images/barcode_scan.jpg"><br>#}
-{#    </div>#}
-{#    <hr>#}
     {% if request.cookies.get('barcode_id') == 'None' %} {# barcode掃描按鈕 #}
-    <div>
-        <font style="font-weight:bold;">藥瓶條碼掃描流程：</font>
-        <p style="margin-left: 1em;">
-            1. 請詳讀完成再行操作   <br>
-            2. 點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕。   <br>
-            3. 前項操作完成後，會出現機器外觀圖示。   <br>
-            4. 找到機器，等待機器出現指示，開始掃描藥瓶條碼。   <br>
-        </p><br>
-        <img style="width:50%;" src="/static/images/scanning.jpg"><br>
-        <form method="post">
-            <input type="hidden" name="syringe_scan_state" value="0">
-            <input type="hidden" name="injection_site_state" value="0">
-            <input type="hidden" name="add_new_state" value="0">
-            <hr>
-            <button type="submit" name="barcode_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
-        </form>
-    </div>
-
-    {% elif request.cookies.get('syringe_scale_value') == 'None' %} {# 輸入稀釋劑量&注射針筒形式 #}
         <div>
-            <div>
-                <font style="font-weight:bold;">注射劑量辨識流程：</font>
-                <p style="margin-left: 1em;">
-                    1. 請詳讀完成再行操作   <br>
-                    2. 輸入   <br>
-                    2. 點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕。   <br>
-                    3. 前項操作完成後，會出現機器外觀圖示。   <br>
-                    4. 找到機器，等待機器出現指示，開始掃描藥瓶條碼。   <br>
-                </p>
+            <div class="tipicon">
+                <h1 style="line-height: 20%;">
+                    藥瓶條碼掃描
+                    <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
+                </h1>
+                <span class="tipicontext">
+                    <font style="font-weight:bold;">藥瓶條碼掃描流程：</font>
+                    <div style="margin-left: 1em;">
+                        <ol>
+                            <li>點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕。 </li>
+                            <li>前項操作完成後，會出現機器外觀圖示。 </li>
+                            <li>找到機器，等待機器螢幕出現指示。 </li>
+                            <li>按下條碼掃描器按鈕，開始掃描藥瓶條碼。 </li>
+                        </ol>
+                    </div>
+                </span>
             </div>
             <hr>
-
             <div>
-                <font style="font-weight:bold;">當前藥劑資訊：</font>
-                <table border=3 style="margin-left: 1em;">
+                *點擊<font style="background-color: #4CAF50">"下一步"</font>按鈕後開始掃描。
+                <img style="width:100%;" src="/static/images/scanning.jpg"><br>
+                <form method="post">
+                    <input type="hidden" name="syringe_scan_state" value="0">
+                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="add_new_state" value="0">
+                    <input type="hidden" name="syringe_diluent_state" value="0">
+                    <hr>
+                    <button type="submit" name="barcode_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
+                </form>
+                <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
+            </div>
+        </div>
+
+    {% elif request.cookies.get('syringe_diluent_value') == 'None' %} {# 輸入稀釋劑量 #}
+        <div>
+            <div class="tipicon">
+                <h1 style="line-height: 20%;">
+                    稀釋總量輸入
+                    <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
+                </h1>
+                <span class="tipicontext">
+                    <font style="font-weight:bold;">稀釋總量輸入流程:</font>
+                    <div style="margin-left: 1em;">
+                        <ol>
+                            <li>請在下方稀釋劑用量欄位輸入本次稀釋劑用量。 </li>
+                            <li>若無需稀釋，請輸入"0"。 </li>
+                            <li>將稀釋劑以輸入的量，注入藥瓶中。 </li>
+                            <li>點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕跳至下一功能。 </li>
+                        </ol>
+                    </div>
+                </span>
+            </div>
+            <hr>
+            <div>
+                <table border=3>
+                    <caption style="font-weight:bold;">當前藥劑資訊</caption>
                     <tr>
-                        <th width=110px align="left" style="background-color: #D6EEEE;">條碼編號</th>
+                        <th width=17% align="left" style="background-color: #D6EEEE;">條碼編號</th>
                         <td> {{ request.cookies.get('barcode_id') }} </td>
                     </tr>
                     <tr>
@@ -82,109 +82,186 @@
             <hr>
 
             <div>
-                <form method="post" onsubmit="if(typeof($('input[name=syringe_type]:checked').val())=='undefined'){alert('Please select the syringe type.');return false;}">
-                    <font style="font-weight:bold;">請輸入該您的稀釋劑用量：</font>
+                <form method="post">
+                    <font style="font-weight:bold;">請輸入本次稀釋劑用量：</font>
                     <p style="margin-left: 1em;">
-                        *若無需稀釋，請輸入"0"。  <br>
-                        稀釋總量: <input type="number" name="syringe_diluent_value" min="0.00" max="100.00" step="0.01" value="0"> /ml
-                    </p>
-                    <hr>
-                    <font style="font-weight:bold;">請選擇您欲辨識之空針樣式：</font>
-                    <p>
-                        空針樣式:
-                        <input type="radio" name="syringe_type" value="1 ml">1 ml &nbsp&nbsp&nbsp&nbsp
-                        <input type="radio" name="syringe_type" value="3 ml">3 ml &nbsp&nbsp&nbsp&nbsp
-                        <input type="radio" name="syringe_type" value="5 ml">5 ml &nbsp&nbsp&nbsp&nbsp
-                        <input type="radio" name="syringe_type" value="10 ml">10 ml
+                        稀釋劑用量: <input type="number" name="syringe_diluent_value" style="font-size:36px;" min="0.00" max="100.00" step="0.01" value="0"> /ml
                     </p>
                     <input type="hidden" name="barcode_scan_state" value="0">
                     <input type="hidden" name="injection_site_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <hr>
-                    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取消</button>
-                    <button type="submit" name="syringe_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
+                    <button type="submit" name="syringe_diluent_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
                 </form>
+                <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
             </div>
         </div>
 
+    {% elif request.cookies.get('syringe_scale_value') == 'None' %} {# 注射針筒形式 #}
+        <div>
+            <div class="tipicon">
+                <h1 style="line-height: 20%;">
+                    注射總量辨識
+                    <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
+                </h1>
+                <span class="tipicontext">
+                    <font style="font-weight:bold;">注射總量辨識流程:</font>
+                    <div style="margin-left: 1em;">
+                        <ol>
+                            <li>請先選擇注射空針樣式。 </li>
+                            <li>抽取藥劑。 </li>
+                            <li>點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕。 </li>
+                            <li>前項操作完成後，會出現機器外觀圖示。 </li>
+                            <li>找到機器，等待機器出現指示，將針筒放入機器辨識。 </li>
+                        </ol>
+                    </div>
+                </span>
+            </div>
+            <hr>
+            <div>
+                <table border=3>
+                    <caption style="font-weight:bold;">當前藥劑資訊</caption>
+                    <tr>
+                        <th width=17% align="left" style="background-color: #D6EEEE;">條碼編號</th>
+                        <td> {{ request.cookies.get('barcode_id') }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left" style="background-color: #D6EEEE;">藥劑名稱</th>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left" style="background-color: #D6EEEE;">稀釋總量</th>
+                        <td> {{ request.cookies.get('syringe_diluent_value') }} /ml </td>
+                    </tr>
+                </table>
+            </div>
+            <hr>
 
-    {% elif request.cookies.get('injection_site') == 'None' %}
+            <div>
+                <form method="post" onsubmit="if($('select[name=syringe_type] option').filter(':selected').val()==''){alert('請選擇注射空針樣式!');return false;}">
+                    <font style="font-weight:bold;">注射空針樣式:</font>
+                    <select name="syringe_type" style="font-size:36px;">
+                        <option value="">--請選擇您欲辨識之空針樣式--</option>
+                        <option value="1 ml">1 ml</option>
+                        <option value="3 ml">3 ml</option>
+                        <option value="5 ml">5 ml</option>
+                        <option value="10 ml">10 ml</option>
+                    </select>
+                    <input type="hidden" name="barcode_scan_state" value="0">
+                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="add_new_state" value="0">
+                    <input type="hidden" name="syringe_diluent_state" value="0">
+                    <hr>
+                    <button type="submit" name="syringe_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
+                </form>
+                <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
+            </div>
+        </div>
+
+    {% elif request.cookies.get('injection_site') == 'None' %} {# 選則施打部位 #}
         <div>
-            <table border=3>
-                <tr>
-                    <th width=110px align="left">Barcode</th>
-                    <td> {{ request.cookies.get('barcode_id') }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Medicine name</th>
-                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Dosage</th>
-                    <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
-                </tr>
-                <tr>
-                    <th align="left">Diluted doses</th>
-                    <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
-                </tr>
-                <tr>
-                    <th align="left">Syringe type</th>
-                    <td> {{ request.cookies.get('syringe_type') }} </td>
-                </tr>
-            </table>
-        </div><br>
-        <div>
-            <p> *Please select the injection site, and click the button next. </p>
-            <form method="post"  onsubmit="if(typeof($('input[name=injection_site]:checked').val())=='undefined'){alert('Please select the injection site.');return false;}">
-                <div style="position:relative; width:500px;">
-                    <img style="width:100%;" src="/static/images/IV.jpg">
-                    <input type="radio" style="position: absolute; width:20px; height:20px; top:200px; left:260px;" name="injection_site" value="IVD">
-                    <input type="radio" style="position: absolute; width:20px; height:20px; top:500px; left:260px;" name="injection_site" value="IVA">
-                    <input type="radio" style="position: absolute; width:20px; height:20px; top:750px; left:265px;" name="injection_site" value="undefine">
-                </div>
-                <input type="hidden" name="barcode_scan_state" value="0">
-                <input type="hidden" name="syringe_scan_state" value="0">
-                <input type="hidden" name="add_new_state" value="0">
-                <button type="submit" name="injection_site_state" style="background-color: #4CAF50;" value="1">下一步</button>
-            </form>
+            <div class="tipicon">
+                <h1 style="line-height: 20%;">
+                    給藥途徑選擇
+                    <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
+                </h1>
+                <span class="tipicontext">
+                    <font style="font-weight:bold;">給藥途徑選擇流程:</font>
+                    <div style="margin-left: 1em;">
+                        <ol>
+                            <li>點選圖片中的勾選框來選給藥途徑。 </li>
+                            <li>點擊頁面右下方<font style="background-color: #4CAF50">"下一步"</font>按鈕進入下一階段。 </li>
+                        </ol>
+                    </div>
+                </span>
+            </div>
+            <hr>
+            <div>
+                <table border=3>
+                    <caption style="font-weight:bold;">當前藥劑資訊</caption>
+                    <tr>
+                        <th width=17% align="left">條碼編號</th>
+                        <td> {{ request.cookies.get('barcode_id') }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left">藥劑名稱</th>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left">稀釋總量</th>
+                        <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
+                    </tr>
+                    <tr>
+                        <th align="left">施打總量</th>
+                        <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
+                    </tr>
+                    <tr>
+                        <th align="left">施打針具</th>
+                        <td> {{ request.cookies.get('syringe_type') }} </td>
+                    </tr>
+                </table>
+            </div><hr>
+            <div>
+                <form method="post"  onsubmit="if(typeof($('input[name=injection_site]:checked').val())=='undefined'){alert('請選擇給藥途徑!');return false;}">
+                    <div style="position:relative; width:500px;">
+                        <img style="width:100%;" src="/static/images/IV.jpg">
+                        <input type="radio" style="position: absolute; width:20px; height:20px; top:200px; left:260px;" name="injection_site" value="IVD">
+                        <input type="radio" style="position: absolute; width:20px; height:20px; top:500px; left:260px;" name="injection_site" value="IVA">
+                        <input type="radio" style="position: absolute; width:20px; height:20px; top:750px; left:265px;" name="injection_site" value="undefine">
+                    </div>
+                    <input type="hidden" name="barcode_scan_state" value="0">
+                    <input type="hidden" name="syringe_scan_state" value="0">
+                    <input type="hidden" name="add_new_state" value="0">
+                    <input type="hidden" name="syringe_diluent_state" value="0">
+                    <button type="submit" name="injection_site_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
+                </form>
+                <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
+            </div>
         </div>
 
     {% else %}
         <div>
-            <table border=3>
-                <tr>
-                    <th width=110px align="left">Barcode</th>
-                    <td> {{ request.cookies.get('barcode_id') }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Medicine name</th>
-                    <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Dosage</th>
-                    <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
-                </tr>
-                <tr>
-                    <th align="left">Diluted doses</th>
-                    <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
-                </tr>
-                <tr>
-                    <th align="left">Syringe type</th>
-                    <td> {{ request.cookies.get('syringe_type') }} </td>
-                </tr>
-                <tr>
-                    <th align="left">Injection site</th>
-                    <td> {{ request.cookies.get('injection_site') }} </td>
-                </tr>
-            </table>
-        </div><br>
+            <h1 style="line-height: 20%;"> 藥劑新增確認</h1>
+            <hr>
+            <div>
+                <table border=3>
+                    <caption style="font-weight:bold;">當前藥劑資訊</caption>
+                    <tr>
+                        <th width=17% align="left">條碼編號</th>
+                        <td> {{ request.cookies.get('barcode_id') }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left">藥劑名稱</th>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left">稀釋總量</th>
+                        <td> {{ request.cookies.get('syringe_diluent_value') }} ml</td>
+                    </tr>
+                    <tr>
+                        <th align="left">施打總量</th>
+                        <td> {{ request.cookies.get('syringe_scale_value') }} ml</td>
+                    </tr>
+                    <tr>
+                        <th align="left">施打針具</th>
+                        <td> {{ request.cookies.get('syringe_type') }} </td>
+                    </tr>
+                    <tr>
+                        <th align="left">給藥途徑</th>
+                        <td> {{ request.cookies.get('injection_site') }} </td>
+                    </tr>
+                </table>
+            </div><br>
 
-        <form method="post">
-            <input type="hidden" name="barcode_scan_state" value="0">
-            <input type="hidden" name="injection_site_state" value="0">
-            <input type="hidden" name="syringe_scan_state" value="0">
-            <button type="submit" name="add_new_state" style="background-color: #4CAF50;" value="1">確認新增</button>
-        </form>
+            <form method="post">
+                <input type="hidden" name="barcode_scan_state" value="0">
+                <input type="hidden" name="injection_site_state" value="0">
+                <input type="hidden" name="syringe_scan_state" value="0">
+                <input type="hidden" name="syringe_diluent_state" value="0">
+                <button type="submit" name="add_new_state" style="float: right; background-color: #4CAF50;" value="1">確認新增</button>
+            </form>
+            <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button
+        </div>
     {% endif %}
 
 

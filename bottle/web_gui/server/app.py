@@ -26,14 +26,21 @@ app = Flask(__name__)
 
 @app.route('/syringe/')
 def init():
+    global hist_dict
+    resp = make_response(redirect(url_for(r'syringe_index')))
+    # print(request.cookies.get('username'))
+    if(request.cookies.get('username') != "None"):
+        try:
+            if hist_dict[request.cookies.get('username')] != []:
+                return resp
+        except:
+            pass
     N = 5  ## len(username)
     username = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
-    print("welcome", username)
-    global hist_dict
     hist_dict[username] = []
-    # hist_dict["kigison"] = [[1,2,3,4,5]]  # use for test
-    resp = make_response(redirect(url_for(r'syringe_index')))
     resp.set_cookie('username', username, samesite='None', secure=True)  # save username in cookies
+    resp.set_cookie('machine_id', "bottle_01", samesite='None', secure=True)
+    print("welcome", username)
     return resp
 
 @app.route('/syringe/syringe_index/')
@@ -54,13 +61,15 @@ def add_new():
     global hist_dict
     if request.method == 'POST':
         if request.values['barcode_scan_state'] == '1':
-            DAN.push('barcode_control_server', request.cookies.get('username'),
+            DAN.push('barcode_control_server', request.cookies.get('machine_id'),
                      request.cookies.get('random_id'), True)
             return redirect(url_for(r'wait_data'))
+        elif request.values['syringe_diluent_state'] == '1':
+            resp = make_response(redirect(url_for(r'add_new')))
+            resp.set_cookie('syringe_diluent_value', request.values['syringe_diluent_value'], samesite='None', secure=True)
+            return resp
         elif request.values['syringe_scan_state'] == '1':
-            DAN.push('syringe_scale_control_server', request.cookies.get('username'),
-                     request.cookies.get('random_id'), request.values['syringe_diluent_value'],
-                     request.values['syringe_type'], True)
+            DAN.push('syringe_scale_control_server', request.cookies.get('machine_id'), request.cookies.get('random_id'), request.values['syringe_type'], True)
             return redirect(url_for(r'wait_data'))
         elif request.values['injection_site_state'] == '1':
             resp = make_response(redirect(url_for(r'add_new')))
@@ -70,11 +79,11 @@ def add_new():
             usr = request.cookies.get('username')
             Barcode = request.cookies.get('barcode_id')
             Medicine_name = medicine_dict[Barcode]
-            Dosage = request.cookies.get('syringe_scale_value')
             Diluted_doses = request.cookies.get('syringe_diluent_value')
+            Dosage = request.cookies.get('syringe_scale_value')
             Injection_site = request.cookies.get('injection_site')
-            print([Barcode, Medicine_name, Dosage, Diluted_doses, Injection_site])
-            hist_dict[usr].append([Barcode, Medicine_name, Dosage, Diluted_doses, Injection_site])
+            # print([Barcode, Medicine_name, Diluted_doses, Dosage, Injection_site])
+            hist_dict[usr].append([Barcode, Medicine_name, Diluted_doses, Dosage, Injection_site])
             return redirect(url_for(r'syringe_index'))
 
     return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
@@ -90,7 +99,6 @@ def wait_data():
         return resp
     if request.cookies.get('random_id') in pull_data["syringe"].keys():
         resp = make_response(redirect(url_for(r'add_new')))
-        resp.set_cookie('syringe_diluent_value', str(pull_data["syringe"][request.cookies.get('random_id')][-3]), samesite='None', secure=True)
         resp.set_cookie('syringe_type', pull_data["syringe"][request.cookies.get('random_id')][-2], samesite='None', secure=True)
         resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]), samesite='None', secure=True)
         del pull_data["syringe"][request.cookies.get('random_id')]
@@ -101,16 +109,19 @@ def wait_data():
 
 @app.route('/syringe/submit_result/')
 def submit_result():
-    global hist_dict
+    global hist_dict, pull_data
     try:
         push_data = json.dumps({"bottle": hist_dict[request.cookies.get('username')]})
         DAN.push('syringe_submit_result_server', push_data)
-        print("DAN.push('syringe_submit_result_server')", push_data)
+        # print("DAN.push('syringe_submit_result_server')", push_data)
         del hist_dict[request.cookies.get('username')]
 
     except KeyError:
         pass
-    return redirect("http://140.113.110.21:1526/show/index.html", code=302)  # Enter the URL you wish to use after push data.
+    # return redirect("http://140.113.110.21:1526/show/index.html", code=302)  # Enter the URL you wish to use after push data.
+    # print(hist_dict, pull_data)
+    # return redirect(url_for(r'init'))
+    return render_template(r"syringe/finished.html")
 
 
 ## =============================================================
@@ -119,7 +130,7 @@ def dummy_device_loop():
     ServerURL = 'http://1.iottalk.tw:9999'  # with non-secure connection
     # ServerURL = 'https://DomainName' #with SSL connection
     Reg_addr = None  # if None, Reg_addr = MAC address
-    DAN.profile['dm_name'] = 'medical_bottle_server'
+    DAN.profile['dm_name'] = 'medical_bottle_server_V2'
     DAN.profile['df_list'] = ['barcode_control_server', 'syringe_scale_control_server', 'syringe_submit_result_server', 'barcode_result_server',
                               'syringe_scale_result_server', ]
     DAN.profile['d_name'] = 'medical_bottle_server'
@@ -133,12 +144,12 @@ def dummy_device_loop():
                 # if barcode_result[-1] == True:
                 #     DAN.push('barcode_control_server', request.cookies.get('username'),
                 #              request.cookies.get('random_id'), False)
-                print('barcode_result', barcode_result)
+                # print('barcode_result', barcode_result)
                 pull_data["barcode"][barcode_result[1]] = barcode_result[-1]
             syringe_scale_result = DAN.pull('syringe_scale_result_server')  # Pull data from an output device feature "Dummy_Control"
-            if syringe_scale_result != None:  ## syringe_scale_result -> [UserName, RandId, DilutedDoses, SyringeType, Dosage]
-                print('syringe_scale_result', syringe_scale_result)
-                pull_data["syringe"][syringe_scale_result[1]] = syringe_scale_result[-3:]
+            if syringe_scale_result != None:  ## syringe_scale_result -> [UserName, RandId, SyringeType, Dosage]
+                # print('syringe_scale_result', syringe_scale_result)
+                pull_data["syringe"][syringe_scale_result[1]] = syringe_scale_result[2:]
 
         except Exception as e:
             print(e)

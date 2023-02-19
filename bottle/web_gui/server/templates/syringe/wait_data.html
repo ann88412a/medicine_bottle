@@ -2,33 +2,19 @@
 <head>
     <title>Wait Data</title>
     <meta charset=utf-8>
-    <style>
-        body{
-            font-family: verdana;
-            font-size: 36px;
-        }
-        button {
-            border: none;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 32px;
-            border-radius: 8px;
-        }
-    </style>
+    <link rel=stylesheet type="text/css" href="/static/css/medical_bottle.css">
     <meta http-equiv="refresh" content="1">
 </head>
 
 <body>
-    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>
+{#    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>#}
     <h1> 新增針劑藥物 </h1>
     <hr>
     <div>
         <font style="font-weight:bold;">針劑辨識機器外觀:</font><br>
-        <img style="width:50%;" src="/static/images/barcode_scan.jpg"><br>
+        <img style="width:100%;" src="/static/images/barcode_scan.jpg"><br>
     </div>
     <hr>
     <p> 請依照機器指示操作... </p>
-    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取消</button>
+    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
 </body>
