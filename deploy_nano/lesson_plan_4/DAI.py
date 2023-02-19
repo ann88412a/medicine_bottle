@@ -6,7 +6,22 @@ from queue import Queue
 from pytimedinput import timedInput
 from datetime import datetime
 import json
+import datetime
+# google Drive API
+import google.auth
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+import auth
+import os
 
+# google drive
+SCOPES = 'https://www.googleapis.com/auth/drive'
+# your google drive API OAuth
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'Drive API'
+authInst = auth.auth(SCOPES,CLIENT_SECRET_FILE,APPLICATION_NAME)
+creds = authInst.getCredentials()
 
 
 # ================ iottalk ===============
@@ -50,23 +65,28 @@ pills = { 'Dilatrend 25mg/tab' : 0,
                 'Requip F.C 1 mg': 0}
 barcode_ans = '--------------'
 rep_pill_check = False
+user_id = 'user'
 while True:
     try:
-        # ============= barcode ===============
-        barcode_check = DAN.pull('patient_barcode_sign')
+        # # ============= barcode ===============
+        # barcode_check = DAN.pull('patient_barcode_sign')
         
-        if barcode_check:
+        # if barcode_check:
             
-            barcode_ans, timedOut = timedInput("Please, do enter something: ", timeout= 10)
-            # print(barcode_ans, timedOut)
-            if barcode_ans == "":
-                barcode_ans = 'barcode not read'
-            DAN.push ('patient_barcode_r', barcode_ans) 
+        #     barcode_ans, timedOut = timedInput("Please, do enter something: ", timeout= 10)
+        #     # print(barcode_ans, timedOut)
+        #     if barcode_ans == "":
+        #         barcode_ans = 'barcode not read'
+        #     DAN.push ('patient_barcode_r', barcode_ans) 
 
         # ============= pill yolo ===============
-        pill_detect_check = DAN.pull('pill_sign')
+        pill_detect_check = DAN.pull('Pill_Detect-O')
         
-        if pill_detect_check:
+        # print('pull', pill_detect_check)
+        
+
+        if pill_detect_check != None and pill_detect_check[1]:
+            user_id = pill_detect_check[0]
             rep_pill_check = False
             # clear queue
             for i in range(predictions.qsize()):
@@ -77,6 +97,7 @@ while True:
             # DAN.push ('pill_r', False)
         
         if rep_pill_check == False and predictions.qsize() >= 50:
+            
             rep_pill_check = True
             candidate = []
             vote = []
@@ -95,7 +116,8 @@ while True:
             print(vote)
             for item in pills:
                 print(item, pills[item])
-            DAN.push ('pill_r',  pills['Dilatrend 25mg/tab'],
+            DAN.push ('Pill_Detect_Result-I',  user_id,
+                                                    pills['Dilatrend 25mg/tab'],
                                                     pills[ 'Requip F.C 0.25mg/tab'],
                                                     pills['Repaglinide 1mg/tab'],
                                                     pills['Transamin 250mg/tab'],
@@ -104,20 +126,25 @@ while True:
                                                     pills['FLU-D (Fluconazole) 50mg/tab'],
                                                     pills['Dilantin'],
                                                     pills['Requip F.C 1 mg'])
-        # print('return',predictions.qsize())
-        # =========== confirm ==========
-        # confirm_check = DAN.pull('id_check') 
-        
-        # if confirm_check:
-        #     pills_json = json.dumps(pills)
-        #     print(pills)
-        #     DAN.push ('backup', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), confirm_check[1], barcode_ans, pills_json) 
 
-        #     time.sleep(0.5)
-        #     DAN.push ('barcode_ans', '____________') 
-        #     DAN.push ('pill_detect_done', False)
-            
+            now = datetime.datetime.now()
+            now = now.strftime('%m_%d_%H_%M_%S')
+            cv2.imwrite(user_id + now + '.jpg', frame_queue.get())
+            try:
+                service = build('drive', 'v3', credentials=creds)
 
+                file_metadata = {'name': user_id + now + '.jpg',
+                                'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
+
+                media = MediaFileUpload(user_id + now + '.jpg', mimetype='image/jpeg')
+                
+                file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                print(F'File ID: {file.get("id")}')
+                os.remove(user_id + now + '.jpg')
+
+            except HttpError as error:
+                print(F'An error occurred: {error}')
+                file = None
 
 
     except Exception as e:
