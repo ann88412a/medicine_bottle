@@ -16,7 +16,7 @@ while True:
         #DAN.push ('Dummy_Sensor', IDF_data) #Push data to an input device feature "Dummy_Sensor"
 
         #==================================
-        pill_detect_check = DAN.pull('patient_barcode_sign')#Pull data from an output device feature "Dummy_Control"
+        pill_detect_check = DAN.pull('Barcode-O')#Pull data from an output device feature "Dummy_Control"
         print(pill_detect_check)
         
         
