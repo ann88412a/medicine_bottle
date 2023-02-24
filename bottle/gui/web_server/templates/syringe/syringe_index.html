@@ -4,6 +4,7 @@
     <meta charset=utf-8>
     <link rel=stylesheet type="text/css" href="/static/css/medical_bottle.css">
     <script>
+        console.log("%c %s", "color:red; font-size: 42px;", "{{ show_log }}");
         window.onpageshow = function(event) {
             if (event.persisted) {
                 window.location.reload()
@@ -23,7 +24,7 @@
             針劑藥物辨識系統
             <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
         </h1>
-        <hr>
+
 
         <span class="tipicontext">
             <font style="font-weight:bold;">操作說明:</font>
@@ -70,7 +71,7 @@
             {% endif %}
         </table><br>
     </div>
-
+    <hr>
     <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('送出後即無法更改，確認送出？')){window.location.href='{{ url_for('submit_result') }}'}">上傳結果</button>
 
 </body>

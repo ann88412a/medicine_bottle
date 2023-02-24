@@ -8,6 +8,28 @@
             window.location.reload();
         }
     </script>
+    <script>
+        function tabSW(evt, tab_ID) {
+            // 声明所有变量
+            var i, tabcontent, tablinks;
+
+            // 使用 class="tabcontent" 获取所有元素并隐藏它们
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // 获取所有带有 class="tablinks" 的元素并删除类 "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // 显示当前选项卡，并添加"活动"选项卡 类到打开选项卡的按钮
+            document.getElementById(tab_ID).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </head>
 
 <body>
@@ -36,7 +58,7 @@
                 <img style="width:100%;" src="/static/images/scanning.jpg"><br>
                 <form method="post">
                     <input type="hidden" name="syringe_scan_state" value="0">
-                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="injection_info_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <input type="hidden" name="syringe_diluent_state" value="0">
                     <hr>
@@ -88,7 +110,7 @@
                         稀釋劑用量: <input type="number" name="syringe_diluent_value" style="font-size:36px;" min="0.00" max="100.00" step="0.01" value="0"> /ml
                     </p>
                     <input type="hidden" name="barcode_scan_state" value="0">
-                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="injection_info_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <hr>
                     <button type="submit" name="syringe_diluent_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
@@ -146,9 +168,10 @@
                         <option value="3 ml">3 ml</option>
                         <option value="5 ml">5 ml</option>
                         <option value="10 ml">10 ml</option>
+                        <option value="others">其他</option>
                     </select>
                     <input type="hidden" name="barcode_scan_state" value="0">
-                    <input type="hidden" name="injection_site_state" value="0">
+                    <input type="hidden" name="injection_info_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <input type="hidden" name="syringe_diluent_state" value="0">
                     <hr>
@@ -158,7 +181,7 @@
             </div>
         </div>
 
-    {% elif request.cookies.get('injection_site') == 'None' %} {# 選則施打部位 #}
+    {% elif request.cookies.get('injection_info') == 'None' %} {# 選則施打部位 #}
         <div>
             <div class="tipicon">
                 <h1 style="line-height: 20%;">
@@ -202,18 +225,65 @@
                 </table>
             </div><hr>
             <div>
-                <form method="post"  onsubmit="if(typeof($('input[name=injection_site]:checked').val())=='undefined'){alert('請選擇給藥途徑!');return false;}">
-                    <div style="position:relative; width:500px;">
-                        <img style="width:100%;" src="/static/images/IV.jpg">
-                        <input type="radio" style="position: absolute; width:20px; height:20px; top:200px; left:260px;" name="injection_site" value="IVD">
-                        <input type="radio" style="position: absolute; width:20px; height:20px; top:500px; left:260px;" name="injection_site" value="IVA">
-                        <input type="radio" style="position: absolute; width:20px; height:20px; top:750px; left:265px;" name="injection_site" value="undefine">
-                    </div>
+                <div class="tab">
+                    <button class="tablinks" id="BT_IV_IVD_IVP" onclick="tabSW(event, 'IV_IVD_IVP'); document.getElementById('radio_injection_info_site').checked=true;">IV、IVD、IVP 選項</button>
+                    <button class="tablinks" id="BT_IM_SC_ID" onclick="tabSW(event, 'IM_SC_ID')">IM、SC、ID 選項</button>
+                </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function(event) {
+                        document.getElementById("BT_IV_IVD_IVP").click();
+                    });
+                    function injection_info_onsubmit_check(){
+                        var __iinjection_info_val = $('input[name=injection_info]:checked').val()
+                        var __injection_info_site_val = $('input[name=injection_info_site]:checked').val()
+                        if(typeof(__iinjection_info_val)=='undefined'){
+                            alert('請選擇給藥途徑!');
+                            return false;
+                        }
+                        else if(["IM", "SC", "ID"].includes(__iinjection_info_val) && __injection_info_site_val=="-"){
+                            alert('您的注射部位尚未選擇!');
+                            return false;
+                        }
+                        else{
+                            return true;
+                        }
+                    }
+                </script>
+                <form method="post"  onsubmit="return injection_info_onsubmit_check();">
+                    <div style="position:relative; width:100%;">
+                        <div id="IV_IVD_IVP" class="tabcontent">
+                            <img style="width:100%;" src="/static/images/IV_IVD_IVP.png">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:40.7%; left:15.7%;" name="injection_info" value="IV">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:60.1%; left:14.1%;" name="injection_info" value="IVD">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:38.3%; left:87.5%;" name="injection_info" value="IVP">
+                            <input type="radio" style="display:none;" id="radio_injection_info_site" name="injection_info_site" value="-"> {# 點滴無須選擇 #}
+                        </div>
+                        <div id="IM_SC_ID" class="tabcontent">
+                            <img style="width:100%;" src="/static/images/IM_SC_ID.png">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:68.25%; left:21.50%;" name="injection_info" value="IM">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:79.95%; left:21.25%;" name="injection_info" value="SC">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:92.20%; left:21.15%;" name="injection_info" value="ID">
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:15.93%; left:26.60%;" name="injection_info_site" value="unknown_01"> {# 肩峰下三橫指 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:21.31%; left:25.69%;" name="injection_info_site" value="unknown_02"> {# 手肘 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:26.97%; left:26.15%;" name="injection_info_site" value="unknown_03"> {# 手背 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:21.30%; left:33.35%;" name="injection_info_site" value="unknown_04"> {# 右上腹 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:24.42%; left:33.28%;" name="injection_info_site" value="unknown_05"> {# 右下腹 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:21.30%; left:38.50%;" name="injection_info_site" value="unknown_06"> {# 左上腹 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:24.42%; left:38.50%;" name="injection_info_site" value="unknown_07"> {# 左下腹 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:27.60%; left:39.90%;" name="injection_info_site" value="unknown_08"> {# 左前腿 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:24.95%; left:61.50%;" name="injection_info_site" value="unknown_09"> {# 左上臀 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:27.15%; left:61.50%;" name="injection_info_site" value="unknown_10"> {# 左下臀 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:24.95%; left:64.85%;" name="injection_info_site" value="unknown_11"> {# 右上臀 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:27.10%; left:64.71%;" name="injection_info_site" value="unknown_12"> {# 右下臀 #}
+                            <input type="radio" style="position: absolute; width:2.5%; height:2.5%; top:22.95%; left:69.60%;" name="injection_info_site" value="unknown_13"> {# 右前臂 #}
+                        </div>
+
+                    </div><br><hr>
                     <input type="hidden" name="barcode_scan_state" value="0">
                     <input type="hidden" name="syringe_scan_state" value="0">
                     <input type="hidden" name="add_new_state" value="0">
                     <input type="hidden" name="syringe_diluent_state" value="0">
-                    <button type="submit" name="injection_site_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
+                    <button type="submit" name="injection_info_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
                 </form>
                 <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
             </div>
@@ -248,14 +318,14 @@
                     </tr>
                     <tr>
                         <th align="left">給藥途徑</th>
-                        <td> {{ request.cookies.get('injection_site') }} </td>
+                        <td> {{ request.cookies.get('injection_info') }} </td>
                     </tr>
                 </table>
             </div><br>
 
             <form method="post">
                 <input type="hidden" name="barcode_scan_state" value="0">
-                <input type="hidden" name="injection_site_state" value="0">
+                <input type="hidden" name="injection_info_state" value="0">
                 <input type="hidden" name="syringe_scan_state" value="0">
                 <input type="hidden" name="syringe_diluent_state" value="0">
                 <button type="submit" name="add_new_state" style="float: right; background-color: #4CAF50;" value="1">確認新增</button>

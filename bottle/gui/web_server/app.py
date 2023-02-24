@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, url_for, redirect, make_response
 from threading import Thread
 from iottalk_lib import DAN
-import time, json, random, string
+import time, json, random, string, sys
+import numpy as np
 
 hist_dict = {}  # {username:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
 pull_data = {"barcode": {}, "syringe": {}}
@@ -47,13 +48,15 @@ def init():
 def syringe_index():
     global hist_dict
     # print(request.cookies)
-    resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')]))
+    show_log = r"\n"*10+r"(#`Д´)ﾉ  跨殺洨  (#`Д´)ﾉ\n\n是想作弊膩  ಠ_ಠ\n\n再不離開我叫老師來了喔!\n     .......(￣０￣)ノ舉手"+r"\n"*10
+    resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')], show_log=show_log))
     resp.set_cookie('random_id', str(time.time()), samesite='None', secure=True)  # save random_id in cookies. use for unit.
     resp.set_cookie('barcode_id', "None", samesite='None', secure=True)  # save random_id in cookies. use for unit.
     resp.set_cookie('syringe_diluent_value', "None", samesite='None', secure=True)
     resp.set_cookie('syringe_type', "None", samesite='None', secure=True)
     resp.set_cookie('syringe_scale_value', "None", samesite='None', secure=True)
-    resp.set_cookie('injection_site', "None", samesite='None', secure=True)
+    resp.set_cookie('injection_info', "None", samesite='None', secure=True)
+    # print(hist_dict)
     return resp
 
 @app.route('/syringe/add_new/', methods=['POST','GET'])
@@ -71,25 +74,44 @@ def add_new():
         elif request.values['syringe_scan_state'] == '1':
             DAN.push('syringe_scale_control_server', request.cookies.get('machine_id'), request.cookies.get('random_id'), request.values['syringe_type'], True)
             return redirect(url_for(r'wait_data'))
-        elif request.values['injection_site_state'] == '1':
+        elif request.values['injection_info_state'] == '1':
             resp = make_response(redirect(url_for(r'add_new')))
-            resp.set_cookie('injection_site', request.values['injection_site'], samesite='None', secure=True)  # save random_id in cookies. use for unit.
+
+            if request.values['injection_info_site'] != "-":
+                __injection_info = "{}({})".format(request.values['injection_info'], request.values['injection_info_site'])
+            else:
+                __injection_info = request.values['injection_info']
+            resp.set_cookie('injection_info', __injection_info, samesite='None', secure=True)  # save random_id in cookies. use for unit.
             return resp
         elif request.values['add_new_state'] == '1':
             usr = request.cookies.get('username')
             Barcode = request.cookies.get('barcode_id')
-            Medicine_name = medicine_dict[Barcode]
+            try:
+                Medicine_name = medicine_dict[Barcode]
+            except:
+                Medicine_name = "查無此藥品"
             Diluted_doses = request.cookies.get('syringe_diluent_value')
             Dosage = request.cookies.get('syringe_scale_value')
-            Injection_site = request.cookies.get('injection_site')
-            # print([Barcode, Medicine_name, Diluted_doses, Dosage, Injection_site])
-            hist_dict[usr].append([Barcode, Medicine_name, Diluted_doses, Dosage, Injection_site])
+            injection_info = request.cookies.get('injection_info')
+            # print([Barcode, Medicine_name, Diluted_doses, Dosage, injection_info])
+            if len(hist_dict[usr]) > 0:
+                same_barcode_index_arr = np.where(np.array(hist_dict[usr].copy())[:, 0] == Barcode)[0]
+                if(same_barcode_index_arr.size != 0):
+                    __idx = same_barcode_index_arr[0]
+                    hist_dict[usr][__idx][2] = str(float(hist_dict[usr][__idx][2]) + float(Diluted_doses))  # Diluted_doses
+                    hist_dict[usr][__idx][3] = str(float(hist_dict[usr][__idx][3]) + float(Dosage))  # Dosage
+                    if hist_dict[usr][__idx][4] != injection_info:
+                        hist_dict[usr][__idx][4] = "{} / {}".format(hist_dict[usr][__idx][4], injection_info)
+                else:
+                    hist_dict[usr].append([Barcode, Medicine_name, Diluted_doses, Dosage, injection_info])
+            else:
+                hist_dict[usr].append([Barcode, Medicine_name, Diluted_doses, Dosage, injection_info])
             return redirect(url_for(r'syringe_index'))
 
     return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
 
 
-@app.route('/syringe/wait_data/')
+@app.route('/syringe/wait_data/', methods=['POST', 'GET'])
 def wait_data():
     global pull_data
     if request.cookies.get('random_id') in pull_data["barcode"].keys():
@@ -103,8 +125,16 @@ def wait_data():
         resp.set_cookie('syringe_scale_value', str(pull_data["syringe"][request.cookies.get('random_id')][-1]), samesite='None', secure=True)
         del pull_data["syringe"][request.cookies.get('random_id')]
         return resp
-    if request.cookies.get('injection_site') != "None":
-        return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
+
+    if request.method == 'POST':
+        if request.values['cancel_scale'] == '1':
+            DAN.push('barcode_control_server', request.cookies.get('machine_id'),
+                     request.cookies.get('random_id'), False)
+            DAN.push('syringe_scale_control_server', request.cookies.get('machine_id'),
+                     request.cookies.get('random_id'), request.cookies.get('syringe_type'), False)
+            return redirect(url_for(r'syringe_index'))
+        if request.values['refresh'] == '1':
+            return ("", 204)
     return render_template(r'syringe/wait_data.html', barcode_id=None, medicine_name=None)
 
 @app.route('/syringe/submit_result/')
@@ -163,7 +193,9 @@ def dummy_device_loop():
 
 
 if __name__ == '__main__':
-    Thread(target=dummy_device_loop).start()
+    dm_loop = Thread(target=dummy_device_loop, name="medical_iottalk")
+    dm_loop.setDaemon(True)
+    dm_loop.start()
     # font - family: verdana;
     # app.run(host='0.0.0.0', port="54784", debug=True)
     app.run(host='0.0.0.0', port="8100", ssl_context=('D:/medical_ssl/server.crt', 'D:/medical_ssl/server.key'), debug=False)

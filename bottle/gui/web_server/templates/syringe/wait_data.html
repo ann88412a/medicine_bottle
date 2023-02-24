@@ -3,18 +3,32 @@
     <title>Wait Data</title>
     <meta charset=utf-8>
     <link rel=stylesheet type="text/css" href="/static/css/medical_bottle.css">
-    <meta http-equiv="refresh" content="1">
+{#    <meta http-equiv="refresh" content="1">#}
+    <script>
+        var auto_refresh = setInterval(function() { submitform(); }, 2000);
+        function submitform()
+        {
+          document.getElementById("check_scale").submit();
+        }
+    </script>
 </head>
 
 <body>
 {#    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>#}
-    <h1> 新增針劑藥物 </h1>
+    <h1 style="line-height: 20%;"> 新增針劑藥物 </h1>
     <hr>
     <div>
+        <p> 請依照機器指示操作... </p>
         <font style="font-weight:bold;">針劑辨識機器外觀:</font><br>
         <img style="width:100%;" src="/static/images/barcode_scan.jpg"><br>
     </div>
     <hr>
-    <p> 請依照機器指示操作... </p>
-    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
+    <form method="post" id="check_scale">
+        <input type="hidden" name="cancel_scale" value="0">
+        <input type="hidden" name="refresh" value="1">
+    </form>
+    <form method="post" onsubmit="if(!confirm('確認取消？')){return false;}">
+        <input type="hidden" name="refresh" value="0">
+        <button type="submit" name="cancel_scale" style="float:left; color: white; background-color: #f44336;" value="1">取  消</button>
+    </form>
 </body>
