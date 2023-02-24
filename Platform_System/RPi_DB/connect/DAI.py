@@ -5,7 +5,7 @@ import threading
 #================iottalk===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
-Reg_addr = 'BAC0B21FDC32' #if None, Reg_addr = MAC address
+Reg_addr = 'FF2C3883758D' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL
 # DAN.device_registration_with_retry(ServerURL, Reg_addr)
@@ -14,10 +14,10 @@ while True:
     try:
         #IDF_data = random.uniform(1, 10)
         barcode_ans = '310832007'
-        DAN.push ('patient_barcode_r', barcode_ans) #Push data to an input device feature "Dummy_Sensor"
+        DAN.push ('Patient-I', barcode_ans) #Push data to an input device feature "Dummy_Sensor"
 
         #==================================
-        pill_detect_check = DAN.pull('patient_barcode_sign')#Pull data from an output device feature "Dummy_Control"
+        pill_detect_check = DAN.pull('Barcode-O')#Pull data from an output device feature "Dummy_Control"
         print(pill_detect_check)
         
         
