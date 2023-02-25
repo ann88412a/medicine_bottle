@@ -1,7 +1,8 @@
 import tkinter as tk
+from tkinter.ttk import Separator
 from iottalk_lib import DAN
 from threading import Thread
-import time, json
+import time, json, statistics
 try:
     # fix opencv open webcam slowly bug in WIN10
     import os
@@ -36,13 +37,15 @@ class medical_GUI:
         stream = Thread(target=self.webcam_stream, name="medical_webcam_stream")
         stream.setDaemon(True)
         stream.start()
-        dm_loop = Thread(target=self.dummy_device_loop, name="medical_iottalk")
-        dm_loop.setDaemon(True)
-        dm_loop.start()
+        # dm_loop = Thread(target=self.dummy_device_loop, name="medical_iottalk")
+        # dm_loop.setDaemon(True)
+        # dm_loop.start()
 
         self.syringe_scale = syringe_scale()
 
-        self.wait_page()  # first step
+        # self.wait_page()  # first step
+        time.sleep(1)
+        self.scan_scale()
 
     def run(self):
         self.window.mainloop()
@@ -52,6 +55,8 @@ class medical_GUI:
         # self.select_mode()
 
     def clean(self):
+        for child in list(self.window.children.values()):
+            child.destroy()
         for widget in self.window.winfo_children():
             widget.configure(state='disabled')  # read only
             # widget.pack_forget()
@@ -65,7 +70,7 @@ class medical_GUI:
 
     def wait_page(self):
         self.clean()
-        tk.Label(self.window, text=self.text_translate("針劑藥物辨識系統\n等待指令中..."),
+        tk.Label(self.window, text=self.text_translate("針劑藥物辨識系統\n\n等待中..."),
                  font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
 
     ## Barcode Mode
@@ -95,32 +100,62 @@ class medical_GUI:
 
 
     ## Syringe Scale Mode
-    def scan_scale(self, mode='medicine'):
+    def scan_scale(self):
+        # self.syringe_scale_control_info = ["aaa", "bbb", "3 ml", "True"]
         self.clean()
-        tk.Label(self.window, text=self.text_translate("Place syringe with "+mode+" on white setup"),
-                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=0.9, relheight=0.1)
-        tk.Button(self.window, text=self.text_translate("done"), font=('', int(20*self.__font_ratio), 'bold'),
-                  command=self.__quit_show_webcam_stream).place(relx=0.5, rely=0.5, relwidth=0.1, relheight=0.1)
+        # self.__scale_val = 0
+        self.__scale_val_hist_list = []
         self.frame_show = tk.Label(self.window)
-        self.frame_show.place(relx=0.0, rely=0.1)
+        self.frame_show.place(relx=0.0, rely=0.0, relwidth=0.3, relheight=1.0)
+
+        tk.Label(self.window, text=self.text_translate("請將針具放置於固定平台"),
+                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.31, rely=0.0, relwidth=0.69, relheight=0.1)
+
+        self.__syringe_hint_imagetk = ImageTk.PhotoImage(Image.open('./images/HW_V2_with_syringe.png').resize(
+            (int(self.__screen_width * 0.69), int(self.__screen_height * 0.69))))
+        tk.Label(self.window, image=self.__syringe_hint_imagetk).place(relx=0.31, rely=0.1, relwidth=0.69, relheight=0.69)
+
+        tk.Label(self.window, text=self.text_translate("針具樣式： {}".format(self.syringe_scale_control_info[-2])), anchor="w",
+                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.31, rely=0.8, relwidth=0.69, relheight=0.1)
+        self.frame_show_val = tk.Label(self.window, text=self.text_translate("辨識數值："), anchor="w",
+                 font=('', int(28 * self.__font_ratio), 'bold'))
+        self.frame_show_val.place(relx=0.31, rely=0.9, relwidth=0.69, relheight=0.1)
+        Separator(self.window, orient=tk.HORIZONTAL).place(relx=0.3, rely=0.8, relwidth=0.7)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
+        Separator(self.window, orient=tk.VERTICAL).place(relx=0.3, rely=0.0, relheight=1.0)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
         self.show_webcam_stream()
 
-    def __quit_show_webcam_stream(self):
-        self.clean()
-        self.webcam_stream_show = False
-        # self.frame_show.destroy()
-        self.wait_page()
-
     def show_webcam_stream(self):
-        self.frame, scale_value = self.syringe_scale.get_scale(self.last_frame, self.cur_frame, syringe_type="3 ml")
+        self.scale_frame, self.scale_value = self.syringe_scale.get_scale(self.last_frame, self.cur_frame, syringe_type=self.syringe_scale_control_info[-2])
 
-        img_ratio = 1000/self.frame.shape[0]
-        cv2image = cv2.cvtColor(cv2.resize(self.frame, None, fx=img_ratio, fy=img_ratio), cv2.COLOR_BGR2RGBA)
+        img_ratio = 0.98 * min(self.__screen_height/self.scale_frame.shape[0], 0.3*self.__screen_width/self.scale_frame.shape[1])
+        cv2image = cv2.cvtColor(cv2.resize(self.scale_frame, None, fx=img_ratio, fy=img_ratio), cv2.COLOR_BGR2RGBA)
+
         img = Image.fromarray(cv2image)
         imgtk = ImageTk.PhotoImage(image=img)
         self.frame_show.imgtk = imgtk
         self.frame_show.configure(image=imgtk)
-        self.frame_show.after(10, self.show_webcam_stream)
+        self.frame_show_val.config(text=self.text_translate("辨識數值： {}".format(self.scale_value)))
+        self.frame_show.after(30, self.show_webcam_stream)
+        self.scan_scale_auto_finish(self.scale_value)
+
+    def scan_scale_auto_finish(self, scale_value):  # push data while scale value stable
+        # print(time.time())
+        if scale_value is not None:
+            self.__scale_val_hist_list.append(scale_value)
+            if(len(self.__scale_val_hist_list) > 100):
+                __mean = statistics.mean(self.__scale_val_hist_list)
+                __median = statistics.median(self.__scale_val_hist_list)
+
+                if(abs(__median - scale_value) < 0.005 and abs(__mean - __median) < 0.005):
+                    # DAN.push
+                    self.wait_page()
+                else:
+                    if max(self.__scale_val_hist_list) - __median > min(self.__scale_val_hist_list) - __median:
+                        pop_num = max(self.__scale_val_hist_list)
+                    else:
+                        pop_num = min(self.__scale_val_hist_list)
+                    self.__scale_val_hist_list.pop(self.__scale_val_hist_list.index(pop_num))
+
 
 
 
@@ -147,7 +182,11 @@ class medical_GUI:
 
                 syringe_scale_control = DAN.pull('syringe_scale_control_nano')  # Pull data from an output device feature "Dummy_Control"
                 if syringe_scale_control != None:  ## syringe_scale_control_nano -> [UserName, RandId, SyringeType, True]
-                    self.syringe_scale_control_info = syringe_scale_control
+                    if syringe_scale_control[-1]:
+                        self.syringe_scale_control_info = syringe_scale_control
+                        self.scan_scale()
+                    else:
+                        self.wait_page()
 
             except Exception as e:
                 print(e)
