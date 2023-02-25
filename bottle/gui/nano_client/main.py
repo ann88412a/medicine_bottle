@@ -92,6 +92,8 @@ class medical_GUI:
 
 
 
+
+
     ## Syringe Scale Mode
     def scan_scale(self, mode='medicine'):
         self.clean()
