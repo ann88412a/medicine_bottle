@@ -13,7 +13,6 @@ import numpy as np
 class syringe_scale:
     def __init__(self, homography):
         self.__homography = homography
-        pass
 
     def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
         # w, h = 1020, 260
