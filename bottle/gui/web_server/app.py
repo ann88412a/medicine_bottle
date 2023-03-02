@@ -193,7 +193,7 @@ def dummy_device_loop():
 
 
 if __name__ == '__main__':
-    cfg_file_path = "./"
+    cfg_file_path = "/home/pcs-file-server/Documents/cfg_files/web_server.cfg"
     with open(cfg_file_path, 'r') as __f:
         __cfg = json.load(__f)
         __f.close()
