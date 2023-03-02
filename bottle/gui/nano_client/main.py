@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter.ttk import Separator
+from tkinter.ttk import Separator, Progressbar
 from iottalk_lib import DAN
 from threading import Thread
-import time, json, statistics
+import time, json, statistics, serial
 try:
     # fix opencv open webcam slowly bug in WIN10
     import os
@@ -18,7 +18,13 @@ sys.path.append('../../')
 from syringe_scale import syringe_scale
 
 class medical_GUI:
-    def __init__(self, cap):
+    def __init__(self, cap, cfg_file_path="./default.cfg"):
+        with open(cfg_file_path, 'r') as __f:
+            self.__cfg = json.load(__f)
+            __f.close()
+        self.light = serial.Serial(self.__cfg["arduino_serial_com_port"], self.__cfg["arduino_serial_baud_rates"])  # 初始化序列通訊埠
+        self.light.close()
+        self.light.open()
         # create the window
         self.window = tk.Tk()
         self.window.attributes("-topmost", True)
@@ -37,15 +43,20 @@ class medical_GUI:
         stream = Thread(target=self.webcam_stream, name="medical_webcam_stream")
         stream.setDaemon(True)
         stream.start()
-        # dm_loop = Thread(target=self.dummy_device_loop, name="medical_iottalk")
-        # dm_loop.setDaemon(True)
-        # dm_loop.start()
+        dm_loop = Thread(target=self.dummy_device_loop, name="medical_iottalk")
+        dm_loop.setDaemon(True)
+        dm_loop.start()
 
-        self.syringe_scale = syringe_scale()
+        self.syringe_scale = syringe_scale(self.__cfg["homography"])
 
+        tk.Button(self.window, text=self.text_translate("quit"),
+                    font=('', int(20 * self.__font_ratio), 'bold'),
+                    command=self.quit).place(relx=0.9, rely=0.0, relwidth=0.1, relheight=0.1)
+
+        self.window.after(3000, lambda: self.wait_page())
         # self.wait_page()  # first step
-        time.sleep(1)
-        self.scan_scale()
+        # time.sleep(1)
+        # self.scan_scale()
 
     def run(self):
         self.window.mainloop()
@@ -70,6 +81,7 @@ class medical_GUI:
 
     def wait_page(self):
         self.clean()
+        self.light.write('0\r\n'.encode())
         tk.Label(self.window, text=self.text_translate("針劑藥物辨識系統\n\n等待中..."),
                  font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
 
@@ -88,11 +100,11 @@ class medical_GUI:
             self.get_barcode()
         else:
             self.clean()
-            tk.Label(self.window, text="條碼編號： "+string,
-                     font=('', int(80*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.25, relwidth=1.0, relheight=0.2)
+            tk.Label(self.window, text="條碼編號：\n{}\n\n上傳中...".format(string),
+                     font=('', int(80*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.1, relwidth=1.0, relheight=0.9)
             DAN.push('barcode_result_nano', self.barcode_control_info[0], self.barcode_control_info[1], string)
-            tk.Label(self.window, text="上傳中...",
-                     font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.6, relwidth=1.0, relheight=0.15)
+            # tk.Label(self.window, text="上傳中...",
+            #          font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.6, relwidth=1.0, relheight=0.15)
             self.window.after(3000, lambda: self.wait_page())
 
 
@@ -101,7 +113,7 @@ class medical_GUI:
 
     ## Syringe Scale Mode
     def scan_scale(self):
-        # self.syringe_scale_control_info = ["aaa", "bbb", "3 ml", "True"]
+        # self.syringe_scale_control_info = ["aaa", "bbb", "5 ml", "True"]
         self.clean()
         # self.__scale_val = 0
         self.__scale_val_hist_list = []
@@ -116,12 +128,18 @@ class medical_GUI:
         tk.Label(self.window, image=self.__syringe_hint_imagetk).place(relx=0.31, rely=0.1, relwidth=0.69, relheight=0.69)
 
         tk.Label(self.window, text=self.text_translate("針具樣式： {}".format(self.syringe_scale_control_info[-2])), anchor="w",
-                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.31, rely=0.8, relwidth=0.69, relheight=0.1)
+                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.31, rely=0.8, relwidth=0.34, relheight=0.1)
         self.frame_show_val = tk.Label(self.window, text=self.text_translate("辨識數值："), anchor="w",
                  font=('', int(28 * self.__font_ratio), 'bold'))
-        self.frame_show_val.place(relx=0.31, rely=0.9, relwidth=0.69, relheight=0.1)
+        self.frame_show_val.place(relx=0.31, rely=0.9, relwidth=0.34, relheight=0.1)
+        tk.Label(self.window, text=self.text_translate("辨識進度："), anchor="w",
+                 font=('', int(28 * self.__font_ratio), 'bold')).place(relx=0.66, rely=0.8, relwidth=0.34, relheight=0.1)
+        self.scale_running_bar = Progressbar(self.window, mode="determinate", orient='horizontal')
+        self.scale_running_bar.place(relx=0.66, rely=0.91, relwidth=0.33, relheight=0.08)
+        self.scale_running_bar['value'] = 0
         Separator(self.window, orient=tk.HORIZONTAL).place(relx=0.3, rely=0.8, relwidth=0.7)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
         Separator(self.window, orient=tk.VERTICAL).place(relx=0.3, rely=0.0, relheight=1.0)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
+        Separator(self.window, orient=tk.VERTICAL).place(relx=0.649, rely=0.8, relheight=0.2)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
         self.show_webcam_stream()
 
     def show_webcam_stream(self):
@@ -142,13 +160,30 @@ class medical_GUI:
         # print(time.time())
         if scale_value is not None:
             self.__scale_val_hist_list.append(scale_value)
+            self.scale_running_bar['value'] = len(self.__scale_val_hist_list)*0.8
             if(len(self.__scale_val_hist_list) > 100):
                 __mean = statistics.mean(self.__scale_val_hist_list)
                 __median = statistics.median(self.__scale_val_hist_list)
-
-                if(abs(__median - scale_value) < 0.005 and abs(__mean - __median) < 0.005):
-                    # DAN.push
-                    self.wait_page()
+                if __mean/__median > 1:
+                    self.scale_running_bar['value'] = 80 + __median/__mean*20
+                else:
+                    self.scale_running_bar['value'] = 80 + __mean/__median*20
+                if(abs(__median - scale_value) < 0.001 and abs(__mean - __median) < 0.001): ## finished and push
+                    self.clean()
+                    # cv2.imwrite("{}/{}_{}_{}_{}_{}.jpg".format(self.__cfg["syringe_scale_img_save_path"], time.strftime("%Y%d%m%H%M%S", time.localtime()),
+                    #                                self.syringe_scale_control_info[0], self.syringe_scale_control_info[1],
+                    #                                self.syringe_scale_control_info[2].replace(" ", ""), scale_value), self.cur_frame)
+                    # self.light.write('0'.encode())
+                    DAN.push('syringe_scale_result_nano', self.syringe_scale_control_info[0],
+                             self.syringe_scale_control_info[1], self.syringe_scale_control_info[2], scale_value)
+                    tk.Label(self.window, text=self.text_translate("針筒樣式: {}".format(self.syringe_scale_control_info[-2])), anchor="w",
+                             font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
+                    tk.Label(self.window, text=self.text_translate("辨識結果: {}".format(scale_value)), anchor="w",
+                             font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.2)
+                    tk.Label(self.window, text=self.text_translate("上傳中..."), anchor="e",
+                             font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=1.0, relheight=0.2)
+                    self.window.after(3000, lambda: self.wait_page())
+                    # self.wait_page()
                 else:
                     if max(self.__scale_val_hist_list) - __median > min(self.__scale_val_hist_list) - __median:
                         pop_num = max(self.__scale_val_hist_list)
@@ -160,13 +195,12 @@ class medical_GUI:
 
 
     def dummy_device_loop(self):
-        ServerURL = 'http://1.iottalk.tw:9999'  # with non-secure connection
+        ServerURL = self.__cfg["ServerURL"]  # with non-secure connection
         # ServerURL = 'https://DomainName' #with SSL connection
-        Reg_addr = "assasassa"  # if None, Reg_addr = MAC address
-        DAN.profile['dm_name'] = 'medical_bottle_nano_V2'
-        DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_scale_control_nano', 'barcode_result_nano',
-                                  'syringe_scale_result_nano', ]
-        DAN.profile['d_name'] = 'medical_bottle_nano_ID_01'
+        Reg_addr = self.__cfg["Reg_addr"]  # if None, Reg_addr = MAC address
+        DAN.profile['dm_name'] = "medical_bottle_nano_V2"
+        DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_control_nano', 'barcode_result_nano', 'syringe_scale_result_nano', ]
+        DAN.profile['d_name'] = self.__cfg["d_name"]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
         # exit()            #if you want to deregister this device, uncomment this line
@@ -180,9 +214,10 @@ class medical_GUI:
                     else:
                         self.wait_page()
 
-                syringe_scale_control = DAN.pull('syringe_scale_control_nano')  # Pull data from an output device feature "Dummy_Control"
+                syringe_scale_control = DAN.pull('syringe_control_nano')  # Pull data from an output device feature "Dummy_Control"
                 if syringe_scale_control != None:  ## syringe_scale_control_nano -> [UserName, RandId, SyringeType, True]
                     if syringe_scale_control[-1]:
+                        self.light.write('255\r\n'.encode())
                         self.syringe_scale_control_info = syringe_scale_control
                         self.scan_scale()
                     else:

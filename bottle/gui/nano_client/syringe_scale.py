@@ -11,13 +11,14 @@ except:
 import numpy as np
 
 class syringe_scale:
-    def __init__(self):
+    def __init__(self, homography):
+        self.__homography = homography
         pass
 
     def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
         # w, h = 1020, 260
         w, h = 1200, 260
-        pts1 = np.float32([[684, 387], [1897, 370], [680, 675], [1902, 695]])
+        pts1 = np.float32(self.__homography)
         pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
         H, _ = cv2.findHomography(pts1, pts2, method=cv2.RANSAC, ransacReprojThreshold=3.0)
         img = cv2.warpPerspective(img, H, (w, h), flags=cv2.INTER_LINEAR)
@@ -120,11 +121,16 @@ class syringe_scale:
         return None
 
     def syringe_pixel2unit(self, pixel_y, syringe_type):
+        # def precision_0point2(num):
+        #     if num % 0.2 > 0:
+        #         return num+0.1
+        #     else:
+        #         return num
         return {
             "1 ml": (round(pixel_y/665, 2), pixel_y),
-            "3 ml": (round(pixel_y/525*3, 1), pixel_y),
-            "5 ml": (pixel_y/82, pixel_y),
-            "10 ml": (pixel_y/82, pixel_y),
+            "3 ml": (abs(round((pixel_y-58)/530*3, 1)), pixel_y),
+            "5 ml": (abs(round((pixel_y-75)/512*5, 1)), pixel_y),
+            "10 ml": (abs(round((pixel_y-68)/750*10, 1)), pixel_y),
             "100 units": (pixel_y/82, pixel_y),
             "others": (pixel_y/82, pixel_y)
         }[syringe_type]
@@ -142,7 +148,7 @@ class syringe_scale:
             scale, tip_y = self.syringe_pixel2unit(plunger_tip[1], syringe_type)
             # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
             # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
-            # cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
+            cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
             # cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
             # print("scale: " + str(scale), str(plunger_tip[1]))
         else:
@@ -157,7 +163,7 @@ if(__name__ == "__main__"):
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    sc = syringe_scale()
+    sc = syringe_scale([[684, 387], [1897, 370], [680, 675], [1902, 695]])
     last_ret, last_frame = cap.read()
     while(True):
         ret, cur_frame = cap.read()
@@ -165,8 +171,8 @@ if(__name__ == "__main__"):
         # height, width, channels = frame.shape
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
-        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="3 ml")
-
+        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
+        print(scale_value)
         img_ratio = 1000/frame_scall.shape[0]
         cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 

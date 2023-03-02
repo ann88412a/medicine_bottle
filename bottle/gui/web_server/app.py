@@ -199,3 +199,7 @@ if __name__ == '__main__':
     # font - family: verdana;
     # app.run(host='0.0.0.0', port="54784", debug=True)
     app.run(host='0.0.0.0', port="8100", ssl_context=('D:/medical_ssl/server.crt', 'D:/medical_ssl/server.key'), debug=False)
+
+
+
+    # https://freemyip.com/update?token=6c45fd4a1593f4a16b1f9803&domain=medical.freemyip.com&verbose=yes
