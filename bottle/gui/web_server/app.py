@@ -157,13 +157,13 @@ def submit_result():
 ## =============================================================
 def dummy_device_loop():
     global pull_data
-    ServerURL = 'http://1.iottalk.tw:9999'  # with non-secure connection
+    ServerURL = __cfg["ServerURL"]  # with non-secure connection
     # ServerURL = 'https://DomainName' #with SSL connection
-    Reg_addr = None  # if None, Reg_addr = MAC address
+    Reg_addr = __cfg["Reg_addr"]  # if None, Reg_addr = MAC address
     DAN.profile['dm_name'] = 'medical_bottle_server_V2'
     DAN.profile['df_list'] = ['barcode_control_server', 'syringe_scale_control_server', 'syringe_submit_result_server', 'barcode_result_server',
                               'syringe_scale_result_server', ]
-    DAN.profile['d_name'] = 'medical_bottle_server'
+    DAN.profile['d_name'] = __cfg["d_name"]
     DAN.device_registration_with_retry(ServerURL, Reg_addr)
     # DAN.deregister()  #if you want to deregister this device, uncomment this line
     # exit()            #if you want to deregister this device, uncomment this line
@@ -193,12 +193,16 @@ def dummy_device_loop():
 
 
 if __name__ == '__main__':
+    cfg_file_path = "./"
+    with open(cfg_file_path, 'r') as __f:
+        __cfg = json.load(__f)
+        __f.close()
     dm_loop = Thread(target=dummy_device_loop, name="medical_iottalk")
     dm_loop.setDaemon(True)
     dm_loop.start()
     # font - family: verdana;
-    # app.run(host='0.0.0.0', port="54784", debug=True)
-    app.run(host='0.0.0.0', port="8100", ssl_context=('D:/medical_ssl/server.crt', 'D:/medical_ssl/server.key'), debug=False)
+    app.run(host='0.0.0.0', port=__cfg["flask_port"], debug=__cfg["flask_debug"])
+    # app.run(host='0.0.0.0', port="8100", ssl_context=('D:/medical_ssl/server.crt', 'D:/medical_ssl/server.key'), debug=False)
 
 
 
