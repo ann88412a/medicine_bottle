@@ -144,7 +144,7 @@ class medical_GUI:
         self.frame_show.imgtk = imgtk
         self.frame_show.configure(image=imgtk)
         self.frame_show_val.config(text=self.text_translate("辨識數值： {}".format(self.scale_value)))
-        self.frame_show.after(30, self.show_webcam_stream)
+        self.frame_show.after(90, self.show_webcam_stream)
         self.scan_scale_auto_finish(self.scale_value)
 
     def scan_scale_auto_finish(self, scale_value):  # push data while scale value stable
