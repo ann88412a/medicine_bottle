@@ -13,15 +13,17 @@ except:
     # call cv2 in jetson nano
     import cv2
 from PIL import Image, ImageTk
-import sys
-sys.path.append('../../')
+# import sys
+# sys.path.append('../../')
 from syringe_scale import syringe_scale
 
 class medical_GUI:
     def __init__(self, cap, cfg_file_path="./default.cfg"):
+        # Load config file
         with open(cfg_file_path, 'r') as __f:
             self.__cfg = json.load(__f)
             __f.close()
+        # Setup the serial with arduino light
         self.light = serial.Serial(self.__cfg["arduino_serial_com_port"], self.__cfg["arduino_serial_baud_rates"])  # 初始化序列通訊埠
         self.light.close()
         self.light.open()
@@ -47,16 +49,8 @@ class medical_GUI:
         dm_loop.setDaemon(True)
         dm_loop.start()
 
-        self.syringe_scale = syringe_scale(self.__cfg["homography"])
-
-        tk.Button(self.window, text=self.text_translate("quit"),
-                    font=('', int(20 * self.__font_ratio), 'bold'),
-                    command=self.quit).place(relx=0.9, rely=0.0, relwidth=0.1, relheight=0.1)
-
-        self.window.after(3000, lambda: self.wait_page())
-        # self.wait_page()  # first step
-        # time.sleep(1)
-        # self.scan_scale()
+        self.syringe_scale = syringe_scale(self.__cfg)
+        self.wait_page()  # first step
 
     def run(self):
         self.window.mainloop()
@@ -70,11 +64,8 @@ class medical_GUI:
             child.destroy()
         for widget in self.window.winfo_children():
             widget.configure(state='disabled')  # read only
-            # widget.pack_forget()
             widget.destroy()
-        # tk.Button(self.window, text=self.text_translate("quit"),
-        #           font=('', int(20 * self.__font_ratio), 'bold'),
-        #           command=self.quit).place(relx=0.9, rely=0.0, relwidth=0.1, relheight=0.1)
+        self.window.bind('<Escape>', lambda _: self.quit())  # press "Esc" key to close
 
     def text_translate(self, text, language='zh-tw'):
         return text
@@ -196,7 +187,6 @@ class medical_GUI:
 
     def dummy_device_loop(self):
         ServerURL = self.__cfg["ServerURL"]  # with non-secure connection
-        # ServerURL = 'https://DomainName' #with SSL connection
         Reg_addr = self.__cfg["Reg_addr"]  # if None, Reg_addr = MAC address
         DAN.profile['dm_name'] = "medical_bottle_nano_V2"
         DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_control_nano', 'barcode_result_nano', 'syringe_scale_result_nano', ]

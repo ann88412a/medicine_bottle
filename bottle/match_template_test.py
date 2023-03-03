@@ -11,9 +11,8 @@ except:
 import numpy as np
 
 class syringe_scale:
-    def __init__(self, cfg):
-        self.__homography = cfg["homography"]
-        self.__template_fig_path = cfg["template_fig_path"]
+    def __init__(self, homography):
+        self.__homography = homography
 
     def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
         # w, h = 1020, 260
@@ -102,28 +101,6 @@ class syringe_scale:
             return contour
         return None
 
-    def find_match_template(self, img, syringe_type, method_idx=1):
-        methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
-                   'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
-        method = eval(methods[method_idx])
-        template = cv2.imread("{}/{}.png".format(self.__template_fig_path, syringe_type.replace(" ", "")), 0)
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        template_ratio = img_gray.shape[1] / template.shape[1]
-        template = cv2.resize(template, None, fx=template_ratio, fy=template_ratio)
-        w, h = template.shape[::-1]
-        res = cv2.matchTemplate(img_gray, template, method)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            top_left = min_loc
-        else:
-            top_left = max_loc
-        x, y = top_left[0] + w // 2, top_left[1] + h // 2  # center
-        # bottom_right = (top_left[0] + w, top_left[1] + h)
-        # cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
-        # cv2.circle(frame_scall, (top_left[0] + w // 2, top_left[1] + h // 2), 0, (0, 255, 0), 2)
-        return (x, y), (w, h)
-
     def get_plunger_tip_dist(self, img, syringe_type, threshold=40):
         contour = self.find_plunger_tip(img, syringe_type, threshold)
         if contour is not None:
@@ -159,16 +136,20 @@ class syringe_scale:
 
     def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=40):  # draw
         img = self.image_preprocessing(last_frame.copy(), cur_frame.copy(), syringe_type)
-        plunger_tip = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
+        # plunger_tip = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
         # plunger_tip = self.get_plunger_tip_dist(img.copy(), threshold=threshold)  # get tip xy
 
+
+
+
+
+        plunger_tip = 0, 0
         scale = None
         # cv2.putText(img, "type: "+syringe_type, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
         # print("type: " + syringe_type)
 
         if plunger_tip is not None:
             scale, tip_y = self.syringe_pixel2unit(plunger_tip[1], syringe_type)
-            (mt_x, mt_y), (mt_w, mt_h) = self.find_match_template(img, syringe_type)
             # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
             # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
             cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
@@ -186,10 +167,8 @@ if(__name__ == "__main__"):
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    sc = syringe_scale({"homography": [[684, 387], [1897, 370], [680, 675], [1902, 695]],
-    "template_fig_path": "./images/match_fig_template"})
+    sc = syringe_scale([[684, 387], [1897, 370], [680, 675], [1902, 695]])
     last_ret, last_frame = cap.read()
-
     while(True):
         ret, cur_frame = cap.read()
         # ret, frame = cap.read()
@@ -197,7 +176,40 @@ if(__name__ == "__main__"):
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
         frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
-        print(scale_value)
+
+
+
+        # All the 6 methods for comparison in a list
+        methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
+                   'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
+        method = eval(methods[1])
+        template = cv2.imread(r"C:\Users\ken88\Desktop\medicine_bottle\bottle\gui\nano_client\images\match_fig_template\10ml.png", 0)
+        gray = cv2.cvtColor(frame_scall, cv2.COLOR_BGR2GRAY)
+        template_ratio = gray.shape[1]/template.shape[1]
+        template = cv2.resize(template, None, fx=template_ratio, fy=template_ratio)
+        # cv2.imshow("frame_scall", template)
+        w, h = template.shape[::-1]
+        # print("template", template.shape[::-1])
+        # Apply template Matching
+
+        # print("gray", gray.shape[::-1])
+        res = cv2.matchTemplate(gray, template, method)
+
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        print(min_val, max_val, min_loc, max_loc)
+        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
+        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+            top_left = min_loc
+        else:
+            top_left = max_loc
+        bottom_right = (top_left[0] + w, top_left[1] + h)
+        cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
+        cv2.circle(frame_scall, (top_left[0]+w//2, top_left[1]+h//2), 0, (0, 255, 0), 2)
+
+
+
+
+        # print(scale_value)
         img_ratio = 1000/frame_scall.shape[0]
         cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 
