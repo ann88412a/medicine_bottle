@@ -18,7 +18,7 @@ from PIL import Image, ImageTk
 from syringe_scale import syringe_scale
 
 class medical_GUI:
-    def __init__(self, cap, cfg_file_path="./default.cfg"):
+    def __init__(self, cap, cfg_file_path="./syringe_scale_default.cfg"):
         # Load config file
         with open(cfg_file_path, 'r') as __f:
             self.__cfg = json.load(__f)

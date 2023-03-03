@@ -82,7 +82,10 @@ class syringe_scale:
         auto_canny_img = cv2.dilate(auto_canny_img, np.ones((3, 5), np.uint8), iterations=2)
         auto_canny_img = cv2.erode(auto_canny_img, np.ones((5, 7), np.uint8), iterations=1)
 
-        contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
+        try:
+            _, contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)  # nano use old ver. opencv
+        except:
+            contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
         if len(contours) > 0:
             # (x, y), radius = cv2.minEnclosingCircle(contour)
             # center = (int(x), int(y))
