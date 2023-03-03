@@ -14,6 +14,7 @@ class syringe_scale:
     def __init__(self, cfg):
         self.__homography = cfg["homography"]
         self.__template_fig_path = cfg["template_fig_path"]
+        self.__pix2unit = cfg["px2unit"]
 
     def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
         # w, h = 1020, 260
@@ -148,14 +149,10 @@ class syringe_scale:
         #         return num+0.1
         #     else:
         #         return num
-        return {
-            "1 ml": (abs(round((pixel_y-53)/(670-53)*1, 2)), pixel_y),
-            "3 ml": (abs(round((pixel_y-58)/(533-58)*3, 1)), pixel_y),
-            "5 ml": (abs(round((pixel_y-55)/(590-55)*5, 1)), pixel_y),
-            "10 ml": (abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y),
-            "100 units": (pixel_y/82, pixel_y),
-            "others": (pixel_y/82, pixel_y)
-        }[syringe_type]
+        # return {
+        #     self.__pix2unit
+        # }[syringe_type]
+        return eval(self.__pix2unit[syringe_type])
 
     def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=130):  # draw
         img = self.image_preprocessing(last_frame.copy(), cur_frame.copy(), syringe_type)
@@ -170,8 +167,9 @@ class syringe_scale:
             (mt_x, mt_y), (mt_w, mt_h) = self.find_match_template(img, syringe_type)
             if abs(mt_y - plunger_tip_by_color[1]) < mt_h/2:
                 scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
+                cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
                 # cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
-                print(scale, tip_y)
+                # print(scale, tip_y)
 
             # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
             # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
@@ -191,7 +189,13 @@ if(__name__ == "__main__"):
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     sc = syringe_scale({"homography": [[684, 387], [1897, 370], [680, 675], [1902, 695]],
-    "template_fig_path": "./images/match_fig_template"})
+    "template_fig_path": "./images/match_fig_template",
+    "px2unit": {"1 ml": "(abs(round((pixel_y-53)/(670-53)*1, 2)), pixel_y)",
+                "3 ml": "(abs(round((pixel_y-58)/(533-58)*3, 1)), pixel_y)",
+                "5 ml": "(abs(round((pixel_y-55)/(590-55)*5, 1)), pixel_y)",
+                "10 ml": "(abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y)",
+                "100 units": "(pixel_y/82, pixel_y)",
+                "others": "(pixel_y/82, pixel_y)"}})
     last_ret, last_frame = cap.read()
 
     while(True):
@@ -201,7 +205,7 @@ if(__name__ == "__main__"):
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
         frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="1 ml")
-        # print(scale_value)
+        print(scale_value)
         img_ratio = 1000/frame_scall.shape[0]
         cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 
