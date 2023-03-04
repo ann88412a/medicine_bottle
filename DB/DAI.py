@@ -24,14 +24,14 @@ while True:
         
         if barcode != None:
             print(barcode)
-            user_id = barcode[0]
+            user_uid = barcode[0]
             sql = "select info from patient_info where barcode='" + barcode[1] + "';"
             cursor.execute(sql)
             data = cursor.fetchall()
             if (len(data) > 0):
-                DAN.push ('Patient-I', user_id, data[0][0])
+                DAN.push ('Patient-I', user_uid, data[0][0])
             else:
-                DAN.push ('Patient-I', user_id, '查無此病人資訊')
+                DAN.push ('Patient-I', user_uid, '查無此病人資訊')
         
 
         sheet = DAN.pull('Sheet-O')
