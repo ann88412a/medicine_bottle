@@ -66,7 +66,7 @@ while True:
             sql = sql + str(data['check10']) + "', " + str(data['FLU']) + ", " + str(data['correctness10']) + ", '" + str(data['reason10']) + "', '"    
             
 
-            sql = sql + now + "');"
+            sql = sql + now + "', '" + str(data['uid']) + "');"
             print(sql)
             
             # sql = "INSERT INTO record (class, id, name, 1_barcode, 1_select, 1_correctness, 2_check, 2_Dilatrend, 2_Dilantin, 2_correctness, 2_reason, 3_check, 3_Requip, 3_Requip1, 3_correctness, 3_reason, 4_check, 4_correctness, 5_check, 5_Repaglinide, 5_correctness, 5_reason, 6_check, 6_Transamin, 6_correctness, 6_reason, 7_check, 7_correctness, ) VALUES (%s, %s)"
