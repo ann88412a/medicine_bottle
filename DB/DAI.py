@@ -8,7 +8,7 @@ import json
 #================iottalk===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
-Reg_addr = 'FF2C3883758D' #if None, Reg_addr = MAC address
+Reg_addr = 'E759CEFB0DC7' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL
 # DAN.device_registration_with_retry(ServerURL, Reg_addr)
@@ -75,14 +75,83 @@ while True:
             print(cursor.fetchall())
             cursor.execute(sql)
             print(cursor.fetchall())
-            cursor.execute("select * from record;")
-            print(cursor.fetchall())
+            db.commit()
 
+            # cursor.execute("select * from record;")
+            # print(cursor.fetchall())
 
-
-
-
+        search = DAN.pull('Search-O')
+        print(search)
         
+        
+
+        if search != None:
+            user_uid = search[0]
+            data = json.loads(search[1])
+
+            if data['operation'] == 'level':
+                level_num = [0, 0, 0] # low, mid, high
+                sql = "SELECT 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness FROM record ;"
+                cursor.execute(sql)
+                result = cursor.fetchall()
+
+                for each_record in result:
+                    total_score = sum(list(filter(lambda x: x < 2, each_record)))
+
+                    if total_score >= 7:
+                        level_num[2] = level_num[2] + 1
+                    elif total_score >= 4:
+                        level_num[1] = level_num[1] + 1
+                    else: 
+                        level_num[0] = level_num[0] + 1
+
+                print(level_num)
+
+                push_item = {"operation": 'level', "level": level_num,}
+                
+                #轉成 json 字串
+                push_item = json.dumps(push_item)
+
+                DAN.push ('Search_Result-I', user_uid, push_item)
+
+            if data['operation'] == 'history':
+                print('history')
+                history_data = []
+                history_data.clear()
+                history_label = []
+                history_label.clear()
+
+                sql = "SELECT 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness FROM record where id=" + data['id'] + ";"
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                print(result)
+
+                for each_record in result:
+                    total_score = sum(list(filter(lambda x: x < 2, each_record)))
+                    history_data.append(total_score)
+
+                print(history_data)
+
+                sql = "SELECT time FROM record where id=" + data['id'] + ";"
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                
+
+                for each_record in result:
+                    history_label.append(each_record[0])
+
+                print(history_label)
+                
+                push_item = {"operation": 'history', "history_data": history_data, "history_label": history_label,}
+                
+                #轉成 json 字串
+                push_item = json.dumps(push_item)
+
+                DAN.push ('Search_Result-I', user_uid, push_item)
+
+
+
+                
         
 
     except Exception as e:

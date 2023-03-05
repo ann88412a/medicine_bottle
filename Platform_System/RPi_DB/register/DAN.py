@@ -2,8 +2,8 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'Medication_DB',
-    'dm_name': 'Medication_DB',
+    'd_name': 'Medication_Database',
+    'dm_name': 'Medication_Database',
     'u_name': 'dio',
     'is_sim': False,
     'df_list': ['Patient-I', 'Search_Result-I', 'Barcode-O', 'Search-O', 'Sheet-O'],

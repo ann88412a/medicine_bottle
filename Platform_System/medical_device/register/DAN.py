@@ -2,7 +2,7 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'Medication_Device',
+    'd_name': 'Medication_Device2',
     'dm_name': 'Medication_Device',
     'u_name': 'dio',
     'is_sim': False,
