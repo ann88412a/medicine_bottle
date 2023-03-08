@@ -2,7 +2,11 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'Medication_Device',
+<<<<<<< HEAD
+    'd_name': 'Medication_Device2',
+=======
+    'd_name': 'Medication_Device3',
+>>>>>>> 21475ce57a84beea09973147827fa2ed342c228b
     'dm_name': 'Medication_Device',
     'u_name': 'dio',
     'is_sim': False,
