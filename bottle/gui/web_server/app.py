@@ -24,6 +24,13 @@ medicine_dict = {"4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Gro
 app = Flask(__name__)
 
 
+@app.route('/syringe/RESET')
+def RESET():
+    global hist_dict, pull_data
+    hist_dict = {}
+    pull_data = {"barcode": {}, "syringe": {}}
+    print("Reset Successfully!")
+    return "Reset Successfully!"
 
 @app.route('/syringe/')
 def init():
@@ -132,7 +139,7 @@ def wait_data():
                      request.cookies.get('random_id'), False)
             DAN.push('syringe_scale_control_server', request.cookies.get('machine_id'),
                      request.cookies.get('random_id'), request.cookies.get('syringe_type'), False)
-            return redirect(url_for(r'syringe_index'))
+            return redirect(url_for(r'add_new'))
         if request.values['refresh'] == '1':
             return ("", 204)
     return render_template(r'syringe/wait_data.html', barcode_id=None, medicine_name=None)

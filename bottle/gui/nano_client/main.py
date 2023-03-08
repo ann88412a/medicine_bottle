@@ -146,22 +146,23 @@ class medical_GUI:
         self.frame_show.imgtk = imgtk
         self.frame_show.configure(image=imgtk)
         self.frame_show_val.config(text=self.text_translate("辨識數值： {}".format(self.scale_value)))
-        self.frame_show.after(30, self.show_webcam_stream)
+        self.frame_show.after(50, self.show_webcam_stream)
         self.scan_scale_auto_finish(self.scale_value)
 
     def scan_scale_auto_finish(self, scale_value):  # push data while scale value stable
         # print(time.time())
         if scale_value is not None:
             self.__scale_val_hist_list.append(scale_value)
-            self.scale_running_bar['value'] = len(self.__scale_val_hist_list)*0.8
-            if(len(self.__scale_val_hist_list) > 100):
+            self.scale_running_bar['value'] = len(self.__scale_val_hist_list)*90/30
+            if(len(self.__scale_val_hist_list) > 30):
                 __mean = statistics.mean(self.__scale_val_hist_list)
                 __median = statistics.median(self.__scale_val_hist_list)
-                if __mean/__median > 1:
-                    self.scale_running_bar['value'] = 80 + __median/__mean*20
+                if __median > __mean:
+                    self.scale_running_bar['value'] = 100 * (__mean+1) / (__median+1)
                 else:
-                    self.scale_running_bar['value'] = 80 + __mean/__median*20
-                if(abs(__median - scale_value) < 0.001 and abs(__mean - __median) < 0.001): ## finished and push
+                    self.scale_running_bar['value'] = 100 * (__median+1) / (__mean+1)
+
+                if(__median == scale_value and __mean == __median): ## finished and push
                     self.clean()
                     # cv2.imwrite("{}/{}_{}_{}_{}_{}.jpg".format(self.__cfg["syringe_scale_img_save_path"], time.strftime("%Y%d%m%H%M%S", time.localtime()),
                     #                                self.syringe_scale_control_info[0], self.syringe_scale_control_info[1],

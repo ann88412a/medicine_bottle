@@ -27,8 +27,8 @@
         <input type="hidden" name="cancel_scale" value="0">
         <input type="hidden" name="refresh" value="1">
     </form>
-    <form method="post" onsubmit="if(!confirm('確認取消？')){return false;}">
+    <form method="post" onsubmit="">
         <input type="hidden" name="refresh" value="0">
-        <button type="submit" name="cancel_scale" style="float:left; color: white; background-color: #f44336;" value="1">取  消</button>
+        <button onclick="clearInterval(auto_refresh)" type="submit" name="cancel_scale" style="float:left; color: white; background-color: #f44336;" value="1">取  消</button>
     </form>
 </body>

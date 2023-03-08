@@ -175,6 +175,9 @@
                     <input type="hidden" name="add_new_state" value="0">
                     <input type="hidden" name="syringe_diluent_state" value="0">
                     <hr>
+{#                    *點擊<font style="background-color: #4CAF50">"下一步"</font>按鈕後開始辨識。#}
+                    <img style="width:100%;" src="/static/images/HW_V2_with_syringe.png"><br>
+                    <hr>
                     <button type="submit" name="syringe_scan_state" style="float: right; background-color: #4CAF50;" value="1">下一步</button>
                 </form>
                 <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('確認取消？')){window.location.href='{{ url_for('syringe_index') }}'}">取  消</button>
