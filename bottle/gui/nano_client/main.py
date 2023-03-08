@@ -31,8 +31,8 @@ class medical_GUI:
         self.window = tk.Tk()
         self.window.attributes("-topmost", True)
         self.window.title('IoTtalk')
-        self.window.geometry("1024x600")
-        # self.window.attributes("-fullscreen", True)
+        # self.window.geometry("1024x600")
+        self.window.attributes("-fullscreen", True)
         self.window.update()
 
         self.__screen_width = self.window.winfo_width()
@@ -91,11 +91,13 @@ class medical_GUI:
             self.get_barcode()
         else:
             self.clean()
-            tk.Label(self.window, text="條碼編號：\n{}\n\n上傳中...".format(string),
-                     font=('', int(80*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.1, relwidth=1.0, relheight=0.9)
             DAN.push('barcode_result_nano', self.barcode_control_info[0], self.barcode_control_info[1], string)
-            # tk.Label(self.window, text="上傳中...",
-            #          font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.6, relwidth=1.0, relheight=0.15)
+            tk.Label(self.window, text="條碼編號： ", anchor="w",
+                     font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
+            tk.Label(self.window, text="{}".format(string), anchor="w",
+                     font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.4)
+            tk.Label(self.window, text=self.text_translate("上傳中..."), anchor="e",
+                     font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=1.0, relheight=0.2)
             self.window.after(3000, lambda: self.wait_page())
 
 
@@ -144,7 +146,7 @@ class medical_GUI:
         self.frame_show.imgtk = imgtk
         self.frame_show.configure(image=imgtk)
         self.frame_show_val.config(text=self.text_translate("辨識數值： {}".format(self.scale_value)))
-        self.frame_show.after(90, self.show_webcam_stream)
+        self.frame_show.after(30, self.show_webcam_stream)
         self.scan_scale_auto_finish(self.scale_value)
 
     def scan_scale_auto_finish(self, scale_value):  # push data while scale value stable
@@ -231,14 +233,14 @@ class medical_GUI:
             ret, self.cur_frame = self.cap.read()
             # ret, frame = cap.read()
             # height, width, channels = frame.shape
-            # print("fps", cap.`get(cv2.CAP_PROP_FPS))
+            # print("fps", cap.get(cv2.CAP_PROP_FPS))
             # print(frame.shape)
             self.last_frame = self.cur_frame
 
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('v4l2src device=/dev/video0 io-mode=2 ! image/jpeg, framerate=10/1, width=(int)1920, height=(int)1080 !  nvjpegdec ! video/x-raw ! videoconvert ! video/x-raw,format=BGR ! appsink', cv2.CAP_GSTREAMER)
     GUI = medical_GUI(cap)
     GUI.run()
     cap.release()

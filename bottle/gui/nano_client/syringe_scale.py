@@ -16,22 +16,7 @@ class syringe_scale:
         self.__template_fig_path = cfg["template_fig_path"]
         self.__pix2unit = cfg["px2unit"]
 
-    def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
-        # w, h = 1020, 260
-        w, h = 1200, 260
-        pts1 = np.float32(self.__homography)
-        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-        H, _ = cv2.findHomography(pts1, pts2, method=cv2.RANSAC, ransacReprojThreshold=3.0)
-        img = cv2.warpPerspective(img, H, (w, h), flags=cv2.INTER_LINEAR)
-        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-        # print(img.shape)
-        return img[150:w - 50, 5:-5]
-
-    def image_preprocessing(self, last_frame, cur_frame, syringe_type):
-        frame1 = self.image_homography(last_frame)
-        frame2 = self.image_homography(cur_frame)
-        img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
-
+    def image_crop(self, img, syringe_type):
         if syringe_type == "1 ml":
             img = img[230:-40, 70:-70]
         elif syringe_type == "3 ml":
@@ -44,12 +29,23 @@ class syringe_scale:
             img = img[230:-20, 80:-80]
         elif syringe_type == "others":
             img = img[440:-110, 70:-70]
-        else:
-            print("Syringe type input error!! your input:", syringe_type)
-        # img = cv2.resize(img, (250, 1000))
-        # img_ratio = 1.5
-        # img = cv2.resize(img, None, fx=img_ratio, fy=img_ratio)
+        return img
+
+    def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
+        # w, h = 1020, 260
+        w, h = 1200, 260
+        pts1 = np.float32(self.__homography)
+        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+        H, _ = cv2.findHomography(pts1, pts2, method=cv2.RANSAC, ransacReprojThreshold=3.0)
+        img = cv2.warpPerspective(img, H, (w, h), flags=cv2.INTER_LINEAR)
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
         # print(img.shape)
+        return img[150:w - 50, 5:-5]
+
+    def image_preprocessing(self, last_frame, cur_frame, syringe_type):
+        frame1 = self.image_crop(self.image_homography(last_frame), syringe_type)
+        frame2 = self.image_crop(self.image_homography(cur_frame), syringe_type)
+        img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
         return img
 
     def hsv_thresholding(self, img, threshold=40):

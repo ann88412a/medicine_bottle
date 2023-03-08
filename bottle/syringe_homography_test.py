@@ -1,3 +1,5 @@
+import time
+
 try:
     # fix opencv open webcam slowly bug in WIN10
     import os
@@ -8,7 +10,7 @@ except:
     # call cv2 in jetson nano
     import cv2
 import numpy as np
-from syringe_scale import syringe_scale
+# from syringe_scale import syringe_scale
 
 # 讀取中文路徑圖檔(圖片讀取為BGR)
 def cv_imread(filePath):
@@ -35,13 +37,11 @@ def image_homography(img):  # (1080, 1920, 3) -> (1000, 250, 3)
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     # return img[450:1450, 5:-5]
     # print(img.shape)
-    return img[150:w-50, 5:-5]
+    # return img[150:w-50, 5:-5]
+    return img
 
-def image_preprocessing(last_frame, cur_frame, syringe_type):
-    frame1 = image_homography(last_frame)
-    frame2 = image_homography(cur_frame)
-    img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
 
+def image_crop(img, syringe_type):
     if syringe_type == "1 ml":
         img = img[230:-40, 70:-70]
     elif syringe_type == "3 ml":
@@ -54,22 +54,32 @@ def image_preprocessing(last_frame, cur_frame, syringe_type):
         img = img[230:-20, 80:-80]
     elif syringe_type == "others":
         img = img[440:-110, 70:-70]
-    else:
-        print("Syringe type input error!! your input:", syringe_type)
+    return img
+
+
+
+
+def image_preprocessing(last_frame, cur_frame, syringe_type):
+    frame1 = image_crop(image_homography(last_frame), syringe_type)
+    frame2 = image_crop(image_homography(cur_frame), syringe_type)
+    # img = (frame1//2+frame2//2)
+    img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
     return img
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    sc = syringe_scale()
+    # sc = syringe_scale()
     _, last_frame = cap.read()
 
     while (True):
         # ret, frame = cap.read()
+        st_time = time.time()
         ret, cur_frame = cap.read()
-
-        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="others")
+        frame_scall = image_preprocessing(last_frame, cur_frame, "10 ml")
+        print((time.time()-st_time)*1000)
+        # frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="others")
         # print(frame.shape)
 
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -81,7 +91,7 @@ if __name__ == '__main__':
 
 
 
-        img_ratio = 1000 / frame_scall.shape[0]
+        img_ratio = 0.3
         cv2.imshow("frame_scall", cv2.resize(frame_scall, None, fx=img_ratio, fy=img_ratio))
 
 

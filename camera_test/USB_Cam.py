@@ -15,7 +15,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 while(True):
   ret, frame = cap.read()
   print(ret,frame)
-  cv2.imshow('frame', frame)
+  cv2.imshow('frame', cv2.resize(frame, None, fx=0.3, fy=0.3))
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
 
