@@ -38,7 +38,7 @@ while True:
 
         if sheet != None:
             now = datetime.datetime.now()
-            now = now.strftime('%Y_%m_%d_%H_%M_%S')
+            now = now.strftime('%Y-%m-%d-%H-%M-%S')
 
             # print(sheet[0])
             data = json.loads(sheet[0])
@@ -148,6 +148,38 @@ while True:
                 push_item = json.dumps(push_item)
 
                 DAN.push ('Search_Result-I', user_uid, push_item)
+
+            if data['operation'] == 'time_total':
+                each_q_score = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                print('hi', str(int(data["start_date"][5:7])) )
+                sql = "SELECT 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness FROM record where "
+                sql = sql + "(cast(substring(time, 6, 2) as unsigned) = " + str(int(data["start_date"][5:7])) + " and cast(substring(time, 9, 2) as unsigned) >= " + str(int(data["start_date"][8:10])) + ")"
+                sql = sql + "or (cast(substring(time, 6, 2) as unsigned) > " + str(int(data["start_date"][5:7])) + " and cast(substring(time, 6, 2) as unsigned) < " + str(int(data["start_date"][5:7])) + ")"
+                sql = sql + " or (cast(substring(time, 6, 2) as unsigned) = " + str(int(data["end_date"][5:7])) + " and cast(substring(time, 9, 2) as unsigned) <= " + str(int(data["end_date"][8:10])) + ");"
+                print(sql)
+                cursor.execute(sql)
+                result = cursor.fetchall()
+
+               
+                for each_record in result:
+                    for i in range(len(each_record)):
+                        if (each_record[i] == 1):
+                            each_q_score[i] = each_q_score[i] + 1
+
+                push_item = {"operation": 'time_total', "each_q_score": each_q_score,}
+                
+                #轉成 json 字串
+                push_item = json.dumps(push_item)
+ 
+                DAN.push ('Search_Result-I', user_uid, push_item)
+
+
+                
+
+
+
+
+                
 
 
 
