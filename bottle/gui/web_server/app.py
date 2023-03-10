@@ -4,7 +4,7 @@ from iottalk_lib import DAN
 import time, json, random, string, sys
 import numpy as np
 
-hist_dict = {}  # {username:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
+hist_dict = {}  # {userID:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
 pull_data = {"barcode": {}, "syringe": {}}
 medicine_dict = {"4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Group 1
                  "4710031297121": "Heparin Sodium Injection 5000 IU/ml 'Tai Yu'",
@@ -23,32 +23,26 @@ medicine_dict = {"4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Gro
 
 app = Flask(__name__)
 
-
-@app.route('/syringe/RESET')
-def RESET():
-    global hist_dict, pull_data
-    hist_dict = {}
-    pull_data = {"barcode": {}, "syringe": {}}
-    print("Reset Successfully!")
-    return "Reset Successfully!"
-
-@app.route('/syringe/')
-def init():
+@app.route('/syringe/', defaults={'machine_id': 'bottle_01', 'username': 'undefine'})
+@app.route('/syringe/<machine_id>/<username>')
+def init(machine_id, username):
     global hist_dict
     resp = make_response(redirect(url_for(r'syringe_index')))
-    # print(request.cookies.get('username'))
-    if(request.cookies.get('username') != "None"):
+    # print(request.cookies.get('userID'))
+    if(request.cookies.get('userID') != "None"):
         try:
-            if hist_dict[request.cookies.get('username')] != []:
+            if hist_dict[request.cookies.get('userID')] != []:
                 return resp
         except:
             pass
-    N = 5  ## len(username)
-    username = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
-    hist_dict[username] = []
-    resp.set_cookie('username', username, samesite='None', secure=True)  # save username in cookies
-    resp.set_cookie('machine_id', "bottle_01", samesite='None', secure=True)
-    print("welcome", username)
+
+    N = 12  ## len(userID)
+    userID = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    hist_dict[userID] = []
+    resp.set_cookie('userID', userID, samesite='None', secure=True)  # save userID in cookies
+    resp.set_cookie('machine_id', machine_id, samesite='None', secure=True)
+    resp.set_cookie('username', username, samesite='None', secure=True)
+    print("welcome", userID)
     return resp
 
 @app.route('/syringe/syringe_index/')
@@ -56,7 +50,7 @@ def syringe_index():
     global hist_dict
     # print(request.cookies)
     show_log = r"\n"*10+r"(#`Д´)ﾉ  跨殺洨  (#`Д´)ﾉ\n\n是想作弊膩  ಠ_ಠ\n\n再不離開我叫老師來了喔!\n     .......(￣０￣)ノ舉手"+r"\n"*10
-    resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('username')], show_log=show_log))
+    resp = make_response(render_template(r"syringe/syringe_index.html", medicine_list=hist_dict[request.cookies.get('userID')], show_log=show_log))
     resp.set_cookie('random_id', str(time.time()), samesite='None', secure=True)  # save random_id in cookies. use for unit.
     resp.set_cookie('barcode_id', "None", samesite='None', secure=True)  # save random_id in cookies. use for unit.
     resp.set_cookie('syringe_diluent_value', "None", samesite='None', secure=True)
@@ -91,7 +85,7 @@ def add_new():
             resp.set_cookie('injection_info', __injection_info, samesite='None', secure=True)  # save random_id in cookies. use for unit.
             return resp
         elif request.values['add_new_state'] == '1':
-            usr = request.cookies.get('username')
+            usr = request.cookies.get('userID')
             Barcode = request.cookies.get('barcode_id')
             try:
                 Medicine_name = medicine_dict[Barcode]
@@ -116,7 +110,6 @@ def add_new():
             return redirect(url_for(r'syringe_index'))
 
     return render_template(r'syringe/add_new_medicine.html', medicine_dict=medicine_dict)
-
 
 @app.route('/syringe/wait_data/', methods=['POST', 'GET'])
 def wait_data():
@@ -148,10 +141,10 @@ def wait_data():
 def submit_result():
     global hist_dict, pull_data
     try:
-        push_data = json.dumps({"bottle": hist_dict[request.cookies.get('username')]})
+        push_data = json.dumps({"bottle": hist_dict[request.cookies.get('userID')]})
         DAN.push('syringe_submit_result_server', push_data)
         # print("DAN.push('syringe_submit_result_server')", push_data)
-        del hist_dict[request.cookies.get('username')]
+        del hist_dict[request.cookies.get('userID')]
 
     except KeyError:
         pass
@@ -160,6 +153,13 @@ def submit_result():
     # return redirect(url_for(r'init'))
     return render_template(r"syringe/finished.html")
 
+@app.route('/syringe/RESET')
+def RESET():
+    global hist_dict, pull_data
+    hist_dict = {}
+    pull_data = {"barcode": {}, "syringe": {}}
+    print("Reset Successfully!")
+    return "Reset Successfully!"
 
 ## =============================================================
 def dummy_device_loop():
@@ -179,7 +179,7 @@ def dummy_device_loop():
             barcode_result = DAN.pull('barcode_result_server')  # Pull data from an output device feature "Dummy_Control"
             if barcode_result != None:  ## barcode_result -> [UserName, RandId, BarcodeResult]
                 # if barcode_result[-1] == True:
-                #     DAN.push('barcode_control_server', request.cookies.get('username'),
+                #     DAN.push('barcode_control_server', request.cookies.get('userID'),
                 #              request.cookies.get('random_id'), False)
                 # print('barcode_result', barcode_result)
                 pull_data["barcode"][barcode_result[1]] = barcode_result[-1]
@@ -197,6 +197,8 @@ def dummy_device_loop():
                 print('Connection failed due to unknow reasons.')
                 time.sleep(1)
         time.sleep(0.2)
+
+
 
 
 if __name__ == '__main__':
