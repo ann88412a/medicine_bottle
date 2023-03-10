@@ -83,7 +83,7 @@ class medical_GUI:
                  font=('', int(80*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.25, relwidth=1.0, relheight=0.2)
         self.barcode_entry = tk.Entry(self.window, font=('', int(60*self.__font_ratio), 'bold'))
         self.barcode_entry.place(relx=0.1, rely=0.6, relwidth=0.8, relheight=0.15)
-        self.barcode_entry.focus()
+        self.barcode_entry.focus_set()
         self.barcode_entry.bind('<Return>', self.check_barcode)
     def check_barcode(self, event):
         string = self.barcode_entry.get()

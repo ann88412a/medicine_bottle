@@ -6,23 +6,6 @@ The plan of using real-time video and the other method to Identifying medicines.
 This project is using Jetson Nano with camera to predicted the medicine bottle label, pill shape and the dosage of drugs.
 
 
-##給藥方式說明:
-IVA需要一個agent，通常是精密輸液套
-每次給藥就對一些輸液
-用滴數控制給藥時間
-
-IVD是直接加在點滴袋(瓶)中
-比如說KCl，不可能15、30分鐘內給完，會GG
-而是加在bag中慢慢滴
-
-IV是緩推
-抽完藥後直接逗在IV cath上推注
-通常仿單中會告訴你要推幾分鐘
-大部分可IV的藥物也都可IVA
-注意勿將IV與IVP混淆
-
-IVP是快速推注
-除非急救，否則由醫師執行
 
 ----------------------------------------
 
@@ -50,8 +33,38 @@ IVP是快速推注
     ├── LICENSE
     └── README.md
 
-## The Self-Signed Certificate (local-SSL)：
-https://blog.miniasp.com/post/2019/02/25/Creating-Self-signed-Certificate-using-OpenSSL
+## How to upgrade the opencv to 4.7.0：
+uninstall the old opencv version. 
+```shell
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo sudo apt-get purge *libopencv*
+```
+Enlarge memory swap.
+```shell
+$ sudo apt-get update
+$ sudo apt-get upgrade
+## install dphys-swapfile
+$ sudo apt-get install dphys-swapfile
+## enlarge the boundary (set CONF_MAXSWAP=4096)
+$ sudo vim /sbin/dphys-swapfile
+## give the required memory size (set CONF_SWAPSIZE=4096)
+$ sudo vim /etc/dphys-swapfile
+## reboot afterwards
+$ sudo reboot.
+```
+Installation script with the 4.7.0 version.
+```shell
+$ wget https://github.com/Qengineering/Install-OpenCV-Jetson-Nano/raw/main/OpenCV-4-7-0.sh
+$ sudo chmod 755 ./OpenCV-4-7-0.sh
+$ ./OpenCV-4-7-0.sh
+## The installation is considered complete only when "Congratulations" appears.
+```
+Remove the dphys-swapfile
+```shell
+$ sudo /etc/init.d/dphys-swapfile stop
+$ sudo apt-get remove --purge dphys-swapfile
+```
 
 ## How to install Arduino IDE(AARCH64) in Jetson Nano
 *Install the Arduino IDE (AARCH64 Ver.1.8.10).*
