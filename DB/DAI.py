@@ -8,7 +8,7 @@ import json
 #================iottalk===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
-Reg_addr = 'E759CEFB0DC7' #if None, Reg_addr = MAC address
+Reg_addr = 'Medication_DB_0' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL
 # DAN.device_registration_with_retry(ServerURL, Reg_addr)
