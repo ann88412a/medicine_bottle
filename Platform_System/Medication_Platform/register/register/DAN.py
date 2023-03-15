@@ -7,9 +7,9 @@ profile = {
 
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['Barcode-I', 'Pill_Detect-I', 'Search-I', 'Sheet-I', 'Pill_Detect_Result-O', 'Search_Result-O', 'Syringe-O'],
+    'df_list': ['Barcode-I', 'Pill_Detect-I', 'Search-I', 'Sheet-I', 'Patient-O', 'Pill_Detect_Result-O', 'Search_Result-O', 'Syringe-O'],
 }
-mac_addr = 'MedicationTalk_Platform_0' #'C860008BD249'
+mac_addr = 'Medication_Platform_0' #'C860008BD249'
 
 #state = 'SUSPEND'     #for control channel
 state = 'RESUME'
