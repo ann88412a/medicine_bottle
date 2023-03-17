@@ -97,7 +97,7 @@
                     </tr>
                     <tr>
                         <th align="left" style="background-color: #D6EEEE;">藥劑名稱</th>
-                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')][0] }} </td>
                     </tr>
                 </table>
             </div>
@@ -149,7 +149,7 @@
                     </tr>
                     <tr>
                         <th align="left" style="background-color: #D6EEEE;">藥劑名稱</th>
-                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')][0] }} </td>
                     </tr>
                     <tr>
                         <th align="left" style="background-color: #D6EEEE;">稀釋總量</th>
@@ -211,7 +211,7 @@
                     </tr>
                     <tr>
                         <th align="left">藥劑名稱</th>
-                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')][0] }} </td>
                     </tr>
                     <tr>
                         <th align="left">稀釋總量</th>
@@ -305,7 +305,7 @@
                     </tr>
                     <tr>
                         <th align="left">藥劑名稱</th>
-                        <td> {{ medicine_dict[request.cookies.get('barcode_id')] }} </td>
+                        <td> {{ medicine_dict[request.cookies.get('barcode_id')][0] }} </td>
                     </tr>
                     <tr>
                         <th align="left">稀釋總量</th>
