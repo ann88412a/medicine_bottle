@@ -2,18 +2,14 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-<<<<<<< HEAD
-    'd_name': 'Medication_Database',
-    'dm_name': 'Medication_Database',
-=======
-    'd_name': 'Medication_DB0',
+    'd_name': 'Medication_DB_0',
     'dm_name': 'Medication_DB',
->>>>>>> 21475ce57a84beea09973147827fa2ed342c228b
+
     'u_name': 'dio',
     'is_sim': False,
     'df_list': ['Patient-I', 'Search_Result-I', 'Barcode-O', 'Search-O', 'Sheet-O'],
 }
-mac_addr = None #'C860008BD249'
+mac_addr = 'Medication_DB_0' #'C860008BD249'
 
 #state = 'SUSPEND'     #for control channel
 state = 'RESUME'

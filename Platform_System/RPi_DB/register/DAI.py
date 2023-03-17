@@ -5,7 +5,7 @@ import threading
 #================iottalk===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
-Reg_addr = None #if None, Reg_addr = MAC address
+Reg_addr = 'Medication_DB_0' #if None, Reg_addr = MAC address
 
 
 DAN.device_registration_with_retry(ServerURL, Reg_addr)
