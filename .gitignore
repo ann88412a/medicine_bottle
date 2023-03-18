@@ -545,3 +545,5 @@ bad.list
 demo/__pycache__/darknet.cpython-36.pyc
 camera_test/data
 pill/cyho/backup/yolov7_final.weights
+pill/datasets
+pill/onnx/runs/val
