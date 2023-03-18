@@ -33,6 +33,18 @@
 </head>
 
 <body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                let alert_msg = "";
+                {% for message in messages %}
+                    alert_msg += "{{ message }}";
+                {% endfor %}
+                alert(alert_msg);
+            </script>
+        {% endif %}
+    {% endwith %}
+
     {% if request.cookies.get('barcode_id') == 'None' %} {# barcode掃描按鈕 #}
         <div>
             <div class="tipicon">
