@@ -25,6 +25,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from tidecv import TIDE, datasets
 
 import numpy as np
 import torch
@@ -125,6 +126,7 @@ def run(
         plots=True,
         callbacks=Callbacks(),
         compute_loss=None,
+        tide=False,
 ):
     # Initialize/load model and set device
     training = model is not None
@@ -326,6 +328,21 @@ def run(
         except Exception as e:
             LOGGER.info(f'pycocotools unable to run: {e}')
 
+        if tide:
+            try:
+                check_requirements('tidecv')
+                import tidecv
+                bbox_results = tidecv.datasets.COCOResult(pred_json)
+                tide = tidecv.TIDE()
+                gt = tidecv.datasets.COCO(path=anno_json)
+                tide.evaluate_range(gt, bbox_results, mode=TIDE.BOX)
+                tide.summarize()
+                tide.plot()
+            except Exception as e:
+                LOGGER.info(f'tide porotocol unable to run: {e}')
+
+
+
     # Return results
     model.float()  # for training
     if not training:
@@ -361,6 +378,7 @@ def parse_opt():
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
+    parser.add_argument('--tide', action='store_true', help='use tide evaluation protocol.')
     opt = parser.parse_args()
     opt.data = check_yaml(opt.data)  # check YAML
     opt.save_json |= opt.data.endswith('coco.yaml')
