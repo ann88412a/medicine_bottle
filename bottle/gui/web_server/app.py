@@ -1,27 +1,15 @@
-from flask import Flask, render_template, request, url_for, redirect, make_response
+from flask import Flask, render_template, request, url_for, redirect, make_response, flash
 from threading import Thread
 from iottalk_lib import DAN
 import time, json, random, string, sys
 import numpy as np
 
-hist_dict = {}  # {userID:[[Barcode, Medicine name, Dosage, Diluted doses, Injection site], ...], ...}
+hist_dict = {}  # {userID:[[Barcode, Medicine name, Diluted doses, Dosage, Injection site], ...], ...}
 pull_data = {"barcode": {}, "syringe": {}}
-medicine_dict = {"4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Group 1
-                 "4710031297121": "Heparin Sodium Injection 5000 IU/ml 'Tai Yu'",
-                 "4710596700920": "CEFAZOLIN INJECTION 1GM 'C.C.P.'",
-                 "3582910008934": "CORDARONE INJECTION",
-                 "4719858031321": "SODIUM BICARBONATE INJECTION 'CHI SHENG'",
-                 "4711916010354": "ROLIKAN INJECTION (SODIUM BICARBONATE)",
-                 # "4710031116149": "AMIKACIN INJECTION 250MG/ML 'TAI YU'",  # Group 2
-                 "4711457371105": "Sirolac IV Injection 30 mg/ml 'ASTAR'",
-                 "4710596702344": "Oxacillin Powder for Injection 'CYH'",  # Group 3
-                 "4719858033455": "Progesterone Injection 'Chi Sheng'",
-                 "108806520004816": "CLEXANE INJECTION",
-                 "4715550032017": "AMPOLIN INJECTION 500MG",  # Group 4
-                 "4987170870854": "MILLISROL INJECTION"}
 
 
 app = Flask(__name__)
+app.secret_key = "pcs54784"
 
 @app.route('/syringe/', defaults={'machine_id': 'bottle_01', 'username': 'undefine'})
 @app.route('/syringe/<machine_id>/<username>')
@@ -88,7 +76,7 @@ def add_new():
             usr = request.cookies.get('userID')
             Barcode = request.cookies.get('barcode_id')
             try:
-                Medicine_name = medicine_dict[Barcode]
+                Medicine_name = medicine_dict[Barcode][0]
             except:
                 Medicine_name = "查無此藥品"
             Diluted_doses = request.cookies.get('syringe_diluent_value')
@@ -101,8 +89,6 @@ def add_new():
                     __idx = same_barcode_index_arr[0]
                     hist_dict[usr][__idx][2] = str(float(hist_dict[usr][__idx][2]) + float(Diluted_doses))  # Diluted_doses
                     hist_dict[usr][__idx][3] = str(float(hist_dict[usr][__idx][3]) + float(Dosage))  # Dosage
-                    if hist_dict[usr][__idx][4] != injection_info:
-                        hist_dict[usr][__idx][4] = "{} / {}".format(hist_dict[usr][__idx][4], injection_info)
                 else:
                     hist_dict[usr].append([Barcode, Medicine_name, Diluted_doses, Dosage, injection_info])
             else:
@@ -115,10 +101,16 @@ def add_new():
 def wait_data():
     global pull_data
     if request.cookies.get('random_id') in pull_data["barcode"].keys():
-        resp = make_response(redirect(url_for(r'add_new')))
-        resp.set_cookie('barcode_id', str(pull_data["barcode"][request.cookies.get('random_id')]), samesite='None', secure=True)
-        del pull_data["barcode"][request.cookies.get('random_id')]
-        return resp
+        if str(pull_data["barcode"][request.cookies.get('random_id')]) in medicine_dict.keys():
+            resp = make_response(redirect(url_for(r'add_new')))
+            resp.set_cookie('barcode_id', str(pull_data["barcode"][request.cookies.get('random_id')]), samesite='None', secure=True)
+            del pull_data["barcode"][request.cookies.get('random_id')]
+            return resp
+        else:
+            flash("您輸入的藥品條碼未定義!\\n條碼編號: {}\\n\\n請聯絡助教或老師!".format(str(pull_data["barcode"][request.cookies.get('random_id')])))
+            del pull_data["barcode"][request.cookies.get('random_id')]
+            return redirect(url_for(r'add_new'))
+
     if request.cookies.get('random_id') in pull_data["syringe"].keys():
         resp = make_response(redirect(url_for(r'add_new')))
         resp.set_cookie('syringe_type', pull_data["syringe"][request.cookies.get('random_id')][-2], samesite='None', secure=True)
@@ -139,10 +131,14 @@ def wait_data():
 
 @app.route('/syringe/submit_result/')
 def submit_result():
-    global hist_dict, pull_data
+    global hist_dict
     try:
-        push_data = json.dumps({"bottle": hist_dict[request.cookies.get('userID')]})
-        DAN.push('syringe_submit_result_server', push_data)
+        push_data = {"UID": request.cookies.get('username')}
+        for __key in medicine_dict.keys():  ## send all medicine data
+            push_data[medicine_dict[__key][0]] = [0, None]
+        for hist_medicine in hist_dict[request.cookies.get('userID')]:
+            push_data[hist_medicine[1]] = [float(hist_medicine[3]) / (float(hist_medicine[2])+1) * float(medicine_dict[hist_medicine[0]][1]), hist_medicine[4]]
+        DAN.push('syringe_submit_result_server', json.dumps(push_data))
         # print("DAN.push('syringe_submit_result_server')", push_data)
         del hist_dict[request.cookies.get('userID')]
 
@@ -151,7 +147,8 @@ def submit_result():
     # return redirect("http://140.113.110.21:1526/show/index.html", code=302)  # Enter the URL you wish to use after push data.
     # print(hist_dict, pull_data)
     # return redirect(url_for(r'init'))
-    return render_template(r"syringe/finished.html")
+    # return render_template(r"syringe/finished.html")
+    return "<!DOCTYPE html><html><body><style>body{font-family: verdana;font-size: 36px;}</style> <h1 style=\"text-align: center; line-height: 20%;\"> 針劑藥物辨識系統 </h1> <hr> <h2 style=\"text-align: center;\"> 已完成上傳 </h2></body></html>"
 
 @app.route('/syringe/RESET')
 def RESET():
@@ -205,6 +202,10 @@ if __name__ == '__main__':
     cfg_file_path = "/home/pcs-file-server/Documents/cfg_files/web_server.cfg"
     with open(cfg_file_path, 'r') as __f:
         __cfg = json.load(__f)
+        __f.close()
+    medicine_list_file_path = "/home/pcs-file-server/Documents/cfg_files/medicine_list.json"
+    with open(medicine_list_file_path, 'r') as __f:
+        medicine_dict = json.load(__f)
         __f.close()
     dm_loop = Thread(target=dummy_device_loop, name="medical_iottalk")
     dm_loop.setDaemon(True)
