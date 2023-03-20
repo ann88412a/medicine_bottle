@@ -1,11 +1,12 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter.ttk import Separator, Progressbar
 from iottalk_lib import DAN
 from threading import Thread
 import time, json, statistics, serial
+import os
 try:
     # fix opencv open webcam slowly bug in WIN10
-    import os
     os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
     # call cv2 in WIN10
     from cv2 import cv2
@@ -30,10 +31,13 @@ class medical_GUI:
         # create the window
         self.window = tk.Tk()
         self.window.attributes("-topmost", True)
-        self.window.title('IoTtalk')
+        self.window.title('Medical Talk')
         # self.window.geometry("1024x600")
         self.window.attributes("-fullscreen", True)
         self.window.update()
+        self.window.bind('<Escape>', lambda _: self.quit())  # press "Esc" key to close
+        self.window.bind("<Triple-Button>", lambda _: self.sys_options())  # show reboot, power-off, closeAPP options after click 3 times
+
 
         self.__screen_width = self.window.winfo_width()
         self.__screen_height = self.window.winfo_height()
@@ -56,8 +60,26 @@ class medical_GUI:
         self.window.mainloop()
 
     def quit(self):
-        self.window.destroy()
-        # self.select_mode()
+        if(messagebox.askyesno("Close app", "Quit?")):
+            self.window.destroy()
+
+    def sys_shutdown(self):
+        if(messagebox.askyesno("Power off", "Power off?")):
+            self.window.destroy()
+            os.system('systemctl poweroff')
+
+    def sys_reboot(self):
+        if(messagebox.askyesno("Reboot", "Reboot?")):
+            self.window.destroy()
+            os.system('systemctl reboot')
+
+    def sys_options(self):
+        self.clean()
+        tk.Button(self.window, text='poweroff', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.sys_shutdown()]).place(relx=0.025, rely=0.2, relwidth=0.3, relheight=0.3)
+        tk.Button(self.window, text='reboot', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.sys_reboot()]).place(relx=0.35, rely=0.2, relwidth=0.3, relheight=0.3)
+        tk.Button(self.window, text='結束APP', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.quit()]).place(relx=0.675, rely=0.2, relwidth=0.3, relheight=0.3)
+        tk.Button(self.window, text='取消', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.wait_page()]).place(relx=0.8, rely=0.8, relwidth=0.2, relheight=0.2)
+
 
     def clean(self):
         for child in list(self.window.children.values()):
@@ -65,7 +87,7 @@ class medical_GUI:
         for widget in self.window.winfo_children():
             widget.configure(state='disabled')  # read only
             widget.destroy()
-        self.window.bind('<Escape>', lambda _: self.quit())  # press "Esc" key to close
+
 
     def text_translate(self, text, language='zh-tw'):
         return text
