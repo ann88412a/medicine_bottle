@@ -184,7 +184,7 @@ class medical_GUI:
                 else:
                     self.scale_running_bar['value'] = 100 * (__median+1) / (__mean+1)
 
-                if(__median == scale_value and __mean == __median): ## finished and push
+                if(float(__median) == float(scale_value) and float(__mean) == float(__median)): ## finished and push
                     self.clean()
                     # cv2.imwrite("{}/{}_{}_{}_{}_{}.jpg".format(self.__cfg["syringe_scale_img_save_path"], time.strftime("%Y%d%m%H%M%S", time.localtime()),
                     #                                self.syringe_scale_control_info[0], self.syringe_scale_control_info[1],
