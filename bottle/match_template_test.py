@@ -11,8 +11,25 @@ except:
 import numpy as np
 
 class syringe_scale:
-    def __init__(self, homography):
-        self.__homography = homography
+    def __init__(self, cfg):
+        self.__homography = cfg["homography"]
+        self.__template_fig_path = cfg["template_fig_path"]
+        self.__pix2unit = cfg["px2unit"]
+
+    def image_crop(self, img, syringe_type):
+        if syringe_type == "1 ml":
+            img = img[230:-40, 70:-70]
+        elif syringe_type == "3 ml":
+            img = img[360:-30, 60:-60]
+        elif syringe_type == "5 ml":
+            img = img[290:, 45:-45]
+        elif syringe_type == "10 ml":
+            img = img[70:-10, 30:-30]
+        elif syringe_type == "100 units":
+            img = img[230:-20, 80:-80]
+        elif syringe_type == "others":
+            img = img[440:-110, 70:-70]
+        return img
 
     def image_homography(self, img):  # (1080, 1920, 3) -> (1000, 250, 3)
         # w, h = 1020, 260
@@ -26,28 +43,9 @@ class syringe_scale:
         return img[150:w - 50, 5:-5]
 
     def image_preprocessing(self, last_frame, cur_frame, syringe_type):
-        frame1 = self.image_homography(last_frame)
-        frame2 = self.image_homography(cur_frame)
+        frame1 = self.image_crop(self.image_homography(last_frame), syringe_type)
+        frame2 = self.image_crop(self.image_homography(cur_frame), syringe_type)
         img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
-
-        if syringe_type == "1 ml":
-            img = img[230:-40, 70:-70]
-        elif syringe_type == "3 ml":
-            img = img[360:-30, 60:-60]
-        elif syringe_type == "5 ml":
-            img = img[290:, 45:-45]
-        elif syringe_type == "10 ml":
-            img = img[70:-10, 30:-30]
-        elif syringe_type == "100 units":
-            img = img[230:-20, 80:-80]
-        elif syringe_type == "others":
-            img = img[440:-110, 70:-70]
-        else:
-            print("Syringe type input error!! your input:", syringe_type)
-        # img = cv2.resize(img, (250, 1000))
-        # img_ratio = 1.5
-        # img = cv2.resize(img, None, fx=img_ratio, fy=img_ratio)
-        # print(img.shape)
         return img
 
     def hsv_thresholding(self, img, threshold=40):
@@ -80,7 +78,10 @@ class syringe_scale:
         auto_canny_img = cv2.dilate(auto_canny_img, np.ones((3, 5), np.uint8), iterations=2)
         auto_canny_img = cv2.erode(auto_canny_img, np.ones((5, 7), np.uint8), iterations=1)
 
-        contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
+        try:
+            _, contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)  # nano use old ver. opencv
+        except:
+            contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
         if len(contours) > 0:
             # (x, y), radius = cv2.minEnclosingCircle(contour)
             # center = (int(x), int(y))
@@ -100,6 +101,30 @@ class syringe_scale:
             # cv2.imshow("frame_scall", cv2.resize(img, None, fx=img_ratio, fy=img_ratio))
             return contour
         return None
+
+    def find_match_template(self, img, syringe_type, threshold=0.5):
+        ## template img load and thresh
+        template = cv2.imread("{}/{}.png".format(self.__template_fig_path, syringe_type.replace(" ", "")), 0)
+        _, template_bin = cv2.threshold(template, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        ## img thresh
+        _, img_bin = cv2.threshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        ## template size must <= img size
+        template_ratio = img.shape[1] / template.shape[1]
+        template = cv2.resize(template, None, fx=template_ratio, fy=template_ratio)
+        ## match template
+        res = cv2.matchTemplate(img_bin, template, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        # print(min_val, max_val, min_loc, max_loc)
+        if max_val > threshold:
+            top_left = max_loc
+            w, h = template.shape[::-1]
+            x, y = top_left[0] + w // 2, top_left[1] + h // 2  # center
+            # bottom_right = (top_left[0] + w, top_left[1] + h)
+            # cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
+            # cv2.circle(frame_scall, (top_left[0] + w // 2, top_left[1] + h // 2), 0, (0, 255, 0), 2)
+            return x, y
+        else:
+            return None
 
     def get_plunger_tip_dist(self, img, syringe_type, threshold=40):
         contour = self.find_plunger_tip(img, syringe_type, threshold)
@@ -125,41 +150,20 @@ class syringe_scale:
         #         return num+0.1
         #     else:
         #         return num
-        return {
-            "1 ml": (round(pixel_y/665, 2), pixel_y),
-            "3 ml": (abs(round((pixel_y-58)/530*3, 1)), pixel_y),
-            "5 ml": (abs(round((pixel_y-75)/512*5, 1)), pixel_y),
-            "10 ml": (abs(round((pixel_y-68)/750*10, 1)), pixel_y),
-            "100 units": (pixel_y/82, pixel_y),
-            "others": (pixel_y/82, pixel_y)
-        }[syringe_type]
+        # return {
+        #     self.__pix2unit
+        # }[syringe_type]
+        return eval(self.__pix2unit[syringe_type])
 
-    def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=40):  # draw
+    def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=130):  # draw
         img = self.image_preprocessing(last_frame.copy(), cur_frame.copy(), syringe_type)
-        # plunger_tip = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
-        # plunger_tip = self.get_plunger_tip_dist(img.copy(), threshold=threshold)  # get tip xy
-
-
-
-
-
-        plunger_tip = 0, 0
         scale = None
-        # cv2.putText(img, "type: "+syringe_type, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-        # print("type: " + syringe_type)
+        _mtr = self.find_match_template(img, syringe_type)
+        if _mtr is not None:
+            mt_x, mt_y = _mtr
+            scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
+            cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
 
-        if plunger_tip is not None:
-            scale, tip_y = self.syringe_pixel2unit(plunger_tip[1], syringe_type)
-            # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
-            # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
-            cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
-            # cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-            # print("scale: " + str(scale), str(plunger_tip[1]))
-        else:
-            # cv2.putText(img, "scale: Null", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-            # print("scale: Null")
-            pass
-        # print("\n\n\n\n\n")
         return img, scale
 
 
@@ -167,8 +171,16 @@ if(__name__ == "__main__"):
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    sc = syringe_scale([[684, 387], [1897, 370], [680, 675], [1902, 695]])
+    sc = syringe_scale({"homography": [[684, 387], [1897, 370], [680, 675], [1902, 695]],
+    "template_fig_path": "C:\\Users\\ken88\\Desktop\\medicine_bottle\\bottle\\gui\\nano_client/images/match_fig_template",
+    "px2unit": {"1 ml": "(abs(round((pixel_y-53)/(670-53)*1, 2)), pixel_y)",
+                "3 ml": "(abs(round((pixel_y-58)/(533-58)*3, 1)), pixel_y)",
+                "5 ml": "(abs(round((pixel_y-55)/(590-55)*5, 1)), pixel_y)",
+                "10 ml": "(abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y)",
+                "100 units": "(pixel_y/82, pixel_y)",
+                "others": "(pixel_y/82, pixel_y)"}})
     last_ret, last_frame = cap.read()
+
     while(True):
         ret, cur_frame = cap.read()
         # ret, frame = cap.read()
@@ -176,37 +188,6 @@ if(__name__ == "__main__"):
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
         frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
-
-
-
-        # All the 6 methods for comparison in a list
-        methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
-                   'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
-        method = eval(methods[1])
-        template = cv2.imread(r"C:\Users\ken88\Desktop\medicine_bottle\bottle\gui\nano_client\images\match_fig_template\10ml.png", 0)
-        gray = cv2.cvtColor(frame_scall, cv2.COLOR_BGR2GRAY)
-        template_ratio = gray.shape[1]/template.shape[1]
-        template = cv2.resize(template, None, fx=template_ratio, fy=template_ratio)
-        # cv2.imshow("frame_scall", template)
-        w, h = template.shape[::-1]
-        # print("template", template.shape[::-1])
-        # Apply template Matching
-
-        # print("gray", gray.shape[::-1])
-        res = cv2.matchTemplate(gray, template, method)
-
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        print(min_val, max_val, min_loc, max_loc)
-        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            top_left = min_loc
-        else:
-            top_left = max_loc
-        bottom_right = (top_left[0] + w, top_left[1] + h)
-        cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
-        cv2.circle(frame_scall, (top_left[0]+w//2, top_left[1]+h//2), 0, (0, 255, 0), 2)
-
-
 
 
         # print(scale_value)

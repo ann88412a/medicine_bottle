@@ -48,100 +48,102 @@ class syringe_scale:
         img = np.mean([frame1, frame2], axis=0).astype(np.uint8)  # get 2 frame mean
         return img
 
-    def hsv_thresholding(self, img, threshold=40):
-        lower_black = np.array([100, 90, 40], np.uint8)
-        upper_black = np.array([130, 230, 40+threshold], np.uint8)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(img, lower_black, upper_black)
-        # mask = cv2.bitwise_not(mask)
-        # mask = cv2.dilate(mask, np.ones((3, 5), np.uint8), iterations=2)
-        mask = cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
-        mask = cv2.dilate(mask, np.ones((7, 7), np.uint8), iterations=1)
-        # mask = cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=2)
-        return mask
+    # def hsv_thresholding(self, img, threshold=40):
+    #     lower_black = np.array([100, 90, 40], np.uint8)
+    #     upper_black = np.array([130, 230, 40+threshold], np.uint8)
+    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    #     mask = cv2.inRange(img, lower_black, upper_black)
+    #     # mask = cv2.bitwise_not(mask)
+    #     # mask = cv2.dilate(mask, np.ones((3, 5), np.uint8), iterations=2)
+    #     mask = cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
+    #     mask = cv2.dilate(mask, np.ones((7, 7), np.uint8), iterations=1)
+    #     # mask = cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=2)
+    #     return mask
 
-    def auto_canny(self, img, sigma=0.3):
-        # compute the median of the single channel pixel intensities
-        v = np.median(img)
-        lower = int(max(0, (1.0 - sigma) * v))
-        upper = int(min(255, (1.0 + sigma) * v))
-        edged = cv2.Canny(img, lower, upper)
-        return edged
+    # def auto_canny(self, img, sigma=0.3):
+    #     # compute the median of the single channel pixel intensities
+    #     v = np.median(img)
+    #     lower = int(max(0, (1.0 - sigma) * v))
+    #     upper = int(min(255, (1.0 + sigma) * v))
+    #     edged = cv2.Canny(img, lower, upper)
+    #     return edged
 
-    def find_plunger_tip(self, img, syringe_type, threshold=40, first_call=True):
-        img = img.copy()
-        img[self.hsv_thresholding(img, threshold) == 0] = [255, 255, 255]  # only save the target color
-        bilateralFilter_img = cv2.bilateralFilter(img, 9, 50, 50)  # blur
-        auto_canny_img = self.auto_canny(bilateralFilter_img)
-        # auto_canny_img = cv2.bitwise_not(auto_canny_img)
-        # auto_canny_img = cv2.erode(auto_canny_img, np.ones((3, 3), np.uint8), iterations=1)
-        auto_canny_img = cv2.dilate(auto_canny_img, np.ones((3, 5), np.uint8), iterations=2)
-        auto_canny_img = cv2.erode(auto_canny_img, np.ones((5, 7), np.uint8), iterations=1)
+    # def find_plunger_tip(self, img, syringe_type, threshold=40, first_call=True):
+    #     img = img.copy()
+    #     img[self.hsv_thresholding(img, threshold) == 0] = [255, 255, 255]  # only save the target color
+    #     bilateralFilter_img = cv2.bilateralFilter(img, 9, 50, 50)  # blur
+    #     auto_canny_img = self.auto_canny(bilateralFilter_img)
+    #     # auto_canny_img = cv2.bitwise_not(auto_canny_img)
+    #     # auto_canny_img = cv2.erode(auto_canny_img, np.ones((3, 3), np.uint8), iterations=1)
+    #     auto_canny_img = cv2.dilate(auto_canny_img, np.ones((3, 5), np.uint8), iterations=2)
+    #     auto_canny_img = cv2.erode(auto_canny_img, np.ones((5, 7), np.uint8), iterations=1)
+    #
+    #     try:
+    #         _, contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)  # nano use old ver. opencv
+    #     except:
+    #         contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
+    #     if len(contours) > 0:
+    #         # (x, y), radius = cv2.minEnclosingCircle(contour)
+    #         # center = (int(x), int(y))
+    #         # radius = int(radius)
+    #         # # cv2.circle(img, center, radius, (0, 255, 0), 2)
+    #         # # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
+    #
+    #         for c in range(len(contours)):
+    #             if cv2.contourArea(contours[c]) > 1000:
+    #                 # print(cv2.contourArea(contours[c]))
+    #                 cv2.fillPoly(contours[c], [contours[c]], (0, 0, 255))
+    #
+    #         contour = max(contours, key=cv2.contourArea)  # max Area contour
+    #         # cv2.fillPoly(img, [contour], (255, 0, 0))
+    #         # # print("arcLength", cv2.arcLength(contour, True))
+    #         # img_ratio = 0.8
+    #         # cv2.imshow("frame_scall", cv2.resize(img, None, fx=img_ratio, fy=img_ratio))
+    #         return contour
+    #     return None
 
-        try:
-            _, contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)  # nano use old ver. opencv
-        except:
-            contours, hierarchy = cv2.findContours(auto_canny_img, cv2.CHAIN_APPROX_SIMPLE, cv2.CHAIN_APPROX_NONE)
-        if len(contours) > 0:
-            # (x, y), radius = cv2.minEnclosingCircle(contour)
-            # center = (int(x), int(y))
-            # radius = int(radius)
-            # # cv2.circle(img, center, radius, (0, 255, 0), 2)
-            # # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
-
-            for c in range(len(contours)):
-                if cv2.contourArea(contours[c]) > 1000:
-                    # print(cv2.contourArea(contours[c]))
-                    cv2.fillPoly(contours[c], [contours[c]], (0, 0, 255))
-
-            contour = max(contours, key=cv2.contourArea)  # max Area contour
-            # cv2.fillPoly(img, [contour], (255, 0, 0))
-            # # print("arcLength", cv2.arcLength(contour, True))
-            # img_ratio = 0.8
-            # cv2.imshow("frame_scall", cv2.resize(img, None, fx=img_ratio, fy=img_ratio))
-            return contour
-        return None
-
-    def find_match_template(self, img, syringe_type, method_idx=1):
-        methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
-                   'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
-        method = eval(methods[method_idx])
+    def find_match_template(self, img, syringe_type, threshold=0.5):
+        ## template img load and thresh
         template = cv2.imread("{}/{}.png".format(self.__template_fig_path, syringe_type.replace(" ", "")), 0)
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        template_ratio = img_gray.shape[1] / template.shape[1]
+        _, template_bin = cv2.threshold(template, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        ## img thresh
+        _, img_bin = cv2.threshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        ## template size must <= img size
+        template_ratio = img.shape[1] / template.shape[1]
         template = cv2.resize(template, None, fx=template_ratio, fy=template_ratio)
-        w, h = template.shape[::-1]
-        res = cv2.matchTemplate(img_gray, template, method)
+        ## match template
+        res = cv2.matchTemplate(img_bin, template, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            top_left = min_loc
-        else:
+        # print(min_val, max_val, min_loc, max_loc)
+        if max_val > threshold:
             top_left = max_loc
-        x, y = top_left[0] + w // 2, top_left[1] + h // 2  # center
-        # bottom_right = (top_left[0] + w, top_left[1] + h)
-        # cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
-        # cv2.circle(frame_scall, (top_left[0] + w // 2, top_left[1] + h // 2), 0, (0, 255, 0), 2)
-        return (x, y), (w, h)
+            w, h = template.shape[::-1]
+            x, y = top_left[0] + w // 2, top_left[1] + h // 2  # center
+            # bottom_right = (top_left[0] + w, top_left[1] + h)
+            # cv2.rectangle(frame_scall, top_left, bottom_right, 255, 2)
+            # cv2.circle(frame_scall, (top_left[0] + w // 2, top_left[1] + h // 2), 0, (0, 255, 0), 2)
+            return x, y
+        else:
+            return None
 
-    def get_plunger_tip_dist(self, img, syringe_type, threshold=40):
-        contour = self.find_plunger_tip(img, syringe_type, threshold)
-        if contour is not None:
-            # (x, y), radius = cv2.minEnclosingCircle(contour)
-            # center = (int(x), int(y))
-            # radius = int(radius)
-            # cv2.circle(img, center, radius, (0, 255, 0), 2)
-            # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
-            # cv2.fillPoly(img, [contour], (255, 0, 0))
-            # print("arcLength", cv2.arcLength(contour, True))
-            ## find the centroid of this contour
-            M = cv2.moments(contour)
-            X, Y = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-
-
-            return X, Y
-        return None
-
+    # def get_plunger_tip_dist(self, img, syringe_type, threshold=40):
+    #     contour = self.find_plunger_tip(img, syringe_type, threshold)
+    #     if contour is not None:
+    #         # (x, y), radius = cv2.minEnclosingCircle(contour)
+    #         # center = (int(x), int(y))
+    #         # radius = int(radius)
+    #         # cv2.circle(img, center, radius, (0, 255, 0), 2)
+    #         # cv2.drawContours(img, contour, -1, (255,0,0), cv2.FILLED)
+    #         # cv2.fillPoly(img, [contour], (255, 0, 0))
+    #         # print("arcLength", cv2.arcLength(contour, True))
+    #         ## find the centroid of this contour
+    #         M = cv2.moments(contour)
+    #         X, Y = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+    #
+    #
+    #         return X, Y
+    #     return None
+    #
     def syringe_pixel2unit(self, pixel_y, syringe_type):
         # def precision_0point2(num):
         #     if num % 0.2 > 0:
@@ -155,32 +157,32 @@ class syringe_scale:
 
     def get_scale(self, last_frame, cur_frame, syringe_type="others", threshold=130):  # draw
         img = self.image_preprocessing(last_frame.copy(), cur_frame.copy(), syringe_type)
-        plunger_tip_by_color = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
+        # plunger_tip_by_color = self.get_plunger_tip_dist(img, syringe_type, threshold=threshold)  # get tip xy
         # plunger_tip = self.get_plunger_tip_dist(img.copy(), threshold=threshold)  # get tip xy
 
         scale = None
-        # cv2.putText(img, "type: "+syringe_type, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-        # print("type: " + syringe_type)
+        match_template_coordinate = self.find_match_template(img, syringe_type)
+        if match_template_coordinate is not None:
+            mt_x, mt_y = match_template_coordinate
+            scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
+            cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
 
-        if plunger_tip_by_color is not None:
-            (mt_x, mt_y), (mt_w, mt_h) = self.find_match_template(img, syringe_type)
-            if abs(mt_y - plunger_tip_by_color[1]) < mt_h/2:
-                scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
-                cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
-                # cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
-                # print(scale, tip_y)
-
-            # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
-            # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
-
-            # cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-            # print("scale: " + str(scale), str(plunger_tip[1]))
-        else:
-            # cv2.putText(img, "scale: Null", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
-            # print("scale: Null")
-            pass
-        # print("\n\n\n\n\n")
         return img, scale
+
+        # if plunger_tip_by_color is not None:
+        #     (mt_x, mt_y), (mt_w, mt_h) = self.find_match_template(img, syringe_type)
+        #     if abs(mt_y - plunger_tip_by_color[1]) < mt_h/2:
+        #         scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
+        #         cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
+        #         # cv2.line(img, (0, tip_y), (img.shape[1], tip_y), (0, 0, 255), 2)
+        #         # print(scale, tip_y)
+        #
+        #     # cv2.line(img, (0, plunger_tip_value), (img.shape[1], plunger_tip_value), (0, 0, 255), 2)
+        #     # cv2.circle(img, plunger_tip, 7, (0, 255, 0), -1)
+        #
+        #     # cv2.putText(img, "scale: " + str(round(scale, 1)), (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+        #     # print("scale: " + str(scale), str(plunger_tip[1]))
+        # return img, scale
 
 
 if(__name__ == "__main__"):
