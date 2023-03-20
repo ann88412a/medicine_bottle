@@ -16,10 +16,20 @@ user_id = 'user'
 # DB
 db = pymysql.connect(host='localhost', port=3306, user='root', passwd='pcs54784', db='yangming', charset='utf8')
 cursor = db.cursor()
-
+watchdog = 0
 
 while True:
     try:
+        watchdog = watchdog + 1
+        
+        if (watchdog > 1000):
+            db.close()
+            db = pymysql.connect(host='localhost', port=3306, user='root', passwd='pcs54784', db='yangming', charset='utf8')
+            cursor = db.cursor()
+            DAN.device_registration_with_retry(ServerURL, Reg_addr)
+            watchdog = 0
+
+
         barcode = DAN.pull('Barcode-O')
         
         if barcode != None:
