@@ -6,7 +6,7 @@ profile = {
     'dm_name': 'Medication_Device',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['Pill_Detect_Resul-I', 'Pill_Detect-O'],
+    'df_list': ['Pill_Detect_Result-I', 'Pill_Detect-O'],
 }
 mac_addr = 'BAC0B21FDC32' #'C860008BD249'
 MAC = mac_addr
