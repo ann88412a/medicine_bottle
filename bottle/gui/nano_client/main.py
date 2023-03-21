@@ -5,6 +5,7 @@ from iottalk_lib import DAN
 from threading import Thread
 import time, json, statistics, serial
 import os
+import urllib.request
 try:
     # fix opencv open webcam slowly bug in WIN10
     os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
@@ -36,14 +37,17 @@ class medical_GUI:
         self.window.attributes("-fullscreen", True)
         self.window.update()
         self.window.bind('<Escape>', lambda _: self.quit())  # press "Esc" key to close
-        self.window.bind("<Triple-Button>", lambda _: self.sys_options())  # show reboot, power-off, closeAPP options after click 3 times
-
+        # self.window.bind("<Triple-Button>", lambda _: self.sys_options())  # show reboot, power-off, closeAPP options after click 3 times
+        self.window.bind('<ButtonPress-1>', self.sys_options_long_press_event)  # long press to quit (3s)
+        self.window.bind('<ButtonRelease-1>', self.sys_options_long_press_event)
 
         self.__screen_width = self.window.winfo_width()
         self.__screen_height = self.window.winfo_height()
         # print(self.__screen_width, self.__screen_height)
         self.__font_ratio = self.__screen_width/1024
         # print(self.__font_ratio)
+
+        self.check_network(self.__cfg["ServerURL"])
 
         self.cap = cap
         stream = Thread(target=self.webcam_stream, name="medical_webcam_stream")
@@ -63,6 +67,16 @@ class medical_GUI:
         if(messagebox.askyesno("Close app", "Quit?")):
             self.window.destroy()
 
+    def sys_options_long_press_event(self, event=None):
+        if event is None:
+            self.sys_options()
+            self.__id_of_sys_options_long_press_after_event = None
+        elif event.type == tk.EventType.ButtonPress:
+            self.__id_of_sys_options_long_press_after_event = self.window.after(3000, self.sys_options_long_press_event)
+        elif self.__id_of_sys_options_long_press_after_event:
+            self.window.after_cancel(self.__id_of_sys_options_long_press_after_event)
+            self.__id_of_sys_options_long_press_after_event = None
+
     def sys_shutdown(self):
         if(messagebox.askyesno("Power off", "Power off?")):
             self.window.destroy()
@@ -78,7 +92,7 @@ class medical_GUI:
         tk.Button(self.window, text='poweroff', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.sys_shutdown()]).place(relx=0.025, rely=0.2, relwidth=0.3, relheight=0.3)
         tk.Button(self.window, text='reboot', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.sys_reboot()]).place(relx=0.35, rely=0.2, relwidth=0.3, relheight=0.3)
         tk.Button(self.window, text='結束APP', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.quit()]).place(relx=0.675, rely=0.2, relwidth=0.3, relheight=0.3)
-        tk.Button(self.window, text='取消', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.wait_page()]).place(relx=0.8, rely=0.8, relwidth=0.2, relheight=0.2)
+        tk.Button(self.window, text='取消', font=('', int(40 * self.__font_ratio), 'bold'), command=lambda: [self.check_network(self.__cfg["ServerURL"]), self.wait_page()]).place(relx=0.8, rely=0.8, relwidth=0.2, relheight=0.2)
 
 
     def clean(self):
@@ -107,6 +121,7 @@ class medical_GUI:
         self.barcode_entry.place(relx=0.1, rely=0.6, relwidth=0.8, relheight=0.15)
         self.barcode_entry.focus_set()
         self.barcode_entry.bind('<Return>', self.check_barcode)
+
     def check_barcode(self, event):
         string = self.barcode_entry.get()
         if not string:  # check the string isn't empty
@@ -207,11 +222,23 @@ class medical_GUI:
                         pop_num = min(self.__scale_val_hist_list)
                     self.__scale_val_hist_list.pop(self.__scale_val_hist_list.index(pop_num))
 
-
+    def check_network(self, URL="https://www.google.com.tw/"):
+        self.clean()
+        # retry_time_count = time.time()
+        try:
+            urllib.request.urlopen(URL, timeout=1)
+            # return True
+        except urllib.request.URLError as err:
+            flg = tk.Label(self.window, text="")
+            tk.Label(self.window, text=self.text_translate("系統已離線..."), font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
+            tk.Button(self.window, text=self.text_translate("retry"), font=('', int(40 * self.__font_ratio), 'bold'),
+                      command=flg.pack).place(relx=0.8, rely=0.8, relwidth=0.2, relheight=0.2)
+            self.window.wait_visibility(flg)
+            self.check_network(URL)
 
 
     def dummy_device_loop(self):
-        ServerURL = self.__cfg["ServerURL"]  # with non-secure connection
+        ServerURL = self.__cfg["ServerURL"]
         Reg_addr = self.__cfg["Reg_addr"]  # if None, Reg_addr = MAC address
         DAN.profile['dm_name'] = "medical_bottle_nano_V2"
         DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_control_nano', 'barcode_result_nano', 'syringe_scale_result_nano', ]
@@ -239,6 +266,7 @@ class medical_GUI:
                         self.wait_page()
 
             except Exception as e:
+                self.check_network(ServerURL)
                 print(e)
                 if str(e).find('mac_addr not found:') != -1:
                     print('Reg_addr is not found. Try to re-register...')

@@ -162,6 +162,7 @@ class syringe_scale:
         if _mtr is not None:
             mt_x, mt_y = _mtr
             scale, tip_y = self.syringe_pixel2unit(mt_y, syringe_type)
+            print(scale, tip_y)
             cv2.circle(img, (mt_x, mt_y), 0, (0, 0, 255), 10)
 
         return img, scale
@@ -173,12 +174,10 @@ if(__name__ == "__main__"):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     sc = syringe_scale({"homography": [[684, 387], [1897, 370], [680, 675], [1902, 695]],
     "template_fig_path": "C:\\Users\\ken88\\Desktop\\medicine_bottle\\bottle\\gui\\nano_client/images/match_fig_template",
-    "px2unit": {"1 ml": "(abs(round((pixel_y-53)/(670-53)*1, 2)), pixel_y)",
-                "3 ml": "(abs(round((pixel_y-58)/(533-58)*3, 1)), pixel_y)",
-                "5 ml": "(abs(round((pixel_y-55)/(590-55)*5, 1)), pixel_y)",
-                "10 ml": "(abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y)",
-                "100 units": "(pixel_y/82, pixel_y)",
-                "others": "(pixel_y/82, pixel_y)"}})
+    "px2unit": {"1 ml": "(abs(round((pixel_y-45)/(681-45)*1, 2)), pixel_y)",
+                "3 ml": "(abs(round((pixel_y-61)/(550-61)*3, 1)), pixel_y)",
+                "5 ml": "(round((pixel_y-62)/(588-62)*5+0.1, 1) if round(round((pixel_y-62)/(588-62)*5, 1)%0.2, 1) == 0.1 else abs(round((pixel_y-62)/(588-62)*5, 1)), pixel_y)",
+                "10 ml": "(round((pixel_y-63)/(768-63)*10+0.1, 1) if round(round((pixel_y-63)/(768-63)*10, 1)%0.2, 1) == 0.1 else abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y)"}})
     last_ret, last_frame = cap.read()
 
     while(True):
@@ -187,7 +186,7 @@ if(__name__ == "__main__"):
         # height, width, channels = frame.shape
         # print("fps", cap.`get(cv2.CAP_PROP_FPS))
         # print(frame.shape)
-        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="10 ml")
+        frame_scall, scale_value = sc.get_scale(last_frame, cur_frame, syringe_type="1 ml")
 
 
         # print(scale_value)
