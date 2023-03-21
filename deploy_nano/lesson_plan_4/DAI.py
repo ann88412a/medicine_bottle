@@ -81,6 +81,7 @@ while True:
 
         # ============= pill yolo ===============
         pill_detect_check = DAN.pull('Pill_Detect-O')
+        # print('1', pill_detect_check)
         
         # print('pull', pill_detect_check)
         
@@ -129,22 +130,29 @@ while True:
 
             now = datetime.datetime.now()
             now = now.strftime('%m_%d_%H_%M_%S')
-            cv2.imwrite(user_id + now + '.jpg', frame_queue.get())
+            cv2.imwrite(user_id + '_' + now + '.jpg', frame_queue.get())
             try:
                 service = build('drive', 'v3', credentials=creds)
 
-                file_metadata = {'name': user_id + now + '.jpg',
+                file_metadata = {'name': user_id + '_' + now + '.jpg',
                                 'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
 
-                media = MediaFileUpload(user_id + now + '.jpg', mimetype='image/jpeg')
+                media = MediaFileUpload(user_id + '_' + now + '.jpg', mimetype='image/jpeg')
                 
                 file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
                 print(F'File ID: {file.get("id")}')
-                os.remove(user_id + now + '.jpg')
+                os.remove(user_id + '_' + now + '.jpg')
 
             except HttpError as error:
                 print(F'An error occurred: {error}')
                 file = None
+
+        # clear queue
+        if (predictions.qsize() > 300):
+            print('clear image queue!!')
+            DAN.device_registration_with_retry(ServerURL, Reg_addr)
+            for i in range(predictions.qsize()):
+                predictions.get()
 
 
     except Exception as e:
