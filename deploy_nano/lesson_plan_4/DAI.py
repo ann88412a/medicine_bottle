@@ -84,7 +84,6 @@ while True:
         print(pill_detect_check)
 
         if pill_detect_check != None and pill_detect_check[1]:
-            print(predictions.qsize())
             user_id = pill_detect_check[0]
             rep_pill_check = False
 
@@ -95,7 +94,9 @@ while True:
             # clear value
             for item in pills.keys():
                 pills[item] = 0
-            
+        
+        print(cap.isOpened(), predictions.qsize())
+        
         # voting processing
         if rep_pill_check == False and predictions.qsize() >= 50:
             rep_pill_check = True
@@ -161,11 +162,16 @@ while True:
                 file = None
 
         # clear queue
-        if (predictions.qsize() > 300):
+        if (predictions.qsize() > 2000):
             print('clear image queue!!')
             DAN.device_registration_with_retry(ServerURL, Reg_addr)
             for i in range(predictions.qsize()):
                 predictions.get()
+            # Thread(target=yolo_detect.video_capture, args=(cap, frame_queue, darknet_image_queue, darknet_width, darknet_height)).start()
+            # Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
+            # Thread(target=yolo_detect.drawing, args=(cap, frame_queue, detections_queue, fps_queue)).start()
+            
+            Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
 
 
     except Exception as e:
