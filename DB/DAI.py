@@ -101,7 +101,7 @@ while True:
 
             if data['operation'] == 'level':
                 level_num = [0, 0, 0] # low, mid, high
-                sql = "SELECT 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness FROM record ;"
+                sql = "select 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness from record ;"
                 cursor.execute(sql)
                 result = cursor.fetchall()
 
@@ -131,18 +131,21 @@ while True:
                 history_label = []
                 history_label.clear()
 
-                sql = "SELECT 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness FROM record where id=" + data['id'] + ";"
+                sql = "select 1_correctness, 2_correctness, 3_correctness, 4_correctness, 5_correctness, 6_correctness, 7_correctness, 8_correctness, 9_correctness, 10_correctness from record where id='" + data['id'] + "';"
+                print(sql)
                 cursor.execute(sql)
+                
                 result = cursor.fetchall()
-                print(result)
+                
+                print('result', result)
 
                 for each_record in result:
                     total_score = sum(list(filter(lambda x: x < 2, each_record)))
                     history_data.append(total_score)
 
-                print(history_data)
+                print('a', history_data)
 
-                sql = "SELECT time FROM record where id=" + data['id'] + ";"
+                sql = "SELECT time FROM record where id='" + data['id'] + "';"
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 
@@ -150,14 +153,15 @@ while True:
                 for each_record in result:
                     history_label.append(each_record[0])
 
-                print(history_label)
+                print('b', history_label)
                 
                 push_item = {"operation": 'history', "history_data": history_data, "history_label": history_label,}
                 
                 #轉成 json 字串
                 push_item = json.dumps(push_item)
-
+                
                 DAN.push ('Search_Result-I', user_uid, push_item)
+                
 
             if data['operation'] == 'time_total':
                 each_q_score = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
