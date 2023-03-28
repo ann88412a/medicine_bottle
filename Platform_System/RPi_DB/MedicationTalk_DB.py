@@ -12,11 +12,12 @@ csmapi.ENDPOINT = ServerURL
 # set DB dummy device
 DB_Reg_addr = 'Medication_DB_0' #if None, Reg_addr = MAC address
 DB_DAN.profile['d_name'] = 'Medication_DB_0'
+DB_DAN.device_registration_with_retry(ServerURL, DB_Reg_addr)
 
 # set Platform dummy device
 Platform_Reg_addr = 'Medication_Platform_0' #if None, Reg_addr = MAC address
 Platform_DAN.profile['d_name'] = 'Medication_Platform_0'
-
+Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
 
 # connect DB
 db = pymysql.connect(host='localhost', port=3306, user='root', passwd='pcs54784', db='yangming', charset='utf8')
