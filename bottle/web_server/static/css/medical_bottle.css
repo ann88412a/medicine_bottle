@@ -1,0 +1,76 @@
+body{
+    font-family: verdana;
+    font-size: 36px;
+}
+button {
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    border-radius: 8px;
+}
+table {
+    table-layout:fixed;
+    /*word-break: break-all;*/
+    word-wrap: break-word;
+    width:100%;
+    font-size: 30px;
+}
+.tipicon {
+    position: relative;
+    display: inline-block;
+}
+.tipicon .tipicontext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: left;
+    border-radius: 24px;
+    padding: 50px 50px;
+    width: 80vw;
+    position: absolute;
+
+}
+.tipicon:hover .tipicontext {
+    visibility: visible;
+}
+
+
+/* 为选项卡设置样式 */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* 为用于打开选项卡内容的按钮设置样式 */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 50%;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* 更改悬停按钮的背景颜色 */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* 创建一个活动的/当前的 tablink 类 */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* 设置选项卡内容的样式 */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
