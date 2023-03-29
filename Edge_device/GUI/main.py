@@ -13,7 +13,7 @@ from . import DAN
 # print(os.getcwd())
 
 class medical_GUI:
-    def __init__(self, cfg_file_path="./config_files/syringe_scale_default.cfg"):
+    def __init__(self, cfg_file_path="./config_files/GUI_default.cfg"):
         self.DEBUG = True
         ## Load config file
         with open(cfg_file_path, 'r') as __f:
@@ -53,7 +53,7 @@ class medical_GUI:
         ## release cam after done
         self.webcam_stream.cap.release()
 
-    def quit(self):
+    def quit(self):  ## exit GUI app
         if(messagebox.askyesno("Close app", "Quit?")):
             self.window.destroy()
 
@@ -94,12 +94,6 @@ class medical_GUI:
     def text_translate(self, text, language='zh-tw'):
         return text
 
-    def wait_page(self):
-        self.clean()
-        self.light.light_off()
-        tk.Label(self.window, text=self.text_translate("針劑藥物辨識系統\n\n等待中..."),
-                 font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
-
     def start_up_check(self):
         try:
             assert self.check_network(URL=self.__cfg["ServerURL"], show_GUI=False), "Failed to connect to the IoTtalk server!"
@@ -120,12 +114,22 @@ class medical_GUI:
             print("Error msg:", e)
             print("#############################")
 
+    ## defult Page
+    def wait_page(self):
+        self.clean()
+        self.light.light_off()
+        tk.Label(self.window, text=self.text_translate("醫療藥物辨識系統"),
+                 font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
+        self.logo_img = ImageTk.PhotoImage(Image.open('./GUI/images/logo.png').resize((int(self.__screen_height * 0.6), int(self.__screen_height * 0.6))))
+        tk.Label(self.window, image=self.logo_img).place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
+        tk.Label(self.window, text=self.text_translate("待命中..."), anchor="se",
+                 font=('', int(70 * self.__font_ratio), 'bold')).place(relx=0.6, rely=0.8, relwidth=0.4, relheight=0.2)
+        tk.Label(self.window, text=self.text_translate("機器編號：{}".format(self.__cfg["Mechine_ID"])), anchor="sw",
+                 font=('', int(40 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=0.6, relheight=0.2)
 
 
-
-
-    ## Barcode Mode
-    def get_barcode(self):  # 輸入欄位
+    ## Barcode Mode Page
+    def get_barcode(self):  ## 輸入欄位
         self.clean()
         tk.Label(self.window, text=self.text_translate("請掃描條碼"),
                  font=('', int(80*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.25, relwidth=1.0, relheight=0.2)
@@ -134,7 +138,7 @@ class medical_GUI:
         self.barcode_entry.focus_set()
         self.barcode_entry.bind('<Return>', self.check_barcode)
 
-    def check_barcode(self, event):
+    def check_barcode(self, event):  ## 檢查非空白字串就push，回到等待頁面
         string = self.barcode_entry.get()
         if not string:  # check the string isn't empty
             self.get_barcode()
@@ -150,10 +154,7 @@ class medical_GUI:
             self.window.after(3000, lambda: self.wait_page())
 
 
-
-
-
-    ## Syringe Scale Mode
+    ## Syringe Scale Mode Page
     def scan_scale(self):
         if self.DEBUG:
             self.syringe_scale_control_info = ["aaa", "bbb", "5 ml", "True"]
@@ -179,7 +180,7 @@ class medical_GUI:
         self.scale_running_bar = Progressbar(self.window, mode="determinate", orient='horizontal')
         self.scale_running_bar.place(relx=0.66, rely=0.91, relwidth=0.33, relheight=0.08)
         self.scale_running_bar['value'] = 0
-        Separator(self.window, orient=tk.HORIZONTAL).place(relx=0.3, rely=0.8, relwidth=0.7)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
+        Separator(self.window, orient=tk.HORIZONTAL).place(relx=0.3, rely=0.8, relwidth=0.7)
         Separator(self.window, orient=tk.VERTICAL).place(relx=0.3, rely=0.0, relheight=1.0)
         Separator(self.window, orient=tk.VERTICAL).place(relx=0.649, rely=0.8, relheight=0.2)
         self.show_webcam_stream()
@@ -264,7 +265,7 @@ class medical_GUI:
         # exit()            #if you want to deregister this device, uncomment this line
         while True:
             try:
-                barcode_control = DAN.pull('barcode_control_nano')  # Pull data from an output device feature "Dummy_Control"
+                barcode_control = DAN.pull('barcode_control_nano')
                 if barcode_control != None:  ## barcode_control_nano -> [UserName, RandId, True]
                     if barcode_control[-1]:
                         self.barcode_control_info = barcode_control
