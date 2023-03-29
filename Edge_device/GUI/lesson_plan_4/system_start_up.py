@@ -2,7 +2,8 @@
 
 
 if __name__ == "__main__":
-    import GUI.DAI
+    from GUI.DAI import pill_yolo
+    pill_yolo()
 
 
 

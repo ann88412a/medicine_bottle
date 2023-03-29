@@ -234,10 +234,12 @@ def detect_image(network, class_names, image, thresh=.5, hier_thresh=.5, nms=.45
 
 
 if os.name == "posix":
-    cwd = os.path.dirname(__file__)
+    # cwd = os.path.dirname(__file__)
+    cwd = os.path.dirname(os.path.dirname(__file__))
     lib = CDLL(cwd + "/config_files/libdarknet.so", RTLD_GLOBAL)
 elif os.name == "nt":
-    cwd = os.path.dirname(__file__)
+    # cwd = os.path.dirname(__file__)
+    cwd = os.path.dirname(os.path.dirname(__file__))
     os.environ['PATH'] = cwd + ';' + os.environ['PATH']
     lib = CDLL("./config_files/darknet.dll", RTLD_GLOBAL)
 else:

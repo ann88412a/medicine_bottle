@@ -1,6 +1,6 @@
 classes = 9
 
-train  = ./train.txt
-valid  = ./test.txt
-names = ./obj.name
+train  = ./config_files/train.txt
+valid  = ./config_files/test.txt
+names = ./config_files/obj.name
 backup = ./backup
