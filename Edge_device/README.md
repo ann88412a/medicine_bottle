@@ -5,6 +5,7 @@ This is a medical medication detection project based on edge computing and IoTta
 ----------------------------------------
 ## Equipment Appearance
 <img src="../Edge_device/GUI/images/pill_platform.png" height=50% width=50%>
+
 ----------------------------------------
 ## Requirements
 Python 3.6.9 or later with all [requirements.txt](../Edge_device/requirements.txt)
