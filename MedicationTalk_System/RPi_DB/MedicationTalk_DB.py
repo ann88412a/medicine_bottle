@@ -44,7 +44,7 @@ while True:
         # pull IoTtalk info
 
         # barcode
-        barcode = DB_DAN.pull('Barcode-O')
+        barcode = DB_DAN.pull('Retrieve-O')
         
         if barcode != None:
             # user identify
