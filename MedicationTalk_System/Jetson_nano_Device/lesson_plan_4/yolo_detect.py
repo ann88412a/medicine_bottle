@@ -145,6 +145,7 @@ def inference(cap, darknet_image_queue, detections_queue, fps_queue, network, cl
         predictions.put(sorted(prediction))
 
         darknet.free_image(darknet_image)
+        
     cap.release()
 
 

@@ -25,7 +25,7 @@ creds = authInst.getCredentials()
 
 # ================ iottalk ===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
-Reg_addr = 'BAC0B21FDC32' #if None, Reg_addr = MAC address
+Reg_addr = 'Device_0' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL
 
@@ -81,7 +81,8 @@ while True:
         pill_detect_check = DAN.pull('Pill_Detect-O')
         print(pill_detect_check)
 
-        if pill_detect_check != None and pill_detect_check[1]:
+        if pill_detect_check != None and pill_detect_check[1] == Reg_addr and pill_detect_check[2]:
+            
             user_id = pill_detect_check[0]
             rep_pill_check = False
 
@@ -93,7 +94,7 @@ while True:
             for item in pills.keys():
                 pills[item] = 0
         
-        print(cap.isOpened(), predictions.qsize())
+        # print(cap.isOpened(), predictions.qsize())
         
         # voting processing
         if rep_pill_check == False and predictions.qsize() >= 50:
@@ -170,7 +171,8 @@ while True:
             # Thread(target=yolo_detect.drawing, args=(cap, frame_queue, detections_queue, fps_queue)).start()
             
             Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
-
+            
+        # ============= pill yolo ===============
 
     except Exception as e:
         print(e)
