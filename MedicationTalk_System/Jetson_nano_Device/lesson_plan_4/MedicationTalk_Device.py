@@ -3,8 +3,6 @@ import cv2
 import DAN, csmapi, darknet, yolo_detect
 from threading import Thread
 from queue import Queue
-from datetime import datetime
-import json
 import datetime
 
 # google Drive API

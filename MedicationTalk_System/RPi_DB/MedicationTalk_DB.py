@@ -10,14 +10,14 @@ ServerURL = 'https://1.iottalk.tw'
 csmapi.ENDPOINT = ServerURL
 
 # set DB dummy device
-DB_Reg_addr = 'Medication_DB_0' #if None, Reg_addr = MAC address
-DB_DAN.profile['d_name'] = 'Medication_DB_0'
+DB_Reg_addr = 'DataBase_0' #if None, Reg_addr = MAC address
+DB_DAN.profile['d_name'] = 'DataBase_0'
 DB_DAN.device_registration_with_retry(ServerURL, DB_Reg_addr)
 
 # set Platform dummy device
-Platform_Reg_addr = 'Medication_Platform_0' #if None, Reg_addr = MAC address
-Platform_DAN.profile['d_name'] = 'Medication_Platform_0'
-Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
+# Platform_Reg_addr = 'Medication_Platform_0' #if None, Reg_addr = MAC address
+# Platform_DAN.profile['d_name'] = 'Medication_Platform_0'
+# Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
 
 # connect DB
 db = pymysql.connect(host='localhost', port=3306, user='root', passwd='pcs54784', db='yangming', charset='utf8')
@@ -38,7 +38,7 @@ while True:
             db = pymysql.connect(host='localhost', port=3306, user='root', passwd='pcs54784', db='yangming', charset='utf8')
             cursor = db.cursor()
             DB_DAN.device_registration_with_retry(ServerURL, DB_Reg_addr)
-            Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
+            # Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
             watchdog = 0
 
         # pull IoTtalk info
@@ -185,7 +185,7 @@ while True:
         if str(e).find('mac_addr not found:') != -1:
             print('Reg_addr is not found. Try to re-register...')
             DB_DAN.device_registration_with_retry(ServerURL, DB_Reg_addr)
-            Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
+            # Platform_DAN.device_registration_with_retry(ServerURL, Platform_Reg_addr)
         else:
             print('Connection failed due to unknow reasons.')
             time.sleep(1)    

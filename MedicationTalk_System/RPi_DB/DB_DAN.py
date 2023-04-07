@@ -2,13 +2,13 @@ import requests, time, csmapi, random, threading
 
 # example
 profile = {
-    'd_name': 'MedicationTalk_Device0',
-    'dm_name': 'MedicationTalk_Device',
+    'd_name': 'DataBase_0',
+    'dm_name': 'MedicationTalk_DataBase',
     'u_name': 'dio',
     'is_sim': False,
-    'df_list': ['Barcode_Result-I', 'Pill_Detect_Result-I','Syringe_Scale_Result-I', 'Barcode-O', 'Pill_Detect-O', 'Syringe_Type-O'],
+    'df_list': ['Barcode_Result-I', 'Search_Result-I', 'Retrieve-O', 'Search-O', 'Sheet-O'],
 }
-mac_addr = 'MedicationTalk_Device0' #'C860008BD249'
+mac_addr = 'DataBase_0' #'C860008BD249'
 MAC = mac_addr
 # state = 'SUSPEND'     #for control channel
 state = 'RESUME'
