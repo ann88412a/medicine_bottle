@@ -30,13 +30,8 @@ Reg_addr = 'Device_0' #if None, Reg_addr = MAC address
 csmapi.ENDPOINT = ServerURL
 
 # =============== yolo ================
-frame_queue = Queue()
-darknet_image_queue = Queue(maxsize=1)
-detections_queue = Queue(maxsize=1)
-fps_queue = Queue(maxsize=1)
-
 network, class_names, class_colors = darknet.load_network(
-       './yolov7-tiny.cfg',
+    './yolov7-tiny.cfg',
         './obj.data',
         './yolov7-tiny_final.weights',
         batch_size=1
@@ -48,26 +43,30 @@ input_path = yolo_detect.str2int(0)
 
 # webcam
 cap = cv2.VideoCapture(input_path)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-# threading
+# Queue for threading
+row_frame_queue = Queue()
+pill_frame_queue = Queue(maxsize=1)
 predictions = Queue()
 
-Thread(target=yolo_detect.video_capture, args=(cap, frame_queue, darknet_image_queue, darknet_width, darknet_height)).start()
-Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
-Thread(target=yolo_detect.drawing, args=(cap, frame_queue, detections_queue, fps_queue)).start()
+# webcam stream
+Thread(target=yolo_detect.get_frame, args=(cap, row_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
 
-# lesson plan 4 
+# pill detect
+Thread(target=yolo_detect.darknet_pill_detect, args=(cap, pill_frame_queue, network, class_names, 0.5, predictions)).start()
 
 # init
-pills = { 'Dilatrend 25mg/tab' : 0, 
-                'Requip F.C 0.25mg/tab': 0, 
-                'Repaglinide 1mg/tab': 0, 
-                'Transamin 250mg/tab': 0,
-                'Bokey 100mg/tab': 0,
-                'Zocor 20 mg/tab': 0,
-                'FLU-D (Fluconazole) 50mg/tab': 0,
-                'Dilantin': 0,
-                'Requip F.C 1 mg': 0}
+pills = {   'Dilatrend 25mg/tab' : 0, 
+            'Requip F.C 0.25mg/tab': 0, 
+            'Repaglinide 1mg/tab': 0, 
+            'Transamin 250mg/tab': 0,
+            'Bokey 100mg/tab': 0,
+            'Zocor 20 mg/tab': 0,
+            'FLU-D (Fluconazole) 50mg/tab': 0,
+            'Dilantin': 0,
+            'Requip F.C 1 mg': 0}
 
 barcode_ans = '--------------'
 rep_pill_check = False
@@ -94,7 +93,6 @@ while True:
             for item in pills.keys():
                 pills[item] = 0
         
-        # print(cap.isOpened(), predictions.qsize())
         
         # voting processing
         if rep_pill_check == False and predictions.qsize() >= 50:
@@ -139,7 +137,7 @@ while True:
             now = now.strftime('%m_%d_%H_%M_%S')
 
             # save picture
-            cv2.imwrite(user_id + '_' + now + '.jpg', frame_queue.get())
+            cv2.imwrite(user_id + '_' + now + '.jpg', row_frame_queue.get())
 
             try:
                 # connect Google Drive
@@ -161,16 +159,15 @@ while True:
                 file = None
 
         # clear queue
-        if (predictions.qsize() > 2000):
-            print('clear image queue!!')
+        if (row_frame_queue.qsize() > 1000):
             DAN.device_registration_with_retry(ServerURL, Reg_addr)
+            for i in range(row_frame_queue.qsize()):
+                row_frame_queue.get()
+           
+        if (predictions.qsize() > 500 and rep_pill_check == True):
             for i in range(predictions.qsize()):
                 predictions.get()
-            # Thread(target=yolo_detect.video_capture, args=(cap, frame_queue, darknet_image_queue, darknet_width, darknet_height)).start()
-            # Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
-            # Thread(target=yolo_detect.drawing, args=(cap, frame_queue, detections_queue, fps_queue)).start()
-            
-            Thread(target=yolo_detect.inference, args=(cap, darknet_image_queue, detections_queue, fps_queue, network, class_names, 0.5, predictions)).start()
+
             
         # ============= pill yolo ===============
 
