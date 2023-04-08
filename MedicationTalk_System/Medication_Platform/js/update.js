@@ -291,7 +291,7 @@ function check_bt(f){
         output_patient_barcode_bt = output_patient_barcode_bt + 1;
     }
     else if(f === 'pill'){
-        dan.push('Pill_Detect-I', [client_uid, true]);
+        dan.push('Pill_Detect-I', [client_uid, 'Device_Demo', true]);
         output_pill_bt = output_pill_bt + 1;
         $('.pill_hint')[0].innerText = 'waiting...';
     }
