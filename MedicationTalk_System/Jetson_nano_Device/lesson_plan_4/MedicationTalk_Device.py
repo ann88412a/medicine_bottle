@@ -25,7 +25,11 @@ creds = authInst.getCredentials()
 
 # ================ iottalk ===============
 ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
-Reg_addr = 'Device_0' #if None, Reg_addr = MAC address
+
+# set Device dummy device
+Reg_addr = 'Device_Demo' #if None, Reg_addr = MAC address
+DAN.profile['d_name'] = 'Device_Demo'
+DAN.device_registration_with_retry(ServerURL, Reg_addr)
 
 csmapi.ENDPOINT = ServerURL
 
@@ -50,6 +54,19 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 row_frame_queue = Queue()
 pill_frame_queue = Queue(maxsize=1)
 predictions = Queue()
+
+# while cap.isOpened():
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
+
+#     # row frame for save picture and syringe
+#     row_frame_queue.put(frame)
+#     print(row_frame_queue.qsize())
+#     if(row_frame_queue.qsize()>100):
+#         for i in range(row_frame_queue.qsize()):
+#             row_frame_queue.get()
+# cap.release()
 
 # webcam stream
 Thread(target=yolo_detect.get_frame, args=(cap, row_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
@@ -159,12 +176,12 @@ while True:
                 file = None
 
         # clear queue
-        if (row_frame_queue.qsize() > 1000):
+        if (row_frame_queue.qsize() > 100):
             DAN.device_registration_with_retry(ServerURL, Reg_addr)
             for i in range(row_frame_queue.qsize()):
                 row_frame_queue.get()
            
-        if (predictions.qsize() > 500 and rep_pill_check == True):
+        if (predictions.qsize() > 100 and rep_pill_check == True):
             for i in range(predictions.qsize()):
                 predictions.get()
 
