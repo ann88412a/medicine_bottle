@@ -53,7 +53,7 @@ network, class_names, class_colors = darknet.load_network(
 
 darknet_width = darknet.network_width(network)
 darknet_height = darknet.network_height(network)
-input_path = yolo_detect.str2int(0)
+input_path = yolo_darknet.str2int(0)
 
 # webcam
 cap = cv2.VideoCapture(input_path)
@@ -68,10 +68,10 @@ predictions = Queue()
 
 
 # webcam stream
-Thread(target=yolo_detect.get_frame, args=(cap, raw_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
+Thread(target=yolo_darknet.get_frame, args=(cap, raw_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
 
 # pill detect
-Thread(target=yolo_detect.darknet_pill_detect, args=(cap, pill_frame_queue, network, class_names, 0.5, predictions)).start()
+Thread(target=yolo_darknet.darknet_pill_detect, args=(cap, pill_frame_queue, network, class_names, 0.5, predictions)).start()
 
 # init
 pills = {   'Dilatrend 25mg/tab' : 0, 
