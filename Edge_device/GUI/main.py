@@ -10,11 +10,9 @@ from .webcam_video_stream import medical_webcam_stream
 from .light_control import light_control
 from . import DAN
 
-# print(os.getcwd())
-
 class medical_GUI:
     def __init__(self, cfg_file_path="./config_files/GUI_default.cfg"):
-        self.DEBUG = True
+        self.DEBUG = False
         try:
             ## Load config file
             with open(cfg_file_path, 'r') as __f:
@@ -143,16 +141,19 @@ class medical_GUI:
                 return False
 
     def dummy_device_loop(self):
+        ## Init the config
         ServerURL = self.__cfg["ServerURL"]
         Reg_addr = self.__cfg["Reg_addr"]  # if None, Reg_addr = MAC address
-        DAN.profile['dm_name'] = "medical_bottle_nano_V2"
-        DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_control_nano', 'barcode_result_nano', 'syringe_scale_result_nano', ]
         DAN.profile['d_name'] = self.__cfg["d_name"]
+        DAN.profile['dm_name'] = "medical_bottle_nano_V2"
+        DAN.profile['u_name'] = "Medical_Device"
+        DAN.profile['df_list'] = ['barcode_control_nano', 'syringe_control_nano', 'barcode_result_nano', 'syringe_scale_result_nano', ]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
         # exit()            #if you want to deregister this device, uncomment this line
         while True:
             try:
+                ## pull barcode val
                 barcode_control = DAN.pull('barcode_control_nano')
                 if barcode_control != None:  ## barcode_control_nano -> [UserName, RandId, True]
                     if barcode_control[-1]:
@@ -161,7 +162,8 @@ class medical_GUI:
                     else:
                         self.wait_page()
 
-                syringe_scale_control = DAN.pull('syringe_control_nano')  # Pull data from an output device feature "Dummy_Control"
+                ## pull syringe val
+                syringe_scale_control = DAN.pull('syringe_control_nano')
                 if syringe_scale_control != None:  ## syringe_scale_control_nano -> [UserName, RandId, SyringeType, True]
                     if syringe_scale_control[-1]:
                         self.light.light_on(255)
@@ -169,6 +171,16 @@ class medical_GUI:
                         self.scan_scale()
                     else:
                         self.wait_page()
+
+                # ## pull pill val
+                # syringe_scale_control = DAN.pull('syringe_control_nano')
+                # if syringe_scale_control != None:  ## syringe_scale_control_nano -> [UserName, RandId, SyringeType, True]
+                #     if syringe_scale_control[-1]:
+                #         self.light.light_on(255)
+                #         self.syringe_scale_control_info = syringe_scale_control
+                #         self.scan_scale()
+                #     else:
+                #         self.wait_page()
 
             except Exception as e:
                 self.check_network(ServerURL)
@@ -265,10 +277,8 @@ class medical_GUI:
         self.frame_show_val.config(text=self.text_translate("辨識數值： {}".format(self.scale_value)))
         self.frame_show.after(50, self.show_webcam_stream)
         self.scan_scale_auto_finish(self.scale_value)
-        print(time.time())
 
     def scan_scale_auto_finish(self, scale_value):  # push data while scale value stable
-        # print(time.time())
         if scale_value is not None:
             self.__scale_val_hist_list.append(scale_value)
             self.scale_running_bar['value'] = len(self.__scale_val_hist_list)*90/30

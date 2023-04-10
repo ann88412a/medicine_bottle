@@ -1,3 +1,4 @@
+## Clone from https://github.com/IoTtalk/Dummy_Device_IoTtalk_v1_py
 import requests
 
 ENDPOINT = None
