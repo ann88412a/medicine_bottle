@@ -3,12 +3,23 @@
 This is a medical medication detection project based on edge computing and IoTtalk IoT technology. The project develops a hardware system for assisting identification and deploys it on Nvidia Jetson Nano.
 
 ----------------------------------------
-## Equipment Appearance
+## Edge Device Hardware (Ver. 2.0)
+
+#### Devices:
+
+* Computer: [NVIDIA Jetson Nano Developer Kit (4GB RAM)](https://developer.nvidia.com/embedded/jetson-nano-developer-kit)
+* Camera: [Logitech C922 PRO HD STREAM WEBCAM](https://www.logitech.com/zh-tw/products/webcams/c922-pro-stream-webcam.960-001091.html)
+* Light controller: [Arduino Nano](https://store-usa.arduino.cc/products/arduino-nano?selectedStore=us)
+* Barcode scanner: [FILUX FS-2800](https://www.filux.com.tw/products/scan-fs-2800)
+* Touch screen: [WAVESHARE 7inch Touch Screen](https://www.waveshare.com/7inch-hdmi-lcd-h-with-case.htm)
+
+
+#### Equipment Appearance:
 <img src="../Edge_device/GUI/images/pill_platform.png" height=50% width=50%>
 
 ----------------------------------------
 ## Requirements
-Python 3.6.9 or later with all [requirements.txt](../Edge_device/requirements.txt)
+Python 3.6.9 or later with all [requirements.txt](../Edge_device/GUI/requirements.txt)
 dependencies installed. To install run:
 ```bash
 pip3 install -r GUI/requirements.txt
@@ -16,7 +27,7 @@ pip3 install -r GUI/requirements.txt
 
 ----------------------------------------
 ## A short introduction to the GUI config file
-A config file in Vapor (`config_files/GUI_default.cfg`) is basically a JSON file with keys and values, like this:
+A config file in Vapor ([`config_files/GUI_default.cfg`](../Edge_device/config_files/GUI_default.cfg)) is basically a JSON file with keys and values, like this:
 ```json
 {
     "Mechine_ID": "01",
@@ -38,7 +49,7 @@ A config file in Vapor (`config_files/GUI_default.cfg`) is basically a JSON file
 ## File Tree
     .
     ├── config_files/ (Save all the config files)
-    │   ├── GUI_default.cfg (GUI config file)
+    │   ├── GUI_default.cfg (config with IoTtalk, ArduinoSerial, SyringeMeasuring)
     │   └── others (unfinished)
     ├── GUI/ (Python package)
     │   ├── requirements.txt (Pip requirements file)
