@@ -1,6 +1,16 @@
+'''
+MedicationTalk Edge Device
+Deployment: Jetson Nano
+說明：處理‘實體’給藥相關功能與 IoTtalk 交互
+Features：
+1. 藥丸辨識： Yolo 辨識藥丸種類與數量
+2. 影像備份： 備份藥丸辨識之原始影像至 Google Drive 以利回顧正確性
+3. Barcode 掃碼： 掃 Barcode 條碼並將條碼資訊送至與資料庫查詢資訊
+'''
+
 import time
 import cv2
-import DAN, csmapi, darknet, yolo_detect
+import DAN, csmapi, darknet, yolo_darknet
 from threading import Thread
 from queue import Queue
 import datetime
@@ -51,25 +61,14 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 # Queue for threading
-row_frame_queue = Queue()
+raw_frame_queue = Queue()
 pill_frame_queue = Queue(maxsize=1)
 predictions = Queue()
 
-# while cap.isOpened():
-#     ret, frame = cap.read()
-#     if not ret:
-#         break
 
-#     # row frame for save picture and syringe
-#     row_frame_queue.put(frame)
-#     print(row_frame_queue.qsize())
-#     if(row_frame_queue.qsize()>100):
-#         for i in range(row_frame_queue.qsize()):
-#             row_frame_queue.get()
-# cap.release()
 
 # webcam stream
-Thread(target=yolo_detect.get_frame, args=(cap, row_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
+Thread(target=yolo_detect.get_frame, args=(cap, raw_frame_queue, pill_frame_queue, darknet_width, darknet_height)).start()
 
 # pill detect
 Thread(target=yolo_detect.darknet_pill_detect, args=(cap, pill_frame_queue, network, class_names, 0.5, predictions)).start()
@@ -154,7 +153,7 @@ while True:
             now = now.strftime('%m_%d_%H_%M_%S')
 
             # save picture
-            cv2.imwrite(user_id + '_' + now + '.jpg', row_frame_queue.get())
+            cv2.imwrite(user_id + '_' + now + '.jpg', raw_frame_queue.get())
 
             try:
                 # connect Google Drive
@@ -176,10 +175,10 @@ while True:
                 file = None
 
         # clear queue
-        if (row_frame_queue.qsize() > 100):
+        if (raw_frame_queue.qsize() > 100):
             DAN.device_registration_with_retry(ServerURL, Reg_addr)
-            for i in range(row_frame_queue.qsize()):
-                row_frame_queue.get()
+            for i in range(raw_frame_queue.qsize()):
+                raw_frame_queue.get()
            
         if (predictions.qsize() > 100 and rep_pill_check == True):
             for i in range(predictions.qsize()):

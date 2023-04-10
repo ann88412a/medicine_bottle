@@ -1,3 +1,5 @@
+// 接收 IoTtalk 資訊處理
+
 var output_patient_barcode_bt = 0;
 var output_pill_bt = 0;
 var pill_detect = { 'Dilatrend': -1,
