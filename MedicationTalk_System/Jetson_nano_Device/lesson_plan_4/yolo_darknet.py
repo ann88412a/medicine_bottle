@@ -56,3 +56,28 @@ def darknet_pill_detect(cap, pill_frame_queue, network, class_names, thr, predic
         
         
     cap.release()
+
+
+def pill_detect(frame, darknet_width, darknet_height, network, class_names, thr, predictions):
+    while True:
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_croped = frame_rgb[:, 240:1680]
+        frame_resized = cv2.resize(frame_croped, (darknet_width, darknet_height),
+                                interpolation=cv2.INTER_LINEAR)
+        img_for_detect = darknet.make_image(darknet_width, darknet_height, 3)
+        darknet.copy_image_from_bytes(img_for_detect, frame_resized.tobytes())
+        
+        darknet_image = img_for_detect
+        detections = darknet.detect_image(network, class_names, darknet_image, thresh=thr)
+        
+        prediction = []
+        conf = []
+        
+        for i in range(len(detections)):
+            prediction.append(detections[i][0])
+            conf.append(detections[i][1])
+        
+        predictions.put(sorted(prediction))
+        
+        darknet.free_image(darknet_image)
+
