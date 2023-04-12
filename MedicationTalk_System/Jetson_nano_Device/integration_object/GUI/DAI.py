@@ -54,96 +54,106 @@ class pill_yolo:
         self.rep_pill_check = False
         self.user_id = 'user'
         
-        # inference 
-        def inference(self, frame_queue):
+
+    # inference 
+    def inference(self, frame_queue):
+        frame = frame_queue.get()
+        yolo_darknet.pill_detect(frame, self.darknet_width, self.darknet_height, self.network, self.class_names, self.thr, self.predictions)
+
+
+    # google drive upload
+    def image_backup(self, name, frame):
+        try:
+            now = datetime.datetime.now()
+            now = now.strftime('%m_%d_%H_%M_%S')
+            # save picture
+            cv2.imwrite(name + '_' + now + '.jpg', frame)
+
+            # connect Google Drive
+            service = build('drive', 'v3', credentials=self.creds)
+
+            file_metadata = {'name': name + '_' + now + '.jpg',
+                            'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
+
+            # Upload
+            media = MediaFileUpload(name + '_' + now + '.jpg', mimetype='image/jpeg')
+            file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            print(F'File ID: {file.get("id")}')
+
+            # remove local picture
+            os.remove(name + '_' + now + '.jpg')
+
+        except HttpError as error:
+            print(F'An error occurred: {error}')
+            file = None
+
+
+    # pill algorithm
+    def pill_voting(self, frame_queue):
+        if self.rep_pill_check == False and self.predictions.qsize() >= 50:
+            self.rep_pill_check = True
+            candidate = []
+            vote = []
+
+            for i in range(50):
+                # each frame prediction 
+                frame_prediction = self.predictions.get()
+
+                # Calculate prediction combinations.
+                if  frame_prediction not in candidate:
+                    candidate.append(frame_prediction)
+                    vote.append(1)
+
+                else:
+                    vote[candidate.index(frame_prediction)] += 1
+            
+            for pill in candidate[vote.index(max(vote))]:
+                self.pills[pill] += 1
+
+            print(candidate)
+            print(vote)
+
+            for item in self.pills:
+                print(item, self.pills[item])
+
+            # push to IoTtalk
+            DAN.push ('Pill_Detect_Result-I',  self.user_id,
+                                                    self.pills['Dilatrend 25mg/tab'],
+                                                    self.pills[ 'Requip F.C 0.25mg/tab'],
+                                                    self.pills['Repaglinide 1mg/tab'],
+                                                    self.pills['Transamin 250mg/tab'],
+                                                    self.pills[ 'Bokey 100mg/tab'],
+                                                    self.pills['Zocor 20 mg/tab'], 
+                                                    self.pills['FLU-D (Fluconazole) 50mg/tab'],
+                                                    self.pills['Dilantin'],
+                                                    self.pills['Requip F.C 1 mg'])
             frame = frame_queue.get()
-            yolo_darknet.pill_detect(frame, self.darknet_width, self.darknet_height, self.network, self.class_names, self.thr, self.predictions)
+            self.image_backup(self.user_id, frame)
 
-        # google drive upload
-        def image_backup(self, name, frame):
-            try:
-                now = datetime.datetime.now()
-                now = now.strftime('%m_%d_%H_%M_%S')
-                # save picture
-                cv2.imwrite(name + '_' + now + '.jpg', frame)
-
-                # connect Google Drive
-                service = build('drive', 'v3', credentials=self.creds)
-
-                file_metadata = {'name': name + '_' + now + '.jpg',
-                                'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
-
-                # Upload
-                media = MediaFileUpload(name + '_' + now + '.jpg', mimetype='image/jpeg')
-                file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-                print(F'File ID: {file.get("id")}')
-
-                # remove local picture
-                os.remove(name + '_' + now + '.jpg')
-
-            except HttpError as error:
-                print(F'An error occurred: {error}')
-                file = None
-
-        # pill detect check
-        def detect_state(self, iottalk_pull, device):
-            while True:
-                if iottalk_pull != None and iottalk_pull[1] == device and iottalk_pull[2]:
-                    self.user_id = iottalk_pull[0]
-                    self.rep_pill_check = False
-
-                    # clear queue
-                    for i in range(self.predictions.qsize()):
-                        self.predictions.get()
-                    
-                    # clear value
-                    for item in self.pills.keys():
-                        self.pills[item] = 0
+    def pill_processing(self, frame_queue):
+        for i in range(51):
+            self.inference(frame_queue)
         
-        # pill algorithm
-        def pill_detection(self, frame_queue):
-            while True:
-                if self.rep_pill_check == False and self.predictions.qsize() >= 50:
-                    self.rep_pill_check = True
-                    candidate = []
-                    vote = []
+        self.pill_voting(frame_queue)
 
-                    for i in range(50):
-                        # each frame prediction 
-                        frame_prediction = self.predictions.get()
+    # pill detect check
+    def detect(self, iottalk_pull, device, frame_queue):
+        if iottalk_pull != None and iottalk_pull[1] == device and iottalk_pull[2]:
+            self.user_id = iottalk_pull[0]
+            self.rep_pill_check = False
 
-                        # Calculate prediction combinations.
-                        if  frame_prediction not in candidate:
-                            candidate.append(frame_prediction)
-                            vote.append(1)
+            # clear queue
+            for i in range(self.predictions.qsize()):
+                self.predictions.get()
+            
+            # clear value
+            for item in self.pills.keys():
+                self.pills[item] = 0
 
-                        else:
-                            vote[candidate.index(frame_prediction)] += 1
-                    
-                    for pill in candidate[vote.index(max(vote))]:
-                        self.pills[pill] += 1
-
-                    print(candidate)
-                    print(vote)
-
-                    for item in self.pills:
-                        print(item, self.pills[item])
-
-                    # push to IoTtalk
-                    DAN.push ('Pill_Detect_Result-I',  self.user_id,
-                                                            self.pills['Dilatrend 25mg/tab'],
-                                                            self.pills[ 'Requip F.C 0.25mg/tab'],
-                                                            self.pills['Repaglinide 1mg/tab'],
-                                                            self.pills['Transamin 250mg/tab'],
-                                                            self.pills[ 'Bokey 100mg/tab'],
-                                                            self.pills['Zocor 20 mg/tab'], 
-                                                            self.pills['FLU-D (Fluconazole) 50mg/tab'],
-                                                            self.pills['Dilantin'],
-                                                            self.pills['Requip F.C 1 mg'])
-                frame = frame_queue.get()
-                self.image_backup(self.user_id, frame)
-
-
+            inference_loop = Thread(target=self.pill_processing, args=(frame_queue,))
+            inference_loop.setDaemon(True)
+            inference_loop.start()
 
 
             
+        
