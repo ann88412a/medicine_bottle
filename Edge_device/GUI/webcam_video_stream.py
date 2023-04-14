@@ -29,6 +29,7 @@ class example:
 
 import cv2
 from threading import Thread, Lock
+from queue import Queue
 
 class value_with_RWLock: ## protect the Reader-Writer Problem
     def __init__(self):
@@ -77,13 +78,14 @@ class medical_webcam_stream:
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         ## reader writer protect
         self.syringe_image_list = value_with_RWLock()
-        self.darknet_image = value_with_RWLock()
+        # self.darknet_image = value_with_RWLock()
+        self.darknet_image_queue = Queue()  ## 配合東昇的寫法
         ## thread setup
         self.stream = Thread(target=self.update, name="medical_webcam_stream")
         self.stream.setDaemon(True)
         self.stream.start()
         ## wait until the frame img update
-        while self.syringe_image_list.read() is None and self.darknet_image.read() is None:
+        while self.syringe_image_list.read() is None:
             pass
 
     def update(self):
@@ -92,7 +94,9 @@ class medical_webcam_stream:
             _, cur_frame = self.cap.read()
             low_res_frame = self.reduce_resolution_from_1920_1080_to_640_480(cur_frame)
             self.syringe_image_list.write([last_frame, cur_frame])
-            self.darknet_image.write(low_res_frame)
+            # self.darknet_image.write(low_res_frame)
+            if self.darknet_image_queue.qsize() < 1:  ## 配合東昇的寫法
+                self.darknet_image_queue.put(low_res_frame)
             last_frame = cur_frame
 
     def reduce_resolution_from_1920_1080_to_640_480(self, img):
