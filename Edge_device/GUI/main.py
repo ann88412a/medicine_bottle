@@ -60,6 +60,8 @@ class medical_GUI:
         # self.pill_detector()
         ## run GUI
         self.window.mainloop()
+        ## off light after done
+        self.light.light_off()
         ## release cam after done
         self.webcam_stream.cap.release()
 
@@ -197,15 +199,15 @@ class medical_GUI:
     def wait_page(self):
         self.clean()
         # self.light.light_off()
-        self.light.light_on(10)
+        self.light.light_on(3)
         tk.Label(self.window, text=self.text_translate("醫療藥物辨識系統"),
                  font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
         self.logo_img = ImageTk.PhotoImage(Image.open('./GUI/images/logo.png').resize((int(self.__screen_height * 0.6), int(self.__screen_height * 0.6))))
         tk.Label(self.window, image=self.logo_img).place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
         tk.Label(self.window, text=self.text_translate("待命中..."), anchor="se",
-                 font=('', int(70 * self.__font_ratio), 'bold')).place(relx=0.6, rely=0.8, relwidth=0.4, relheight=0.2)
+                 font=('', int(70 * self.__font_ratio), 'bold')).place(relx=0.61, rely=0.8, relwidth=0.39, relheight=0.2)
         tk.Label(self.window, text=self.text_translate("機器編號：{}".format(self.__cfg["Device_ID"])), anchor="sw",
-                 font=('', int(40 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=0.6, relheight=0.2)
+                 font=('', int(40 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=0.61, relheight=0.2)
 
     ## Barcode Mode Page
     def get_barcode(self):  ## 輸入欄位

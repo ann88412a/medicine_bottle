@@ -48,10 +48,8 @@ This is a medical medication detection project based on edge computing and IoTta
 A config file in Vapor ([`config_files/GUI_default.cfg`](../Edge_device/config_files/GUI_default.cfg)) is basically a JSON file with keys and values, like this:
 ```json
 {
-    "Mechine_ID": "01",
+    "Device_ID": "Device_Demo",
     "ServerURL": "http://1.iottalk.tw:9999",
-    "Reg_addr": null,
-    "d_name": "medical_bottle_nano_ID_01",
     "syringe_scale_img_save_path": "./",
     "arduino_serial_com_port": "/dev/ttyUSB0",
     "arduino_serial_baud_rates": 115200,
@@ -62,15 +60,27 @@ A config file in Vapor ([`config_files/GUI_default.cfg`](../Edge_device/config_f
                 "5 ml": "(round((pixel_y-62)/(588-62)*5+0.1, 1) if round(round((pixel_y-62)/(588-62)*5, 1)%0.2, 1) == 0.1 else abs(round((pixel_y-62)/(588-62)*5, 1)), pixel_y)",
                 "10 ml": "(round((pixel_y-63)/(768-63)*10+0.1, 1) if round(round((pixel_y-63)/(768-63)*10, 1)%0.2, 1) == 0.1 else abs(round((pixel_y-63)/(768-63)*10, 1)), pixel_y)"}
 }
+
 ```
 ---
 ## File Tree
     .
+    ├── Arduino_code/env_light/
+    │   └── env_light.ino (The light controller(Arduino nano) code)
+    │
     ├── config_files/ (Save all the config files)
+    │   ├── .credentials/google-drive-credentials.json
+    │   ├── client_secret.json
     │   ├── GUI_default.cfg (config with IoTtalk, ArduinoSerial, SyringeMeasuring)
-    │   └── others (unfinished)
+    │   ├── libdarknet.so
+    │   ├── obj.data
+    │   ├── obj.name
+    │   ├── test.txt
+    │   ├── train.txt
+    │   ├── yolov7-tiny.cfg
+    │   └── yolov7-tiny_final.weights
+    │
     ├── GUI/ (Python package)
-    │   ├── requirements.txt (Pip requirements file)
     │   ├── images/ (All image files)
     │   │   ├── match_fig_template/ (Use for match_template method)
     │   │   │   ├── 1ml.png
@@ -79,18 +89,24 @@ A config file in Vapor ([`config_files/GUI_default.cfg`](../Edge_device/config_f
     │   │   ├── logo.png
     │   │   ├── barcode_scan.jpg
     │   │   └── etc...
-    │   ├── init.py
+    │   ├── __init__.py
+    │   ├── auth.py
     │   ├── check_upgrade.py (unfinished)
     │   ├── csampi.py (IoTtalk lib)
     │   ├── DAN.py (IoTtalk lib)
+    │   ├── darknet.py
     │   ├── light_control.py (control light by serial)
     │   ├── main.py (Main Code)
+    │   ├── pill_yolo.py
+    │   ├── requirements.txt (Pip requirements file)
     │   ├── syringe_scale.py (syringe scale algorithm)
-    │   └── webcam_video_stream.py (webcam streaming)
-    ├── system_start_up.py (Startup Code)
-    └── README.md
+    │   ├── webcam_video_stream.py (webcam streaming)
+    │   └── yolo_darknet.py
+    │
+    ├── README.md
+    └── system_start_up.py (Startup Code)
     
-    4 directories, XXX files
+    7 directories, 48 files
 
 ---
 
