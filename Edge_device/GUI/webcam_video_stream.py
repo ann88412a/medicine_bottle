@@ -105,7 +105,7 @@ class medical_webcam_stream:
         return return_img
 
     def check_cam_ready(self):
-        if self.cap.isOpened() and self.syringe_image_list.read() is not None and self.darknet_image.read() is not None:
+        if self.cap.isOpened() and self.syringe_image_list.read() is not None:
             return True
         else:
             return False

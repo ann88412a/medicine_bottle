@@ -196,14 +196,15 @@ class medical_GUI:
     ## defult Page
     def wait_page(self):
         self.clean()
-        self.light.light_off()
+        # self.light.light_off()
+        self.light.light_on(10)
         tk.Label(self.window, text=self.text_translate("醫療藥物辨識系統"),
                  font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
         self.logo_img = ImageTk.PhotoImage(Image.open('./GUI/images/logo.png').resize((int(self.__screen_height * 0.6), int(self.__screen_height * 0.6))))
         tk.Label(self.window, image=self.logo_img).place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
         tk.Label(self.window, text=self.text_translate("待命中..."), anchor="se",
                  font=('', int(70 * self.__font_ratio), 'bold')).place(relx=0.6, rely=0.8, relwidth=0.4, relheight=0.2)
-        tk.Label(self.window, text=self.text_translate("機器編號：{}".format(self.__cfg["Mechine_ID"])), anchor="sw",
+        tk.Label(self.window, text=self.text_translate("機器編號：{}".format(self.__cfg["Device_ID"])), anchor="sw",
                  font=('', int(40 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=0.6, relheight=0.2)
 
     ## Barcode Mode Page
@@ -315,14 +316,14 @@ class medical_GUI:
                     self.__scale_val_hist_list.pop(self.__scale_val_hist_list.index(pop_num))
 
 
-    ## Pill Mode Page
-    def pill_detector(self):  ## 輸入欄位
-        self.light.light_on(10)
-        self.clean()
-        # tk.Label(self.window, text=self.text_translate("藥丸辨識"), font=('', int(40*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.1)
-        self.__pill_hint_imagetk = ImageTk.PhotoImage(Image.open('./GUI/images/HW_V2_with_pill_box.png').resize((int(self.__screen_width), int(self.__screen_height))))
-        tk.Label(self.window, image=self.__pill_hint_imagetk).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
-        ### do something
-        # self.window.after(3000, lambda: self.wait_page())
+    # ## Pill Mode Page  ## 東昇沒有要顯示
+    # def pill_detector(self):  ## 輸入欄位
+    #     self.light.light_on(10)
+    #     self.clean()
+    #     # tk.Label(self.window, text=self.text_translate("藥丸辨識"), font=('', int(40*self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.1)
+    #     self.__pill_hint_imagetk = ImageTk.PhotoImage(Image.open('./GUI/images/HW_V2_with_pill_box.png').resize((int(self.__screen_width), int(self.__screen_height))))
+    #     tk.Label(self.window, image=self.__pill_hint_imagetk).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
+    #     ### do something
+    #     # self.window.after(3000, lambda: self.wait_page())
 
 
