@@ -12,6 +12,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--weights', type=str, default='./yolov6/yolov6n.onnx', help='weights path')
 parser.add_argument('--source', type=str, default='./pill.png')  # height, width
+parser.add_argument('--size', type=int, default=320)
+parser.add_argument('--dataset', type=str, default='pill')
 opt = parser.parse_args()
 print(opt)
 
@@ -19,12 +21,24 @@ cuda = True
 w = opt.weights
 img = cv2.imread(opt.source)
 now = time.time()
+print(ort.get_device())
+print(ort.get_available_providers())
+# providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if cuda else ['CPUExecutionProvider']
+providers = ['TensorrtExecutionProvider']
+# print(ort.get_device())
 
-providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if cuda else ['CPUExecutionProvider']
+inference_time = time.time()
 session = ort.InferenceSession(w, providers=providers)
+print(time.time() - inference_time)
+for i in range(1000):
+    inference_time = time.time()
+    session = ort.InferenceSession(w, providers=providers)
+    print(time.time() - inference_time)
+
+print(ort.get_device())
 
 
-def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleup=True, stride=32):
+def letterbox(im, new_shape=(opt.size, opt.size), color=(114, 114, 114), auto=True, scaleup=True, stride=32):
     # Resize and pad image while meeting stride-multiple constraints
     shape = im.shape[:2]  # current shape [height, width]
     if isinstance(new_shape, int):
@@ -52,15 +66,21 @@ def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleu
     im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return im, r, (dw, dh)
 
-names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
-         'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 
-         'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 
-         'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 
-         'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 
-         'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 
-         'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 
-         'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 
-         'hair drier', 'toothbrush']
+names = ['Dilatrend 25mg/tab', 'Requip F.C 0.25mg/tab', 'Repaglinide 1mg/tab', 'Transamin 250mg/tab'
+       , 'Bokey 100mg/tab', 'Zocor 20 mg/tab', 'FLU-D (Fluconazole) 50mg/tab', 'Dilantin'
+       , 'Requip F.C 1 mg']
+
+if opt.dataset == 'coco':
+    names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
+            'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 
+            'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 
+            'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 
+            'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 
+            'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 
+            'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 
+            'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 
+            'hair drier', 'toothbrush']
+    
 colors = {name:[random.randint(0, 255) for _ in range(3)] for i,name in enumerate(names)}
 
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
