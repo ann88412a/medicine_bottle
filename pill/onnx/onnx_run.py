@@ -11,7 +11,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--weights', type=str, default='./yolov6/yolov6n.onnx', help='weights path')
-parser.add_argument('--source', type=str, default='./test.png')  # height, width
+parser.add_argument('--source', type=str, default='./pill.png')  # height, width
 opt = parser.parse_args()
 print(opt)
 
