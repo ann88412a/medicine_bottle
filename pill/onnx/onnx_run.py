@@ -24,16 +24,15 @@ now = time.time()
 print(ort.get_device())
 print(ort.get_available_providers())
 # providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if cuda else ['CPUExecutionProvider']
-providers = ['TensorrtExecutionProvider']
-# print(ort.get_device())
+# providers = ['TensorrtExecutionProvider']
+providers = ['CUDAExecutionProvider']
+# providers = ['CPUExecutionProvider']
+print(ort.get_device())
 
 inference_time = time.time()
 session = ort.InferenceSession(w, providers=providers)
 print(time.time() - inference_time)
-for i in range(1000):
-    inference_time = time.time()
-    session = ort.InferenceSession(w, providers=providers)
-    print(time.time() - inference_time)
+
 
 print(ort.get_device())
 
@@ -103,9 +102,16 @@ inname = [i.name for i in session.get_inputs()]
 
 inp = {inname[0]:im}
 
+t = []
 
-outputs = session.run(outname, inp)[0]
+for i in range(100):
+    inference_time = time.time()
 
+    outputs = session.run(outname, inp)[0]
+    t.append(time.time() - inference_time)
+    # print(outputs)
+
+print('t', sum(t)/ 100.0)
 print(outputs)
 
 
