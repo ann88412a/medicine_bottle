@@ -311,11 +311,7 @@ class medical_GUI:
                              font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.8, relwidth=1.0, relheight=0.2)
                     self.window.after(3000, lambda: self.wait_page())
                 else:
-                    if max(self.__scale_val_hist_list) - __median > min(self.__scale_val_hist_list) - __median:
-                        pop_num = max(self.__scale_val_hist_list)
-                    else:
-                        pop_num = min(self.__scale_val_hist_list)
-                    self.__scale_val_hist_list.pop(self.__scale_val_hist_list.index(pop_num))
+                    self.__scale_val_hist_list.pop(0)
 
 
     # ## Pill Mode Page  ## 東昇沒有要顯示
