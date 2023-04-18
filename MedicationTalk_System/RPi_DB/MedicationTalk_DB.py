@@ -59,16 +59,19 @@ while True:
         if barcode != None:
             # user identify
             user_uid = barcode[0]
-
+            
             # sql cmd
             sql = "select info from patient_info where barcode='" + barcode[1] + "';"
             cursor.execute(sql)
             data = cursor.fetchall()
 
+            barcode_dict = {'patient_info':  data[0][0]}
+            barcode_json = json.dumps(barcode_dict)
+
             if (len(data) > 0):
-                DB_DAN.push ('Patient-I', user_uid, data[0][0])
+                DB_DAN.push ('Barcode_Result-I', user_uid, barcode_dict)
             else:
-                DB_DAN.push ('Patient-I', user_uid, '查無此病人資訊')
+                DB_DAN.push ('Barcode_Result-I', user_uid, '查無此病人資訊')
         
         # sheet 
         # record exam info to SQL
