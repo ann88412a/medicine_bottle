@@ -65,11 +65,10 @@ while True:
             cursor.execute(sql)
             data = cursor.fetchall()
 
-            barcode_dict = {'patient_info':  data[0][0]}
-            barcode_json = json.dumps(barcode_dict)
-
             if (len(data) > 0):
-                DB_DAN.push ('Barcode_Result-I', user_uid, barcode_dict)
+                barcode_dict = {'patient_info':  data[0][0]}
+                barcode_json = json.dumps(barcode_dict)
+                DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
             else:
                 DB_DAN.push ('Barcode_Result-I', user_uid, '查無此病人資訊')
         
