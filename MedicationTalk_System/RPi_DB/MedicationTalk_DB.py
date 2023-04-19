@@ -75,7 +75,7 @@ while True:
                     DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
 
             elif barcode[1] == 'syringe':
-                sql = "select info from syringe_barcode where barcode='" + barcode[2] + "';"
+                sql = "select* from syringe_barcode where barcode='" + barcode[2] + "';"
                 cursor.execute(sql)
                 data = cursor.fetchall()
 
