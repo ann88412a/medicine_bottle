@@ -70,10 +70,11 @@ while True:
                     barcode_json = json.dumps(barcode_dict)
                     DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
                 else:
-                    DB_DAN.push ('Barcode_Result-I', user_uid, '查無此病人資訊')
+                    barcode_dict = {'patient_info': '查無此病人資訊'}
+                    barcode_json = json.dumps(barcode_dict)
+                    DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
 
             elif barcode[1] == 'syringe':
-                # sql cmd
                 sql = "select info from syringe_barcode where barcode='" + barcode[2] + "';"
                 cursor.execute(sql)
                 data = cursor.fetchall()
@@ -86,8 +87,12 @@ while True:
 
                     DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
                 else:
-                    DB_DAN.push ('Barcode_Result-I', user_uid, '查無此藥品資訊')
-        
+                    medicine_dict = {
+                        'medicine_info' : '查無此藥品資訊'
+                    }
+                    barcode_json = json.dumps(medicine_dict)
+
+                    DB_DAN.push ('Barcode_Result-I', user_uid, barcode_json)
         # sheet 
         # record exam info to SQL
         sheet = DB_DAN.pull('Sheet-O')
