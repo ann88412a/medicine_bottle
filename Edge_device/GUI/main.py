@@ -162,27 +162,32 @@ class medical_GUI:
                 ## pull barcode val
                 barcode_control = DAN.pull('Barcode-O')
                 if barcode_control != None:  ## Barcode-O -> [UID, Device, Type, On/Off]
-                    if barcode_control[-1]:
-                        self.barcode_control_info = barcode_control
-                        self.get_barcode()
-                    else:
-                        self.wait_page()
+                    if barcode_control[1] == self.__cfg["Device_ID"]:
+                        if barcode_control[-1]:
+                            self.barcode_control_info = barcode_control
+                            self.get_barcode()
+                        else:
+                            self.wait_page()
 
                 ## pull syringe val
                 syringe_scale_control = DAN.pull('Syringe-O')
                 if syringe_scale_control != None:  ## Syringe-O -> [UID, Device, Type, On/Off]
-                    if syringe_scale_control[-1]:
-                        self.light.light_on(255)
-                        self.syringe_scale_control_info = syringe_scale_control
-                        self.scan_scale()
-                    else:
-                        self.wait_page()
+                    if syringe_scale_control[1] == self.__cfg["Device_ID"]:
+                        if syringe_scale_control[-1]:
+                            self.light.light_on(255)
+                            self.syringe_scale_control_info = syringe_scale_control
+                            self.scan_scale()
+                        else:
+                            self.wait_page()
 
                 ## pull pill val ## 東昇part
                 pill_detect_check = DAN.pull('Pill_Detect-O')
-                print(pill_detect_check)
-                self.pill_detect.detect(pill_detect_check, self.__cfg["Device_ID"], self.webcam_stream.darknet_image_queue)
-                print(self.webcam_stream.darknet_image_queue.qsize(), self.pill_detect.predictions.qsize())
+                # print(pill_detect_check)
+                try:
+                    self.pill_detect.detect(pill_detect_check, self.__cfg["Device_ID"], self.webcam_stream.darknet_image_queue)
+                    # print(self.webcam_stream.darknet_image_queue.qsize(), self.pill_detect.predictions.qsize())
+                except:
+                    print("self.pill_detect.detect() Error")
 
             except Exception as e:
                 self.check_network(ServerURL)
@@ -272,8 +277,11 @@ class medical_GUI:
         self.show_webcam_stream()
 
     def show_webcam_stream(self):
-        frame = self.webcam_stream.syringe_image_list.read()
-        self.scale_frame, self.scale_value = self.syringe_scale.get_scale(frame[0], frame[1], syringe_type=self.syringe_scale_control_info[-2])
+        try:
+            frame = self.webcam_stream.syringe_image_list.read()
+            self.scale_frame, self.scale_value = self.syringe_scale.get_scale(frame[0], frame[1], syringe_type=self.syringe_scale_control_info[-2])
+        except:
+            print("self.webcam_stream.syringe_image_list is in writing")
 
         img_ratio = 0.98 * min(self.__screen_height/self.scale_frame.shape[0], 0.3*self.__screen_width/self.scale_frame.shape[1])
         cv2image = cv2.cvtColor(cv2.resize(self.scale_frame, None, fx=img_ratio, fy=img_ratio), cv2.COLOR_BGR2RGBA)
