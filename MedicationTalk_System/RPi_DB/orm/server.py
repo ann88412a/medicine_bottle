@@ -5,7 +5,7 @@ import time
 
  
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["*"]}}) 
+CORS(app, resources={r"/api/*": {"origins": ["https://fritingo.github.io"]}}) 
 
 from sqlalchemy import create_engine, text, or_
 from sqlalchemy.orm import Session
