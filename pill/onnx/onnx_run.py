@@ -130,6 +130,7 @@ for i,(batch_id,x0,y0,x1,y1,cls_id,score) in enumerate(outputs):
     name += ' '+str(score)
     cv2.rectangle(image,box[:2],box[2:],color,2)
     cv2.putText(image,name,(box[0], box[1] - 2),cv2.FONT_HERSHEY_SIMPLEX,0.75,[225, 255, 255],thickness=2)  
+    print(batch_id)
 
 Image.fromarray(ori_images[0])
 print(time.time() - now)
