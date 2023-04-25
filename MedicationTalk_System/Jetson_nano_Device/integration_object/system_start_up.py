@@ -15,15 +15,15 @@ from queue import Queue
 from GUI import DAN
 import time
 # set Device dummy device
-ServerURL = 'https://1.iottalk.tw' 
-Reg_addr = 'Device_Demo' #if None, Reg_addr = MAC address
-DAN.profile['d_name'] = 'Device_Demo'
-DAN.profile['dm_name'] = 'MedicationTalk_Device'
-DAN.profile['df_list'] = ['Pill_Detect_Result-I', 'Syringe_Result-I', 'Retrieve-I', 'Connect-I', 'Barcode-O', 'Pill_Detect-O', 'Syringe-O', 'Update-O']
-DAN.device_registration_with_retry(ServerURL, Reg_addr)
+# ServerURL = 'https://1.iottalk.tw' 
+# Reg_addr = 'Device_Demo' #if None, Reg_addr = MAC address
+# DAN.profile['d_name'] = 'Device_Demo'
+# DAN.profile['dm_name'] = 'MedicationTalk_Device'
+# DAN.profile['df_list'] = ['Pill_Detect_Result-I', 'Syringe_Result-I', 'Retrieve-I', 'Connect-I', 'Barcode-O', 'Pill_Detect-O', 'Syringe-O', 'Update-O']
+# DAN.device_registration_with_retry(ServerURL, Reg_addr)
 
 # this device 
-device = 'Device_Demo'
+# device = 'Device_Demo'
 
 # set camera 
 cap = cv2.VideoCapture(0)
@@ -50,17 +50,21 @@ if __name__ == "__main__":
     from GUI.DAI import pill_yolo
     pill_detect = pill_yolo()
 
-    while True:
-        try:   
+    for i in range(50):
+        print(frame_queue.qsize())
+    frame = frame_queue.get()
+    pill_detect.DB_backup('test', frame)
+    # while True:
+    #     try:   
            
-            # pull from IoTtalk
-            pill_detect_check = DAN.pull('Pill_Detect-O')
-            print(pill_detect_check)
+    #         # pull from IoTtalk
+    #         pill_detect_check = DAN.pull('Pill_Detect-O')
+    #         print(pill_detect_check)
 
-            pill_detect.detect(pill_detect_check, device, frame_queue)
+    #         pill_detect.detect(pill_detect_check, device, frame_queue)
             
 
-            print(frame_queue.qsize(), pill_detect.predictions.qsize())
+    #         print(frame_queue.qsize(), pill_detect.predictions.qsize())
             
 
 
@@ -71,16 +75,16 @@ if __name__ == "__main__":
 
             # clear queue
 
-        except Exception as e:
-            print(e)
-            if str(e).find('mac_addr not found:') != -1:
-                print('Reg_addr is not found. Try to re-register...')
-                DAN.device_registration_with_retry(ServerURL, Reg_addr)
-            else:
-                print('Connection failed due to unknow reasons.')
-                time.sleep(1)
+        # except Exception as e:
+        #     print(e)
+        #     if str(e).find('mac_addr not found:') != -1:
+        #         print('Reg_addr is not found. Try to re-register...')
+        #         DAN.device_registration_with_retry(ServerURL, Reg_addr)
+        #     else:
+        #         print('Connection failed due to unknow reasons.')
+        #         time.sleep(1)
 
-        time.sleep(0.5)
+        # time.sleep(0.5)
 
 
                     

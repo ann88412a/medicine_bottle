@@ -6,24 +6,25 @@ from queue import Queue
 import datetime
 import json
 import datetime
+import requests
 
 # google Drive API
-import google.auth
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
-from . import auth
+# import google.auth
+# from googleapiclient.discovery import build
+# from googleapiclient.errors import HttpError
+# from googleapiclient.http import MediaFileUpload
+# from . import auth
 import os
 
 class pill_yolo:
     def __init__(self):
         # google drive
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        # your google drive API OAuth
-        CLIENT_SECRET_FILE = './config_files/client_secret.json'
-        APPLICATION_NAME = 'Drive API'
-        authInst = auth.auth(SCOPES,CLIENT_SECRET_FILE,APPLICATION_NAME)
-        self.creds = authInst.getCredentials()
+        # SCOPES = 'https://www.googleapis.com/auth/drive'
+        # # your google drive API OAuth
+        # CLIENT_SECRET_FILE = './config_files/client_secret.json'
+        # APPLICATION_NAME = 'Drive API'
+        # authInst = auth.auth(SCOPES,CLIENT_SECRET_FILE,APPLICATION_NAME)
+        # self.creds = authInst.getCredentials()
         
         # yolo pill detect
 
@@ -62,30 +63,39 @@ class pill_yolo:
 
 
     # google drive upload
-    def image_backup(self, name, frame):
-        try:
-            now = datetime.datetime.now()
-            now = now.strftime('%m_%d_%H_%M_%S')
-            # save picture
-            cv2.imwrite(name + '_' + now + '.jpg', frame)
+    # def image_backup(self, name, frame):
+    #     try:
+    #         now = datetime.datetime.now()
+    #         now = now.strftime('%m_%d_%H_%M_%S')
+    #         # save picture
+    #         cv2.imwrite(name + '_' + now + '.jpg', frame)
 
-            # connect Google Drive
-            service = build('drive', 'v3', credentials=self.creds)
+    #         # connect Google Drive
+    #         service = build('drive', 'v3', credentials=self.creds)
 
-            file_metadata = {'name': name + '_' + now + '.jpg',
-                            'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
+    #         file_metadata = {'name': name + '_' + now + '.jpg',
+    #                         'parents': ['1ujH56sEnVDuq2tnwk241GIOjkMUxp3S4']}
 
-            # Upload
-            media = MediaFileUpload(name + '_' + now + '.jpg', mimetype='image/jpeg')
-            file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-            print(F'File ID: {file.get("id")}')
+    #         # Upload
+    #         media = MediaFileUpload(name + '_' + now + '.jpg', mimetype='image/jpeg')
+    #         file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    #         print(F'File ID: {file.get("id")}')
 
-            # remove local picture
-            os.remove(name + '_' + now + '.jpg')
+    #         # remove local picture
+    #         os.remove(name + '_' + now + '.jpg')
 
-        except HttpError as error:
-            print(F'An error occurred: {error}')
-            file = None
+    #     except HttpError as error:
+    #         print(F'An error occurred: {error}')
+    #         file = None
+
+    # DB upload
+    def DB_backup(self, name, frame):
+        cv2.imwrite(name + '.jpg', frame)
+        files = {'file': open(name + '.jpg','rb')}
+        values = {'name': name}
+        url = 'https://140.113.110.21:7777/api/_pic'
+        r = requests.post(url, files=files, data=values, verify=False)
+        os.remove(name + '.jpg')
 
 
     # pill algorithm
@@ -128,7 +138,8 @@ class pill_yolo:
                                                     self.pills['Dilantin'],
                                                     self.pills['Requip F.C 1 mg'])
             frame = frame_queue.get()
-            self.image_backup(self.user_id, frame)
+            self.DB_backup(self.user_id, frame)
+            # self.image_backup(self.user_id, frame)
 
     def pill_processing(self, frame_queue):
         for i in range(51):
