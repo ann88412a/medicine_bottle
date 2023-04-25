@@ -549,3 +549,4 @@ camera_test/data
 pill/cyho/backup/yolov7_final.weights
 pill/datasets
 pill/onnx/runs/val
+MedicationTalk_System/RPi_DB/orm/backup/*
