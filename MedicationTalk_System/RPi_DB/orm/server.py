@@ -5,7 +5,7 @@ import time
 
  
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["https://fritingo.github.io"]}}) 
+CORS(app, resources={r"/api/*": {"origins": ["https://fritingo.github.io", "140.113.*.*"]}}) 
 
 from sqlalchemy import create_engine, text, or_
 from sqlalchemy.orm import Session
@@ -169,9 +169,9 @@ def get_sheet_user():
 def get_sheet_pill():
     # pill talbe
     sql_cmd = text("""
-        insert into Pill_Medication (pill_name_id, pill_1, pill_2, pill_3, pill_4, pill_5, pill_6, pill_7, pill_8, pill_9) 
-        values (1, {}, {}, {}, {}, {}, {}, {}, {}, {});
-        """.format(request.form['pills_1'], request.form['pills_2'], request.form['pills_3'], request.form['pills_4'], request.form['pills_5'], request.form['pills_6'], request.form['pills_7'], request.form['pills_8'], request.form['pills_9']))
+        insert into Pill_Medication (pill_name_id, pill_1, pill_2, pill_3, pill_4, pill_5, pill_6, pill_7, pill_8, pill_9, pic) 
+        values (1, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+        """.format(request.form['pills_1'], request.form['pills_2'], request.form['pills_3'], request.form['pills_4'], request.form['pills_5'], request.form['pills_6'], request.form['pills_7'], request.form['pills_8'], request.form['pills_9']), request.form['pic'])
     
     session.execute(sql_cmd)
     session.commit()
@@ -235,6 +235,13 @@ def get_sheet_record():
         """.format(user_id, rows+1, rows+1, rows+1, request.form['ans_1'], request.form['ans_2'], request.form['ans_3'], request.form['ans_4'], request.form['ans_5'], request.form['ans_6'], request.form['ans_7'], request.form['ans_8'], request.form['ans_9'], request.form['ans_10']))
     session.execute(sql_cmd)
     session.commit()
+    return 'ok'
+
+@app.route('/api/_pic', methods=['POST'])
+def get_pic():
+    file = request.files['file']
+    
+    file.save('./backup/' + request.form['name'] + '.jpg')
     return 'ok'
 
 @app.route('/')
