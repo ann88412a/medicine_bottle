@@ -9,6 +9,8 @@ CORS(app, resources={r"/api/*": {"origins": ["https://fritingo.github.io", "140.
 
 from sqlalchemy import create_engine, text, or_
 from sqlalchemy.orm import Session
+import models
+
 
 engine = None
 
@@ -20,6 +22,8 @@ def connect():
 
     engine = create_engine("mysql+pymysql://Demo:Demo_0000@localhost:3306/MedicationTalk")
     
+    models.base.metadata.create_all(engine)
+
 def get_session():
     if not engine:
         connect()
@@ -28,52 +32,58 @@ def get_session():
 
 session = get_session()
 
-@app.route('/api/_add_numbers')
-def add_numbers():
-    a = request.args.get('a')
-    b = request.args.get('b')
-    print(a, b)
-    result = int(a)+int(b)
-    return jsonify(result=result)
-
 @app.route('/api/_patient')
 def get_patient_info():
     barcode = request.args.get('barcode')
-    sql_cmd = text("""
-        select info
-        from Patient_Info
-        where barcode='{}';
-        """.format(barcode))
-    
-    query_data = session.execute(sql_cmd).fetchall()
-    print(query_data)
-    if len(query_data) < 1:
+    result = session.query(models.Patient_Info).filter(models.Patient_Info.barcode == barcode).first()
+    if result == None:
         resp = {'info': '查無此病人資料'}
     else:
-        resp = {'info': query_data[0][0]}
+        resp = {'info': result.info}
+    # sql_cmd = text("""
+    #     select info
+    #     from Patient_Info
+    #     where barcode='{}';
+    #     """.format(barcode))
+    
+    # query_data = session.execute(sql_cmd).fetchall()
+    # print(query_data)
+    # if len(query_data) < 1:
+    #     resp = {'info': '查無此病人資料'}
+    # else:
+    #     resp = {'info': query_data[0][0]}
     
     return jsonify(resp)
 
 @app.route('/api/_level')
 def get_level():
     level_num = [0, 0, 0]
+    result = session.query(models.Record).all()
 
-    sql_cmd = text("""
-        select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
-        from Record;
-        """)
-    
-    query_data = session.execute(sql_cmd).fetchall()
-
-    for each_record in query_data:
-        total_score = sum(each_record)
-
+    for each_record in result:
+        total_score = each_record.question_1 + each_record.question_2 + each_record.question_3 + each_record.question_4 + each_record.question_5 + each_record.question_6 + each_record.question_7 + each_record.question_8 + each_record.question_9 + each_record.question_10
         if total_score >= 7:
             level_num[2] = level_num[2] + 1
         elif total_score >= 4:
             level_num[1] = level_num[1] + 1
         else: 
             level_num[0] = level_num[0] + 1
+    # sql_cmd = text("""
+    #     select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
+    #     from Record;
+    #     """)
+    
+    # query_data = session.execute(sql_cmd).fetchall()
+
+    # for each_record in query_data:
+    #     total_score = sum(each_record)
+
+        # if total_score >= 7:
+        #     level_num[2] = level_num[2] + 1
+        # elif total_score >= 4:
+        #     level_num[1] = level_num[1] + 1
+        # else: 
+        #     level_num[0] = level_num[0] + 1
 
     resp = {'level': level_num}
     
@@ -259,4 +269,4 @@ def index():
  
 if __name__ == "__main__":
     
-    app.run(host='0.0.0.0', port= 7777, ssl_context=('server.crt', 'server.key'))
+    app.run(host='0.0.0.0', port= 7777, debug=True)# , ssl_context=('server.crt', 'server.key')
