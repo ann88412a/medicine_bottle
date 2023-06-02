@@ -97,30 +97,37 @@ def get_history():
     history_label = []
     history_label.clear()
 
-    sql_cmd = text("""
-        select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
-        from User INNER JOIN Record
-        on User.id = Record.user_id
-        where student_id='{}';
-        """.format(user_id))
+    result = session.query(models.User).join(models.Record).filter_by(student_id = user_id).all()
     
-    query_data = session.execute(sql_cmd).fetchall()
-    
-    for each_record in query_data:
-        total_score = sum(each_record)
+    for each_record in result:
+        total_score = each_record.question_1 + each_record.question_2 + each_record.question_3 + each_record.question_4 + each_record.question_5 + each_record.question_6 + each_record.question_7 + each_record.question_8 + each_record.question_9 + each_record.question_10
         history_data.append(total_score)
+        history_label.append(each_record.time)
+    
+    # sql_cmd = text("""
+    #     select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
+    #     from User INNER JOIN Record
+    #     on User.id = Record.user_id
+    #     where student_id='{}';
+    #     """.format(user_id))
+    
+    # query_data = session.execute(sql_cmd).fetchall()
+    
+    # for each_record in query_data:
+    #     total_score = sum(each_record)
+    #     history_data.append(total_score)
 
-    sql_cmd = text("""
-        select time
-        from User INNER JOIN Record
-        on User.id = Record.user_id
-        where student_id='{}';
-        """.format(user_id))
+    # sql_cmd = text("""
+    #     select time
+    #     from User INNER JOIN Record
+    #     on User.id = Record.user_id
+    #     where student_id='{}';
+    #     """.format(user_id))
     
-    query_data = session.execute(sql_cmd).fetchall()
+    # query_data = session.execute(sql_cmd).fetchall()
     
-    for each_record in query_data:
-        history_label.append(each_record[0])
+    # for each_record in query_data:
+    #     history_label.append(each_record[0])
                 
 
     resp = {'history_data': history_data,
@@ -135,18 +142,42 @@ def get_time_total():
     
     each_q_score = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    sql_cmd = text("""
-        select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
-        from Record
-        where time between '{}' and '{}';
-        """.format(start_date, end_date))
+    result = session.query(models.Record).filter(models.Record.time >= start_date and models.Record.time <= end_date).all()
+        
+    for each_record in result:
+        if each_record.question_1 == 1:
+            each_q_score[0] = each_q_score[0] + 1
+        if each_record.question_2 == 1:
+            each_q_score[1] = each_q_score[1] + 1
+        if each_record.question_3 == 1:
+            each_q_score[2] = each_q_score[2] + 1
+        if each_record.question_4 == 1:
+            each_q_score[3] = each_q_score[3] + 1
+        if each_record.question_5 == 1:
+            each_q_score[4] = each_q_score[4] + 1
+        if each_record.question_6 == 1:
+            each_q_score[5] = each_q_score[5] + 1
+        if each_record.question_7 == 1:
+            each_q_score[6] = each_q_score[6] + 1
+        if each_record.question_8 == 1:
+            each_q_score[7] = each_q_score[7] + 1
+        if each_record.question_9 == 1:
+            each_q_score[8] = each_q_score[8] + 1
+        if each_record.question_10 == 1:
+            each_q_score[9] = each_q_score[9] + 1
+            
+    # sql_cmd = text("""
+    #     select question_1, question_2, question_3, question_4, question_5, question_6, question_7, question_8, question_9, question_10
+    #     from Record
+    #     where time between '{}' and '{}';
+    #     """.format(start_date, end_date))
     
-    query_data = session.execute(sql_cmd).fetchall()
+    # query_data = session.execute(sql_cmd).fetchall()
     
-    for each_record in query_data:
-        for i in range(len(each_record)):
-            if (each_record[i] == 1):
-                each_q_score[i] = each_q_score[i] + 1
+    # for each_record in query_data:
+    #     for i in range(len(each_record)):
+    #         if (each_record[i] == 1):
+    #             each_q_score[i] = each_q_score[i] + 1
 
             
     resp = {'each_q_score': each_q_score}
