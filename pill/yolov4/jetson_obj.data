@@ -1,0 +1,11 @@
+classes = 4
+
+train  =/home/medical/medicine_bottle/pill/yolov4/jetson_train.txt
+valid  = /home/medical/medicine_bottle/pill/yolov4/jetson_test.txt
+names = /home/medical/medicine_bottle/pill/yolov4/obj .name
+backup = backup/
+
+'''
+train  =/home/medical/medicine_bottle/pill/yolov4/jetson_train.txt
+valid  = /home/medical/medicine_bottle/pill/yolov4/jetson_test.txt
+'''

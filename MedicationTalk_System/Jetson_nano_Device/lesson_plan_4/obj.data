@@ -1,0 +1,6 @@
+classes = 9
+
+train  = ./train.txt
+valid  = ./test.txt
+names = ./obj.name
+backup = ./backup

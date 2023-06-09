@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=medical_iottalk_device
+Comment=communicate with iottalk
+Exec=gnome-terminal --working-directory=/home/medical/lesson_plan_4_1_13/ -e "bash -c ./run.sh;bash"
+Icon=/home/medical/lesson_plan_4_1_13/doc/pill.png
+Terminal=false
+Type=Application
+Name[zh_TW]=run.desktop
