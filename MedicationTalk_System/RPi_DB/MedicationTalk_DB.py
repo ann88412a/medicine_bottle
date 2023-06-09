@@ -7,6 +7,7 @@ Features：
 2. 紀錄檢定成績： 儲存檢定的學生及檢定資訊
 3. 查詢分析歷史成績： 查詢特定情境的資訊回傳至 Platform 圖表
 '''
+#======test=======#
 
 import time, random, requests
 import DB_DAN, Platform_DAN, csmapi, os
