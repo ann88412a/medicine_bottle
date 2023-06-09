@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name = 收集資料
+Comment = take picture and auto upload 
+Exec = record.sh
+Icon = pill.png
+Terminal = false
+Type = Application
