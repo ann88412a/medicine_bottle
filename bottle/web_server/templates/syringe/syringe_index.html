@@ -1,0 +1,77 @@
+<!doctype html>
+<head>
+    <title>Syringe scale</title>
+    <meta charset=utf-8>
+    <link rel=stylesheet type="text/css" href="/static/css/medical_bottle.css">
+    <script>
+        console.log("%c %s", "color:red; font-size: 42px;", "{{ show_log }}");
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload()
+            }
+        };
+    </script>
+
+</head>
+
+<body>
+{#    <h1 style="text-align: center;">針劑藥物辨識系統</h1>#}
+{#    <h1 style="line-height: 20%;">針劑藥物辨識系統</h1>#}
+{#    <hr>#}
+{#    <div style="float: right">識別碼: {{ request.cookies.get('username') }} </div>#}
+    <div class="tipicon" style="width: 100%">
+        <h1 style="text-align: center; line-height: 20%;">
+            針劑藥物辨識系統
+            <sup><img style="font-size: 36px; width:1em;" src="/static/images/question_icon.png"></sup>
+        </h1>
+
+
+        <span class="tipicontext">
+            <font style="font-weight:bold;">操作說明:</font>
+            <div style="margin-left: 1em;">
+                <ol>
+                    <li>如欲新增新的針劑藥物，請按<font style="background-color: #4CAF50">"新增"</font>按鈕! </li>
+                    <li>若已完成新增或無須新增，請直接按下<font style="color: white; background-color: #f44336">"上傳結果"</font>按鈕! </li>
+                </ol>
+            </div>
+        </span>
+    </div>
+    <hr>
+
+    <div>
+        <table border=3>  <!-- show medicine list -->
+            <caption style="font-weight:bold;">
+                <font style="font-size: 48px;">已新增之針劑藥物清單</font>
+                <div style="float: right;"> <button style="background-color: #4CAF50;" onclick="window.location.href='{{ url_for('add_new') }}'">新增</button> </div>
+            </caption>
+            <tr style="background-color: #D6EEEE;">
+                <th width=8%>No.</th>
+                <th width=17%>條碼編號</th>
+                <th width=24%>藥劑名稱</th>
+                <th width=17%>稀釋總量</th>
+                <th width=17%>施打總量</th>
+                <th width=17%>給藥途徑</th>
+            </tr>
+            {% if (medicine_list |length > 0) %}
+                {% for i in medicine_list %}
+                    <tr>
+                        <td>{{ loop.index0 + 1 }}</td>
+                        <td> {{ i[0] }} </td>
+                        <td> {{ i[1] }} </td>
+                        <td> {{ i[2] }} ml </td>
+                        <td> {{ i[3] }} ml </td>
+                        <td> {{ i[4] }} </td>
+{#                        {% for j in i %}#}
+{#                            <td> {{ j }} </td>#}
+{#                        {%endfor%}#}
+                    </tr>
+                {%endfor%}
+            {% else %}
+                <tr><td colspan=6 align="center"> 這裡面什麼都沒有... </td></tr>
+            {% endif %}
+        </table><br>
+    </div>
+    <hr>
+    <button style="float:left; color: white; background-color: #f44336;" onclick="if(confirm('送出後即無法更改，確認送出？')){window.location.href='{{ url_for('submit_result') }}'}">上傳結果</button>
+
+</body>
