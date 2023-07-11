@@ -150,10 +150,10 @@ class medical_GUI:
         ServerURL = self.__cfg["ServerURL"]
         Reg_addr = "MedicalTalk_ib54784_{}".format(self.__cfg["Device_ID"])  # if None, Reg_addr = MAC address
         DAN.profile['d_name'] = "MedicalTalk_{}".format(self.__cfg["Device_ID"])
-        DAN.profile['dm_name'] = "MedicationTalk_Device"
+        DAN.profile['dm_name'] = "Medication_Device"
         DAN.profile['u_name'] = "Medical_Device"
-        DAN.profile['df_list'] = ['Pill_Detect_Result-I', 'Syringe_Result-I', 'Retrieve-I', 'Connect-I', 'Barcode-O',
-                                  'Pill_Detect-O', 'Syringe-O', 'Update-O', ]
+        DAN.profile['df_list'] = ['Barcode_Result-I', 'Pill_Detect_Result-I', 'Syringe_Result-I', 'Barcode-O',
+                                  'Pill_Detect-O', 'Syringe-O',]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
         # exit()            #if you want to deregister this device, uncomment this line
@@ -190,14 +190,15 @@ class medical_GUI:
                     print("self.pill_detect.detect() Error")
 
             except Exception as e:
-                self.check_network(ServerURL)
-                print(e)
-                if str(e).find('mac_addr not found:') != -1:
-                    print('Reg_addr is not found. Try to re-register...')
-                    DAN.device_registration_with_retry(ServerURL, Reg_addr)
-                else:
-                    print('Connection failed due to unknow reasons.')
-                    time.sleep(1)
+                pass
+                # self.check_network(ServerURL)
+                # print(e)
+                # if str(e).find('mac_addr not found:') != -1:
+                #     print('Reg_addr is not found. Try to re-register...')
+                #     DAN.device_registration_with_retry(ServerURL, Reg_addr)
+                # else:
+                #     print('Connection failed due to unknow reasons.')
+                #     time.sleep(1)
             time.sleep(0.5)
 
     ## defult Page
@@ -235,7 +236,7 @@ class medical_GUI:
             self.get_barcode()
         else:
             self.clean()
-            DAN.push('Retrieve-I', self.barcode_control_info[0], self.barcode_control_info[2], string)  ## [UID, Type, Barcode]
+            DAN.push('Barcode_Result-I', self.barcode_control_info[0], json.dumps({"medicine_info": string}))  ## [UID, Type, Barcode]
             tk.Label(self.window, text="條碼編號： ", anchor="w",
                      font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
             tk.Label(self.window, text="{}".format(string), anchor="w",
