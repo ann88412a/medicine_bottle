@@ -236,11 +236,15 @@ class medical_GUI:
             self.get_barcode()
         else:
             self.clean()
+<<<<<<< HEAD
             if self.barcode_control_info[2] == "syringe":
                 DAN.push('Barcode_Result-I', self.barcode_control_info[0], json.dumps({"medicine_info": string}))  ## [UID, Type, Barcode]
             else:
                 DAN.push('Barcode_Result-I', self.barcode_control_info[0], json.dumps({"barcode": string}))  ## [UID, Type, Barcode]
 
+=======
+            DAN.push('Barcode_Result-I', self.barcode_control_info[0], json.dumps({"medicine_info": string}))  ## [UID, Type, Barcode]
+>>>>>>> 00b83ec045c840b6382e7aac6e5b3836ee9c65ee
             tk.Label(self.window, text="條碼編號： ", anchor="w",
                      font=('', int(60 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
             tk.Label(self.window, text="{}".format(string), anchor="w",
