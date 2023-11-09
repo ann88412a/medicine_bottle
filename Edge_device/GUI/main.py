@@ -205,7 +205,7 @@ class medical_GUI:
     def wait_page(self):
         self.clean()
         # self.light.light_off()
-        self.light.light_on(3)
+        self.light.light_on(8)
         tk.Label(self.window, text=self.text_translate("醫療藥物辨識系統"),
                  font=('', int(80 * self.__font_ratio), 'bold')).place(relx=0.0, rely=0.0, relwidth=1.0, relheight=0.2)
         self.logo_img = ImageTk.PhotoImage(Image.open('./GUI/images/logo.png').resize((int(self.__screen_height * 0.6), int(self.__screen_height * 0.6))))
