@@ -29,7 +29,7 @@ creds = authInst.getCredentials()
 
 
 # ================ iottalk ===============
-ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
+ServerURL = 'https://class.iottalk.tw'      #with non-secure connection
 Reg_addr = 'MedicationTalk_Device0' #if None, Reg_addr = MAC address
 
 csmapi.ENDPOINT = ServerURL

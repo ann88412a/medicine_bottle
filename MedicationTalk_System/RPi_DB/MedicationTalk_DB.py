@@ -16,7 +16,7 @@ import datetime
 import json
 
 #================iottalk===============
-ServerURL = 'https://1.iottalk.tw'     
+ServerURL = 'https://class.iottalk.tw'     
 csmapi.ENDPOINT = ServerURL
 
 # set DB dummy device

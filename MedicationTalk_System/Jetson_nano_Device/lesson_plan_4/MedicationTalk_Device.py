@@ -34,7 +34,7 @@ creds = authInst.getCredentials()
 
 
 # ================ iottalk ===============
-ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
+ServerURL = 'https://class.iottalk.tw'      #with non-secure connection
 
 # set Device dummy device
 Reg_addr = 'Device_Demo' #if None, Reg_addr = MAC address

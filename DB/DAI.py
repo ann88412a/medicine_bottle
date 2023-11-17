@@ -6,7 +6,7 @@ import datetime
 import json
 
 #================iottalk===============
-ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
+ServerURL = 'https://class.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
 Reg_addr = 'Medication_DB_0' #if None, Reg_addr = MAC address
 

@@ -32,7 +32,7 @@ console.log(client_uid);
 
 
 $(function(){
-        csmapi.set_endpoint ('https://1.iottalk.tw');
+        csmapi.set_endpoint ('https://class.iottalk.tw');
         var profile = {
 		    'dm_name': 'MedicationTalk_Platform',          
 			'idf_list':[Barcode_I, Pill_Detect_I, Syringe_I, Search_I, Sheet_I],

@@ -3,7 +3,7 @@ import DAN , os
 import threading
 
 #================iottalk===============
-ServerURL = 'https://1.iottalk.tw'      #with non-secure connection
+ServerURL = 'https://class.iottalk.tw'      #with non-secure connection
 #ServerURL = 'https://DomainName' #with SSL connection
 Reg_addr = 'Medication_Platform_3' #if None, Reg_addr = MAC address
 DAN.profile['d_name'] = 'Medication_Platform_3'
