@@ -75,7 +75,7 @@ const dai = function (profile, ida) {
     }
 
     function deregister () {
-        // dan.deregister(deregisterCallback);
+        dan.deregister(deregisterCallback);
     }
 
     window.onunload = deregister;
