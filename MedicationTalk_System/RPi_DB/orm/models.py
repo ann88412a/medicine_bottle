@@ -65,16 +65,16 @@ class Student_Cognition(base):
 class Feedback(base):
     __tablename__ = 'Feedback'
     id = Column(Integer, primary_key=True, nullable=False)
-    question_1 = Column(Integer, nullable=False)
-    question_2 = Column(Integer, nullable=False)
-    question_3 = Column(Integer, nullable=False)
-    question_4 = Column(Integer, nullable=False)
-    question_5 = Column(Integer, nullable=False)
-    question_6 = Column(Integer, nullable=False)
-    question_7 = Column(Integer, nullable=False)
-    question_8 = Column(Integer, nullable=False)
-    question_9 = Column(Integer, nullable=False)
-    question_10 = Column(Integer, nullable=False)
+    question_1 = Column(String(50), nullable=False)
+    question_2 = Column(String(50), nullable=False)
+    question_3 = Column(String(50), nullable=False)
+    question_4 = Column(String(50), nullable=False)
+    question_5 = Column(String(50), nullable=False)
+    question_6 = Column(String(50), nullable=False)
+    question_7 = Column(String(50), nullable=False)
+    question_8 = Column(String(50), nullable=False)
+    question_9 = Column(String(50), nullable=False)
+    question_10 = Column(String(50), nullable=False)
 
 class Record(base):
     __tablename__ = 'Record'

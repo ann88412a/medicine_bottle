@@ -65,9 +65,7 @@ def letterbox(im, new_shape=(opt.size, opt.size), color=(114, 114, 114), auto=Tr
     im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return im, r, (dw, dh)
 
-names = ['Dilatrend 25mg/tab', 'Requip F.C 0.25mg/tab', 'Repaglinide 1mg/tab', 'Transamin 250mg/tab'
-       , 'Bokey 100mg/tab', 'Zocor 20 mg/tab', 'FLU-D (Fluconazole) 50mg/tab', 'Dilantin'
-       , 'Requip F.C 1 mg']
+names = ['Clopidogrel', 'Aspirin', 'Tulip' ]
 
 if opt.dataset == 'coco':
     names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
