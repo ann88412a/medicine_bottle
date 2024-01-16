@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-###
+
 # 讀取中文路徑圖檔(圖片讀取為BGR)
 def cv_imread(filePath):
     cv_img = cv2.imdecode(np.fromfile(filePath, dtype=np.uint8), -1)
