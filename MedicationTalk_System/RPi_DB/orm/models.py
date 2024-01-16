@@ -1,5 +1,5 @@
 from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey,
-                        Integer, String, Text, UniqueConstraint)
+                        Integer, String, Text, UniqueConstraint, JSON)
 from sqlalchemy.ext.declarative import declarative_base
 
 base = declarative_base()
@@ -94,3 +94,13 @@ class Record(base):
     question_9 = Column(Integer, nullable=False)
     question_10 = Column(Integer, nullable=False)
     time = Column(DateTime, nullable=False)
+    
+class Syringe_Result(base):
+    __tablename__ = 'Syringe_Result'
+    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    lesson = Column(Integer, nullable=False)
+    record = Column(JSON, nullable=False)
+    time = Column(DateTime, nullable=False)
+    
+    

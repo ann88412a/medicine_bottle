@@ -3,7 +3,7 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for
 from flask_cors import CORS
 import time
 import datetime
-
+import json
 
 
 app = Flask(__name__, template_folder="templates", static_folder='static',)
@@ -247,23 +247,33 @@ def get_sheet_pill():
 def get_sheet_syringe():
     # syringe table
     
-    # sql_cmd = text("""
-    #     select * from Patient_Info where barcode='{}';
-    #     """.format(request.form['patient_barcode']))
-
-    # patient_info_id = session.execute(sql_cmd).fetchall()
-    # if len(patient_info_id) > 0:
-    #     patient_info_id = patient_info_id[0][0]
-    # else:
-    #     patient_info_id = -1
-        
-    # sql_cmd = text("""
-    #     insert into Syringe_Result (user_id, lesson, record) 
-    #     values ({}, {}, {});
-    #     """.format(patient_info_id, 1, {'test':1}))
+    syringe_data = request.form
+    syringe_records = syringe_data['record']
+    print("syringe_data is:", syringe_data)
+    print("record is:", syringe_data['record'])
+    json_record = json.dumps(json.loads(syringe_data['record']))
+    print("jsonload", json_record)
     
-    # session.execute(sql_cmd)
-    # session.commit()
+    sql_cmd = text("""
+    select * from User where student_id='{}';
+    """.format(request.form['id']))
+
+    user_table_id = (session.execute(sql_cmd).fetchall())[0][0]
+    print(user_table_id)
+    
+    now = datetime.datetime.now()
+    now = now.strftime('%Y-%m-%d-%H-%M-%S')
+    
+    # record_data = {"test":10}
+    # record_json = json.dumps(record_data)
+    
+    sql_cmd = text("""
+        insert into Syringe_Result (user_id, lesson, record, time) 
+        values ({}, {}, '{}', now());
+        """.format(int(user_table_id), syringe_data['lesson'], json_record))
+    
+    session.execute(sql_cmd)
+    session.commit()
     return 'ok'
     
 
