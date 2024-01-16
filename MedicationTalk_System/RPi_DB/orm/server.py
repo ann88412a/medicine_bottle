@@ -264,9 +264,6 @@ def get_sheet_syringe():
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%d-%H-%M-%S')
     
-    # record_data = {"test":10}
-    # record_json = json.dumps(record_data)
-    
     sql_cmd = text("""
         insert into Syringe_Result (user_id, lesson, record, time) 
         values ({}, {}, '{}', now());
