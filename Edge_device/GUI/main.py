@@ -10,7 +10,10 @@ from .syringe_scale import syringe_scale
 from .webcam_video_stream import medical_webcam_stream
 from .light_control import light_control
 from . import DAN
-from .pill_yolo import pill_yolo
+from .pill_yolo_1 import pill_yolo_1
+from .pill_yolo_2 import pill_yolo_2
+from .pill_yolo_3 import pill_yolo_3
+from .pill_yolo_4 import pill_yolo_4
 
 class medical_GUI:
     def __init__(self, cfg_file_path="./config_files/GUI_default.cfg"):
@@ -24,7 +27,7 @@ class medical_GUI:
             self.syringe_scale = syringe_scale(self.__cfg)
             self.light = light_control(self.__cfg["arduino_serial_com_port"], self.__cfg["arduino_serial_baud_rates"])
             self.webcam_stream = medical_webcam_stream()
-            self.pill_detect = pill_yolo()
+            # self.pill_detect = pill_yolo()
             ## start the IoTtalk DAI loop
             dm_loop = Thread(target=self.dummy_device_loop, name="medical_iottalk")
             dm_loop.setDaemon(True)
@@ -152,13 +155,24 @@ class medical_GUI:
         DAN.profile['d_name'] = "MedicalTalk_{}".format(self.__cfg["Device_ID"])
         DAN.profile['dm_name'] = "Medication_Device"
         DAN.profile['u_name'] = "Medical_Device"
-        DAN.profile['df_list'] = ['Barcode_Result-I', 'Pill_Detect_Result-I', 'Syringe_Result-I', 'Barcode-O',
+        DAN.profile['df_list'] = ['Barcode_Result-I', 'Pill_Detect_Result-I', 'Syringe_Result-I', 'Barcode-O', 'Lesson_Plan-O'
                                   'Pill_Detect-O', 'Syringe-O',]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
         # exit()            #if you want to deregister this device, uncomment this line
         while True:
             try:
+                ## pull lesson plan val
+                lessonPlan = DAN.pull('Lesson_Plan-O')
+                if lessonPlan != None:  ## Lesson_Plan-O -> [Lesson_Plan_num]
+                    if lessonPlan[0] == '1':
+                        self.pill_detect = pill_yolo_1()
+                    elif lessonPlan[0] == '2':
+                        self.pill_detect = pill_yolo_2()
+                    elif lessonPlan[0] == '3':
+                        self.pill_detect = pill_yolo_3()
+                    elif lessonPlan[0] == '4':
+                        self.pill_detect = pill_yolo_4()
                 ## pull barcode val
                 barcode_control = DAN.pull('Barcode-O')
                 if barcode_control != None:  ## Barcode-O -> [UID, Device, Type, On/Off]
