@@ -164,7 +164,7 @@ class medical_GUI:
         while lessonPlan == None:
             ## pull lesson plan val
             lessonPlan = DAN.pull('Lesson_Plan-O')
-            if lessonPlan != None and lessonPlan[0] != 0:  ## Lesson_Plan-O -> [Lesson_Plan_num]
+            if lessonPlan != None:  ## Lesson_Plan-O -> [Lesson_Plan_num]
                 if lessonPlan[0] == 1:
                     self.pill_detect = pill_yolo_1()
                 elif lessonPlan[0] == 2:
