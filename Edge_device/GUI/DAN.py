@@ -130,7 +130,7 @@ def pull(FEATURE_NAME):
         data = csmapi.pull(MAC, FEATURE_NAME)
     else:
         data = []
-
+    print(data)
     if data != []:
         if timestamp[FEATURE_NAME] == data[0][0]:
             return None

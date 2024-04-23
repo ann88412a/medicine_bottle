@@ -155,24 +155,26 @@ class medical_GUI:
         DAN.profile['d_name'] = "MedicalTalk_{}".format(self.__cfg["Device_ID"])
         DAN.profile['dm_name'] = "Medication_Device"
         DAN.profile['u_name'] = "Medical_Device"
-        DAN.profile['df_list'] = ['Barcode_Result-I', 'Pill_Detect_Result-I', 'Syringe_Result-I', 'Barcode-O', 'Lesson_Plan-O'
+        DAN.profile['df_list'] = ['Barcode_Result-I', 'Pill_Detect_Result-I', 'Syringe_Result-I', 'Barcode-O', 'Lesson_Plan-O',
                                   'Pill_Detect-O', 'Syringe-O',]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
         # exit()            #if you want to deregister this device, uncomment this line
+        lessonPlan = None
+        while lessonPlan == None:
+            ## pull lesson plan val
+            lessonPlan = DAN.pull('Lesson_Plan-O')
+            if lessonPlan != None and lessonPlan[0] != 0:  ## Lesson_Plan-O -> [Lesson_Plan_num]
+                if lessonPlan[0] == 1:
+                    self.pill_detect = pill_yolo_1()
+                elif lessonPlan[0] == 2:
+                    self.pill_detect = pill_yolo_2()
+                elif lessonPlan[0] == 3:
+                    self.pill_detect = pill_yolo_3()
+                elif lessonPlan[0] == 4:
+                    self.pill_detect = pill_yolo_4()
         while True:
             try:
-                ## pull lesson plan val
-                lessonPlan = DAN.pull('Lesson_Plan-O')
-                if lessonPlan != None:  ## Lesson_Plan-O -> [Lesson_Plan_num]
-                    if lessonPlan[0] == '1':
-                        self.pill_detect = pill_yolo_1()
-                    elif lessonPlan[0] == '2':
-                        self.pill_detect = pill_yolo_2()
-                    elif lessonPlan[0] == '3':
-                        self.pill_detect = pill_yolo_3()
-                    elif lessonPlan[0] == '4':
-                        self.pill_detect = pill_yolo_4()
                 ## pull barcode val
                 barcode_control = DAN.pull('Barcode-O')
                 if barcode_control != None:  ## Barcode-O -> [UID, Device, Type, On/Off]
@@ -182,7 +184,8 @@ class medical_GUI:
                             self.get_barcode()
                         else:
                             self.wait_page()
-
+                lessonPlan = DAN.pull('Lesson_Plan-O')
+                print(lessonPlan)
                 ## pull syringe val
                 syringe_scale_control = DAN.pull('Syringe-O')
                 if syringe_scale_control != None:  ## Syringe-O -> [UID, Device, Type, On/Off]

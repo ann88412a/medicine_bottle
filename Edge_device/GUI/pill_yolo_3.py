@@ -42,7 +42,7 @@ class pill_yolo_3:
         sess_opt = ort.SessionOptions() 
         sess_opt.intra_op_num_threads = 4
         self.session = ort.InferenceSession(w, sess_opt, providers=providers)
-        print('onnx model loading done')
+        print('Lesson three onnx model loading done')
         
         
         # darknet version
