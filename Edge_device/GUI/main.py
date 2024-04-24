@@ -159,22 +159,22 @@ class medical_GUI:
                                   'Pill_Detect-O', 'Syringe-O',]
         DAN.device_registration_with_retry(ServerURL, Reg_addr)
         # DAN.deregister()  #if you want to deregister this device, uncomment this line
-        # exit()            #if you want to deregister this device, uncomment this line
-        lessonPlan = None
-        while lessonPlan == None:
-            ## pull lesson plan val
-            lessonPlan = DAN.pull('Lesson_Plan-O')
-            if lessonPlan != None:  ## Lesson_Plan-O -> [Lesson_Plan_num]
-                if lessonPlan[0] == 1:
-                    self.pill_detect = pill_yolo_1()
-                elif lessonPlan[0] == 2:
-                    self.pill_detect = pill_yolo_2()
-                elif lessonPlan[0] == 3:
-                    self.pill_detect = pill_yolo_3()
-                elif lessonPlan[0] == 4:
-                    self.pill_detect = pill_yolo_4()
+        # exit()            #if you want to deregister this device, uncomment this line=
         while True:
             try:
+                # lessonPlan = None
+                # while lessonPlan == None:
+                    ## pull lesson plan val
+                lessonPlan = DAN.pull('Lesson_Plan-O')
+                if lessonPlan != None:  ## Lesson_Plan-O -> [Lesson_Plan_num]
+                    if lessonPlan[0] == 1:
+                        self.pill_detect = pill_yolo_1()
+                    elif lessonPlan[0] == 2:
+                        self.pill_detect = pill_yolo_2()
+                    elif lessonPlan[0] == 3:
+                        self.pill_detect = pill_yolo_3()
+                    elif lessonPlan[0] == 4:
+                        self.pill_detect = pill_yolo_4()
                 ## pull barcode val
                 barcode_control = DAN.pull('Barcode-O')
                 if barcode_control != None:  ## Barcode-O -> [UID, Device, Type, On/Off]
