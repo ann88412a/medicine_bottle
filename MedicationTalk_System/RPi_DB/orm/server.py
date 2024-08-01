@@ -376,6 +376,31 @@ def get_sheet_record():
     session.commit()
     return 'ok'
 
+@app.route('/api/_sheet_email_feedback', methods=['POST'])
+def get_email_feedback():
+    # Get data from POST request
+    feedback_data = request.form
+    print('feedback-------', feedback_data)
+    
+    # Extract data
+    username = feedback_data['username']
+    email = feedback_data['email']
+    feedback = feedback_data['feedback']
+
+    # Insert data into Email_Feedback table
+    insert_cmd = text("""
+        INSERT INTO Email_Feedback (username, email, feedback) 
+        VALUES (:username, :email, :feedback)
+    """)
+    session.execute(insert_cmd, {
+        'username': username,
+        'email': email,
+        'feedback': feedback
+    })
+    session.commit()
+
+    return 'ok'
+
 @app.route('/api/_pic', methods=['POST'])
 def get_pic():
     file = request.files['file']
@@ -395,7 +420,8 @@ def index():
     print(query_data)
     return 'ok'
  
+
  
 if __name__ == "__main__":
     
-    app.run(host='0.0.0.0', port= 15260, debug=True)# , ssl_context=('server.crt', 'server.key')
+    app.run(host='localhost', port= 15260, debug=False)
